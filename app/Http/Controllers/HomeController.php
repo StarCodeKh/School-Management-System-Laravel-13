@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\Role;
 use App\Enums\Weekday;
 use App\Models\Department;
 use App\Models\FeeCollection;
@@ -16,9 +17,18 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    /** admin dashboard (routes are already behind the "auth" middleware) */
-    public function index()
+    /** admin dashboard; other roles are sent to their own dashboard */
+    public function index(Request $request)
     {
+        $user = $request->user();
+        if (! $user->isAdmin()) {
+            return match (true) {
+                $user->hasRole(Role::Teacher) => redirect()->route('teacher/dashboard'),
+                $user->hasRole(Role::Student) => redirect()->route('student/dashboard'),
+                default => redirect()->route('user/profile/page'),
+            };
+        }
+
         $stats = [
             'students' => Student::count(),
             'teachers' => Teacher::count(),

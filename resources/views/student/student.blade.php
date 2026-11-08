@@ -1,7 +1,9 @@
 <x-layouts.app title="Students">
     <x-page-header title="Students" :breadcrumbs="['Dashboard' => route('home'), 'Students' => null]">
         <x-slot:actions>
+@can('manage-school')
             <x-button :href="route('student/add/page')" icon="plus">Add student</x-button>
+@endcan
         </x-slot:actions>
     </x-page-header>
 
@@ -25,9 +27,11 @@
                 <td>{{ $student->phone_number }}</td>
                 <td class="text-right">
                     <x-icon-link :href="url('student/profile/'.$student->id)" icon="eye" label="View" />
+@can('manage-school')
                     <x-icon-link :href="url('student/edit/'.$student->id)" icon="pencil" label="Edit" tone="primary" />
                     <x-delete-button :action="route('student/delete')" :fields="['id' => $student->id]" title="Delete student"
                                      :message="'Delete '.$student->full_name.'? This cannot be undone.'" />
+@endcan
                 </td>
             </tr>
         @empty

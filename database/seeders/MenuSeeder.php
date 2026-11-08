@@ -13,29 +13,29 @@ class MenuSeeder extends Seeder
      */
     private const MENU = [
         ['title' => 'Dashboard', 'icon' => 'home', 'children' => [
-            ['title' => 'Admin Dashboard', 'route' => 'home'],
-            ['title' => 'Teacher Dashboard', 'route' => 'teacher/dashboard'],
-            ['title' => 'Student Dashboard', 'route' => 'student/dashboard'],
+            ['title' => 'Admin Dashboard', 'route' => 'home', 'ability' => 'manage-school'],
+            ['title' => 'Teacher Dashboard', 'route' => 'teacher/dashboard', 'ability' => 'teach'],
+            ['title' => 'Student Dashboard', 'route' => 'student/dashboard', 'ability' => 'study'],
         ]],
         ['title' => 'User Management', 'icon' => 'shield', 'ability' => 'manage-users', 'pattern' => 'view/user/edit/*', 'children' => [
             ['title' => 'List Users', 'route' => 'list/users'],
         ]],
-        ['title' => 'Students', 'icon' => 'academic-cap', 'pattern' => 'student/edit/*|student/profile/*', 'children' => [
+        ['title' => 'Students', 'icon' => 'academic-cap', 'ability' => 'teach', 'pattern' => 'student/edit/*|student/profile/*', 'children' => [
             ['title' => 'Student List', 'route' => 'student/list', 'routes' => ['student/list', 'student/grid']],
-            ['title' => 'Student Add', 'route' => 'student/add/page'],
+            ['title' => 'Student Add', 'route' => 'student/add/page', 'ability' => 'manage-school'],
         ]],
-        ['title' => 'Teachers', 'icon' => 'users', 'pattern' => 'teacher/edit/*', 'children' => [
+        ['title' => 'Teachers', 'icon' => 'users', 'ability' => 'teach', 'pattern' => 'teacher/edit/*', 'children' => [
             ['title' => 'Teacher List', 'route' => 'teacher/list/page', 'routes' => ['teacher/list/page', 'teacher/grid/page']],
-            ['title' => 'Teacher Add', 'route' => 'teacher/add/page'],
+            ['title' => 'Teacher Add', 'route' => 'teacher/add/page', 'ability' => 'manage-school'],
         ]],
-        ['title' => 'Departments', 'icon' => 'building', 'pattern' => 'department/edit/*', 'children' => [
+        ['title' => 'Departments', 'icon' => 'building', 'ability' => 'teach', 'pattern' => 'department/edit/*', 'children' => [
             ['title' => 'Department List', 'route' => 'department/list/page'],
-            ['title' => 'Department Add', 'route' => 'department/add/page'],
+            ['title' => 'Department Add', 'route' => 'department/add/page', 'ability' => 'manage-school'],
         ]],
-        ['title' => 'Classes', 'icon' => 'squares', 'route' => 'class/list/page'],
-        ['title' => 'Subjects', 'icon' => 'book', 'pattern' => 'subject/edit/*', 'children' => [
+        ['title' => 'Classes', 'icon' => 'squares', 'ability' => 'manage-school', 'route' => 'class/list/page'],
+        ['title' => 'Subjects', 'icon' => 'book', 'ability' => 'teach', 'pattern' => 'subject/edit/*', 'children' => [
             ['title' => 'Subject List', 'route' => 'subject/list/page'],
-            ['title' => 'Subject Add', 'route' => 'subject/add/page'],
+            ['title' => 'Subject Add', 'route' => 'subject/add/page', 'ability' => 'manage-school'],
         ]],
         ['title' => 'Academics', 'icon' => 'clipboard', 'ability' => 'teach', 'pattern' => 'exams/*', 'children' => [
             ['title' => 'Attendance', 'route' => 'attendance.index'],

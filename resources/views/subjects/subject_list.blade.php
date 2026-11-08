@@ -1,7 +1,9 @@
 <x-layouts.app title="Subjects">
     <x-page-header title="Subjects" :breadcrumbs="['Dashboard' => route('home'), 'Subjects' => null]">
         <x-slot:actions>
+@can('manage-school')
             <x-button :href="route('subject/add/page')" icon="plus">Add subject</x-button>
+@endcan
         </x-slot:actions>
     </x-page-header>
 
@@ -24,9 +26,11 @@
                 <td class="font-medium">{{ $subject->subject_name }}</td>
                 <td><x-badge color="indigo">Class {{ $subject->schoolClass?->name }}</x-badge></td>
                 <td class="text-right">
+@can('manage-school')
                     <x-icon-link :href="url('subject/edit/'.$subject->code)" icon="pencil" label="Edit" tone="primary" />
                     <x-delete-button :action="route('subject/delete')" :fields="['code' => $subject->code]" title="Delete subject"
                                      :message="'Delete '.$subject->subject_name.'?'" />
+@endcan
                 </td>
             </tr>
         @empty

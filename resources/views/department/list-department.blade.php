@@ -1,7 +1,9 @@
 <x-layouts.app title="Departments">
     <x-page-header title="Departments" :breadcrumbs="['Dashboard' => route('home'), 'Departments' => null]">
         <x-slot:actions>
+@can('manage-school')
             <x-button :href="route('department/add/page')" icon="plus">Add department</x-button>
+@endcan
         </x-slot:actions>
     </x-page-header>
 
@@ -20,9 +22,11 @@
                 <td>{{ $department->department_start_date?->format('d M Y') }}</td>
                 <td>{{ number_format($department->no_of_students) }}</td>
                 <td class="text-right">
+@can('manage-school')
                     <x-icon-link :href="url('department/edit/'.$department->code)" icon="pencil" label="Edit" tone="primary" />
                     <x-delete-button :action="route('department/delete')" :fields="['department_id' => $department->id]" title="Delete department"
                                      :message="'Delete '.$department->department_name.'? Its teachers will have no department.'" />
+@endcan
                 </td>
             </tr>
         @empty

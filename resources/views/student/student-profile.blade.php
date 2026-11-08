@@ -3,7 +3,9 @@
 <x-layouts.app :title="$student->full_name">
     <x-page-header :title="$student->full_name" :breadcrumbs="['Students' => route('student/list'), $student->full_name => null]">
         <x-slot:actions>
+@can('manage-school')
             <x-button variant="secondary" :href="url('student/edit/'.$student->id)" icon="pencil">Edit</x-button>
+@endcan
         </x-slot:actions>
     </x-page-header>
 

@@ -52,11 +52,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->
 // ---------------------- APP (login required for everything) ----------------------//
 Route::middleware('auth')->group(function () {
 
+    // Permissions (gates in AppServiceProvider):
+    //   manage-school = admins change school records; teach = admins + teachers view them
+
     // 1. HOME & SETTING
     Route::controller(HomeController::class)->group(function () {
-        Route::get('/home', 'index')->name('home');
+        Route::get('/home', 'index')->name('home'); // sends each role to its own dashboard
         Route::get('user/profile/page', 'userProfile')->name('user/profile/page');
-        Route::get('teacher/dashboard', 'teacherDashboardIndex')->name('teacher/dashboard');
+        Route::get('teacher/dashboard', 'teacherDashboardIndex')->middleware('can:teach')->name('teacher/dashboard');
         Route::get('student/dashboard', 'studentDashboardIndex')->name('student/dashboard');
     });
     // settings: admins only
@@ -69,8 +72,8 @@ Route::middleware('auth')->group(function () {
     });
 
     // 2. USERS
-    Route::controller(UserManagementController::class)->group(function () {
-        Route::post('change/password', 'changePassword')->name('change/password');
+    Route::post('change/password', [UserManagementController::class, 'changePassword'])->name('change/password');
+    Route::controller(UserManagementController::class)->middleware('can:manage-users')->group(function () {
         Route::get('list/users', 'index')->name('list/users');
         Route::get('view/user/edit/{code}', 'userView');
         Route::post('user/update', 'userUpdate')->name('user/update');
@@ -79,39 +82,49 @@ Route::middleware('auth')->group(function () {
 
     // 3. STUDENTS
     Route::prefix('student')->controller(StudentController::class)->group(function () {
-        Route::get('list', 'student')->name('student/list');
-        Route::get('grid', 'studentGrid')->name('student/grid');
-        Route::get('add/page', 'studentAdd')->name('student/add/page');
-        Route::post('add/save', 'studentSave')->name('student/add/save');
-        Route::get('edit/{student}', 'studentEdit');
-        Route::post('update', 'studentUpdate')->name('student/update');
-        Route::post('delete', 'studentDelete')->name('student/delete');
-        Route::get('profile/{student}', 'studentProfile');
+        Route::middleware('can:teach')->group(function () {
+            Route::get('list', 'student')->name('student/list');
+            Route::get('grid', 'studentGrid')->name('student/grid');
+            Route::get('profile/{student}', 'studentProfile');
+        });
+        Route::middleware('can:manage-school')->group(function () {
+            Route::get('add/page', 'studentAdd')->name('student/add/page');
+            Route::post('add/save', 'studentSave')->name('student/add/save');
+            Route::get('edit/{student}', 'studentEdit');
+            Route::post('update', 'studentUpdate')->name('student/update');
+            Route::post('delete', 'studentDelete')->name('student/delete');
+        });
     });
 
     // 4. TEACHERS
     Route::prefix('teacher')->controller(TeacherController::class)->group(function () {
-        Route::get('add/page', 'teacherAdd')->name('teacher/add/page');
-        Route::get('list/page', 'teacherList')->name('teacher/list/page');
-        Route::get('grid/page', 'teacherGrid')->name('teacher/grid/page');
-        Route::post('save', 'saveRecord')->name('teacher/save');
-        Route::get('edit/{teacher}', 'editRecord');
-        Route::post('update', 'updateRecordTeacher')->name('teacher/update');
-        Route::post('delete', 'teacherDelete')->name('teacher/delete');
+        Route::middleware('can:teach')->group(function () {
+            Route::get('list/page', 'teacherList')->name('teacher/list/page');
+            Route::get('grid/page', 'teacherGrid')->name('teacher/grid/page');
+        });
+        Route::middleware('can:manage-school')->group(function () {
+            Route::get('add/page', 'teacherAdd')->name('teacher/add/page');
+            Route::post('save', 'saveRecord')->name('teacher/save');
+            Route::get('edit/{teacher}', 'editRecord');
+            Route::post('update', 'updateRecordTeacher')->name('teacher/update');
+            Route::post('delete', 'teacherDelete')->name('teacher/delete');
+        });
     });
 
     // 5. DEPARTMENTS
     Route::prefix('department')->controller(DepartmentController::class)->group(function () {
-        Route::get('list/page', 'departmentList')->name('department/list/page');
-        Route::get('add/page', 'indexDepartment')->name('department/add/page');
-        Route::get('edit/{code}', 'editDepartment');
-        Route::post('save', 'saveRecord')->name('department/save');
-        Route::post('update', 'updateRecord')->name('department/update');
-        Route::post('delete', 'deleteRecord')->name('department/delete');
+        Route::get('list/page', 'departmentList')->middleware('can:teach')->name('department/list/page');
+        Route::middleware('can:manage-school')->group(function () {
+            Route::get('add/page', 'indexDepartment')->name('department/add/page');
+            Route::get('edit/{code}', 'editDepartment');
+            Route::post('save', 'saveRecord')->name('department/save');
+            Route::post('update', 'updateRecord')->name('department/update');
+            Route::post('delete', 'deleteRecord')->name('department/delete');
+        });
     });
 
     // 6. CLASSES & SECTIONS
-    Route::prefix('class')->controller(SchoolClassController::class)->group(function () {
+    Route::prefix('class')->controller(SchoolClassController::class)->middleware('can:manage-school')->group(function () {
         Route::get('list/page', 'index')->name('class/list/page');
         Route::post('save', 'saveRecord')->name('class/save');
         Route::post('update/{schoolClass}', 'updateRecord')->name('class/update');
@@ -120,12 +133,14 @@ Route::middleware('auth')->group(function () {
 
     // 7. SUBJECTS
     Route::prefix('subject')->controller(SubjectController::class)->group(function () {
-        Route::get('list/page', 'subjectList')->name('subject/list/page');
-        Route::get('add/page', 'subjectAdd')->name('subject/add/page');
-        Route::post('save', 'saveRecord')->name('subject/save');
-        Route::get('edit/{code}', 'subjectEdit');
-        Route::post('update', 'updateRecord')->name('subject/update');
-        Route::post('delete', 'deleteRecord')->name('subject/delete');
+        Route::get('list/page', 'subjectList')->middleware('can:teach')->name('subject/list/page');
+        Route::middleware('can:manage-school')->group(function () {
+            Route::get('add/page', 'subjectAdd')->name('subject/add/page');
+            Route::post('save', 'saveRecord')->name('subject/save');
+            Route::get('edit/{code}', 'subjectEdit');
+            Route::post('update', 'updateRecord')->name('subject/update');
+            Route::post('delete', 'deleteRecord')->name('subject/delete');
+        });
     });
 
     // 8. INVOICES

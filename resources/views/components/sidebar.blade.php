@@ -12,7 +12,7 @@
         <ul class="space-y-1">
             @foreach ($menus as $menu)
                 @php($active = $menu->isActive())
-                @php($children = $menu->children->filter(fn ($child) => $child->route))
+                @php($children = $menu->children)
                 <li x-data="{ open: @js($active) }">
                     @if ($children->isEmpty())
                         <a href="{{ $menu->url() }}" @class([

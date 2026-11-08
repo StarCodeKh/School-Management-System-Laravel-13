@@ -42,7 +42,9 @@ class Menu extends Model
             ->with(['children' => fn ($q) => $q->where('is_active', true)])
             ->orderBy('sort_order')
             ->get()
-            ->filter(fn (Menu $menu) => $menu->isVisible())
+            ->each(fn (Menu $menu) => $menu->setRelation('children', $menu->children->filter(fn (Menu $child) => $child->route && $child->isVisible())->values()))
+            // hide a group the user may not see, or one whose links are all hidden
+            ->filter(fn (Menu $menu) => $menu->isVisible() && ($menu->route || $menu->children->isNotEmpty()))
             ->values();
     }
 

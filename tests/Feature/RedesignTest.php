@@ -116,7 +116,7 @@ class RedesignTest extends TestCase
         $teacher = User::factory()->create(['role' => Role::Teacher]);
 
         $this->actingAs($this->admin)->get('/home')->assertSee('User Management')->assertSee('Settings');
-        $this->actingAs($teacher)->get('/home')->assertSee('Students')->assertDontSee('User Management');
+        $this->actingAs($teacher)->get('/teacher/dashboard')->assertSee('Students')->assertDontSee('User Management')->assertDontSee('Student Add');
     }
 
     public function test_student_can_be_linked_to_a_login_account(): void
