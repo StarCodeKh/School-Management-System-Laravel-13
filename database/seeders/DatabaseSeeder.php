@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         // Local development admin. Change the password after the first login.
         User::factory()->create([
             'name' => 'Super Admin',
-            'email' => 'admin@example.com',
+            'email' => 'admin@system.com',
             'role' => Role::SuperAdmin,
             'password' => 'Password@123',
         ]);

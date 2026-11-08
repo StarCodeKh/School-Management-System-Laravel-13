@@ -53,7 +53,7 @@ Open http://127.0.0.1:8000 and log in with the seeded admin account:
 
 | Email               | Password       |
 |---------------------|----------------|
-| `admin@example.com` | `Password@123` |
+| `admin@system.com`  | `Password@123` |
 
 Change this password after the first login (Profile → Change password).
 
