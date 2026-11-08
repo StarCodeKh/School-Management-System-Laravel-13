@@ -42,12 +42,12 @@
                                                 <div class="student-box flex-fill">
                                                     <div class="student-img">
                                                         <a href="{{ url('student/profile/'.$list->id) }}">
-                                                            <img class="img-fluid" alt="Students Info" src="{{ asset($list->upload) }}" width="20%" height="20%">
+                                                            <img class="img-fluid" alt="Students Info" src="{{ $list->photo_url }}" width="20%" height="20%">
                                                         </a>
                                                     </div>
                                                     <div class="student-content pb-0">
                                                         <h5><a href="{{ url('student/profile/'.$list->id) }}">{{ $list->first_name }} {{ $list->last_name }}</a></h5>
-                                                        <h6>Student</h6>
+                                                        <h6>Class {{ $list->schoolClass?->name }} - {{ $list->section?->name }}</h6>
                                                     </div>
                                                 </div>
                                             </div>

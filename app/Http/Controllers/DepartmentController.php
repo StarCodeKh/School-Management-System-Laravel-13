@@ -2,25 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesDataTables;
 use App\Models\Department;
-use DB;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
-use Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
+    use HandlesDataTables;
+
     /** index page department */
     public function indexDepartment()
     {
-        return view('department.add-department');
+        $teachers = $this->teachers();
+
+        return view('department.add-department', compact('teachers'));
     }
 
-    /** edit record */
-    public function editDepartment($department_id)
+    /** edit record (URL uses the display code, e.g. /department/edit/DEP-00001) */
+    public function editDepartment(string $code)
     {
-        $department = Department::where('department_id', $department_id)->first();
+        $department = Department::where('code', $code)->firstOrFail();
+        $teachers = $this->teachers();
 
-        return view('department.edit-departmen', compact('department'));
+        return view('department.edit-department', compact('department', 'teachers'));
     }
 
     /** department list */
@@ -29,177 +37,102 @@ class DepartmentController extends Controller
         return view('department.list-department');
     }
 
-    /** get data list */
+    /** get data list (DataTables server-side) */
     public function getDataList(Request $request)
     {
-        $draw = $request->get('draw');
-        $start = $request->get('start');
-        $rowPerPage = $request->get('length'); // total number of rows per page
-        $columnIndex_arr = $request->get('order');
-        $columnName_arr = $request->get('columns');
-        $order_arr = $request->get('order');
-        $search_arr = $request->get('search');
+        $query = DB::table('departments')
+            ->leftJoin('users', 'users.id', '=', 'departments.head_user_id')
+            ->select('departments.*', 'users.name as head_of_department');
 
-        $columnIndex = $columnIndex_arr[0]['column']; // Column index
-        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-        $searchValue = $search_arr['value']; // Search value
-
-        $departments = DB::table('departments');
-        $totalRecords = $departments->count();
-
-        $totalRecordsWithFilter = $departments->where(function ($query) use ($searchValue) {
-            $query->where('department_id', 'like', '%'.$searchValue.'%');
-            $query->orWhere('department_name', 'like', '%'.$searchValue.'%');
-            $query->orWhere('head_of_department', 'like', '%'.$searchValue.'%');
-            $query->orWhere('department_start_date', 'like', '%'.$searchValue.'%');
-            $query->orWhere('no_of_students', 'like', '%'.$searchValue.'%');
-        })->count();
-
-        $records = $departments->orderBy($columnName, $columnSortOrder)
-            ->where(function ($query) use ($searchValue) {
-                $query->where('department_id', 'like', '%'.$searchValue.'%');
-                $query->orWhere('department_name', 'like', '%'.$searchValue.'%');
-                $query->orWhere('head_of_department', 'like', '%'.$searchValue.'%');
-                $query->orWhere('department_start_date', 'like', '%'.$searchValue.'%');
-                $query->orWhere('no_of_students', 'like', '%'.$searchValue.'%');
-            })
-            ->skip($start)
-            ->take($rowPerPage)
-            ->get();
-        $data_arr = [];
-
-        foreach ($records as $key => $record) {
-
-            $modify = '
-                <td class="text-end"> 
-                    <div class="actions">
-                        <a href="'.url('department/edit/'.$record->department_id).'" class="btn btn-sm bg-danger-light">
-                            <i class="far fa-edit me-2"></i>
-                        </a>
-                        <a class="btn btn-sm bg-danger-light delete department_id" data-bs-toggle="modal" data-department_id="'.$record->id.'" data-bs-target="#delete">
-                        <i class="fe fe-trash-2"></i>
-                        </a>
-                    </div>
-                </td>
-            ';
-
-            $data_arr[] = [
-                'department_id' => $record->department_id,
-                'department_name' => $record->department_name,
-                'head_of_department' => $record->head_of_department,
-                'department_start_date' => $record->department_start_date,
-                'no_of_students' => $record->no_of_students,
-                'modify' => $modify,
-            ];
-        }
-
-        $response = [
-            'draw' => intval($draw),
-            'iTotalRecords' => $totalRecords,
-            'iTotalDisplayRecords' => $totalRecordsWithFilter,
-            'aaData' => $data_arr,
+        $sortable = [
+            'code' => 'departments.code',
+            'department_name' => 'departments.department_name',
+            'head_of_department' => 'users.name',
+            'department_start_date' => 'departments.department_start_date',
+            'no_of_students' => 'departments.no_of_students',
         ];
 
-        return response()->json($response);
+        return $this->dataTableResponse($request, $query, array_values($sortable), $sortable, fn ($record) => [
+            'code' => e($record->code),
+            'department_name' => e($record->department_name),
+            'head_of_department' => e($record->head_of_department),
+            'department_start_date' => e($record->department_start_date),
+            'no_of_students' => e($record->no_of_students),
+            'modify' => '
+                <td class="text-end">
+                    <div class="actions">
+                        <a href="'.e(url('department/edit/'.$record->code)).'" class="btn btn-sm bg-danger-light">
+                            <i class="far fa-edit me-2"></i>
+                        </a>
+                        <a class="btn btn-sm bg-danger-light delete department_id" data-bs-toggle="modal" data-department_id="'.e($record->id).'" data-bs-target="#delete">
+                            <i class="fe fe-trash-2"></i>
+                        </a>
+                    </div>
+                </td>',
+        ]);
     }
 
     /** Save Record */
     public function saveRecord(Request $request)
     {
-        // Validate input data
-        $request->validate([
-            'department_name' => 'required|string|max:255|unique:departments,department_name',
-            'head_of_department' => 'required|string|max:255',
-            'department_start_date' => 'required|date',
-            'no_of_students' => 'required|integer|min:0',
-        ]);
+        $validated = $request->validate($this->rules());
 
-        DB::beginTransaction();
         try {
-            $saveRecord = new Department;
-            $saveRecord->department_name = $request->department_name;
-            $saveRecord->head_of_department = $request->head_of_department;
-            $saveRecord->department_start_date = $request->department_start_date;
-            $saveRecord->no_of_students = $request->no_of_students;
-            $saveRecord->save();
-
-            DB::commit();
+            Department::create($validated);
 
             return redirect()->back()->with('success', 'Department has been added successfully!');
         } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Failed to add new Department record', [
-                'error' => $e->getMessage(),
-                'request_data' => $request->all(),
-            ]);
+            Log::error('Failed to add new Department record', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->with('error', 'Failed to add new record. Please try again later.');
+            return redirect()->back()->withInput()->with('error', 'Failed to add new record. Please try again later.');
         }
     }
 
     /** Update Record */
     public function updateRecord(Request $request)
     {
-        $request->validate([
-            'department_id' => 'required|exists:departments,department_id',
-            'department_name' => 'required|string|max:255|unique:departments,department_name,'.$request->department_id.',department_id',
-            'head_of_department' => 'required|string|max:255',
-            'department_start_date' => 'required|date',
-            'no_of_students' => 'required|integer|min:0',
-        ]);
+        $department = Department::where('code', $request->input('code'))->firstOrFail();
+        $validated = $request->validate($this->rules($department));
 
-        DB::beginTransaction();
         try {
-            $updateRecord = [
-                'department_name' => $request->department_name,
-                'head_of_department' => $request->head_of_department,
-                'department_start_date' => $request->department_start_date,
-                'no_of_students' => $request->no_of_students,
-            ];
-
-            Department::where('department_id', $request->department_id)->firstOrFail()->update($updateRecord);
-            DB::commit();
+            $department->update($validated);
 
             return redirect()->back()->with('success', 'Department record updated successfully!');
         } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Failed to update Department record', [
-                'error' => $e->getMessage(),
-                'request_data' => $request->all(),
-            ]);
+            Log::error('Failed to update Department record', ['error' => $e->getMessage(), 'department' => $department->code]);
 
             return redirect()->back()->with('error', 'Failed to update the department record. Please try again later.');
         }
     }
 
-    /** Delete Record */
+    /** Delete Record (the list's delete modal posts the primary key) */
     public function deleteRecord(Request $request)
     {
-        DB::beginTransaction();
-        try {
-            $department = Department::find($request->department_id);
-            if ($department) {
-                $department->delete();
-            } else {
-                throw new \Exception('Department not found.');
-            }
+        $department = Department::find($request->input('department_id'));
 
-            DB::commit();
-
-            Log::info('Department record deleted successfully', [
-                'department_id' => $request->department_id,
-            ]);
-
-            return redirect()->back()->with('success', 'Department record deleted successfully!');
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Failed to delete Department record', [
-                'error' => $e->getMessage(),
-                'department_id' => $request->department_id,
-            ]);
-
-            return redirect()->back()->with('error', 'Failed to delete the department record. Please try again later.');
+        if (! $department) {
+            return redirect()->back()->with('error', 'Department not found.');
         }
+
+        $department->delete();
+        Log::info('Department record deleted successfully', ['department' => $department->code]);
+
+        return redirect()->back()->with('success', 'Department record deleted successfully!');
+    }
+
+    private function teachers()
+    {
+        return Teacher::with('user')->get()->sortBy('full_name');
+    }
+
+    private function rules(?Department $ignore = null): array
+    {
+        return [
+            'department_name' => ['required', 'string', 'max:255', Rule::unique('departments')->ignore($ignore?->id)],
+            // only a user with a teacher profile can be head of department
+            'head_user_id' => 'nullable|exists:teachers,user_id',
+            'department_start_date' => 'required|date',
+            'no_of_students' => 'required|integer|min:0',
+        ];
     }
 }

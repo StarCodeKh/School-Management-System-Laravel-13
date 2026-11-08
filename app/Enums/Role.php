@@ -4,21 +4,18 @@ namespace App\Enums;
 
 enum Role: string
 {
-    case SuperAdmin = 'Super Admin';
-    case Admin = 'Admin';
-    case NormalUser = 'Normal User';
-    case Teacher = 'Teachers';
-    case Student = 'Student';
-    case Staff = 'Staff';
-    case Client = 'Client';
+    case SuperAdmin = 'super_admin';
+    case Admin = 'admin';
+    case NormalUser = 'normal_user';
+    case Teacher = 'teacher';
+    case Student = 'student';
+    case Staff = 'staff';
+    case Client = 'client';
 
     /** Display name shown in the UI. */
     public function label(): string
     {
-        return match ($this) {
-            self::Teacher => 'Teacher',
-            default => $this->value,
-        };
+        return ucwords(str_replace('_', ' ', $this->value));
     }
 
     /** Roles allowed to manage other users. */

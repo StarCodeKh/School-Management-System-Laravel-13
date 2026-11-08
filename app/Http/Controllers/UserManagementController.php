@@ -3,107 +3,75 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Role;
+use App\Enums\UserStatus;
+use App\Http\Controllers\Concerns\HandlesDataTables;
 use App\Models\User;
-use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Log;
 
 class UserManagementController extends Controller
 {
+    use HandlesDataTables;
+
     public function index()
     {
         return view('usermanagement.list_users');
     }
 
-    /** user view */
-    public function userView($id)
+    /** user view (URL uses the display code, e.g. /view/user/edit/USR-00001) */
+    public function userView(string $code)
     {
-        $users = User::where('user_id', $id)->first();
+        $users = User::where('code', $code)->firstOrFail();
         $roles = Role::cases();
+        $statuses = UserStatus::cases();
 
-        return view('usermanagement.user_update', compact('users', 'roles'));
+        return view('usermanagement.user_update', compact('users', 'roles', 'statuses'));
     }
 
     /** User Update */
     public function userUpdate(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,user_id',
+        if (Gate::denies('manage-users')) {
+            Log::warning('Unauthorized user update attempt', [
+                'code' => $request->input('code'),
+                'role' => $request->user()->role?->value,
+            ]);
+
+            return redirect()->back()->with('error', 'User update failed: Unauthorized access.');
+        }
+
+        $user = User::where('code', $request->input('code'))->firstOrFail();
+
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($request->user_id, 'user_id')],
-            'role_name' => ['required', Rule::enum(Role::class)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'role' => ['required', Rule::enum(Role::class)],
+            'status' => ['required', Rule::enum(UserStatus::class)],
+            'position' => 'nullable|string|max:255',
             'date_of_birth' => 'nullable|date',
             'phone_number' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        DB::beginTransaction();
         try {
-            if (Gate::allows('manage-users')) {
-                $name = $request->name;
-                $email = $request->email;
-                $role_name = $request->role_name;
-                $position = $request->position;
-                $phone = $request->phone_number;
-                $date_of_birth = $request->date_of_birth;
-                $department = $request->department;
-                $status = $request->status;
-
-                $image_name = $request->hidden_avatar;
-                $image = $request->file('avatar');
-
-                if ($image_name == 'photo_defaults.jpg') {
-                    if ($image != '') {
-                        $image_name = rand().'.'.$image->getClientOriginalExtension();
-                        $image->move(public_path('/images/'), $image_name);
-                    }
-                } else {
-                    if ($image != '') {
-                        $oldImagePath = public_path('/images/').$image_name;
-                        if (file_exists($oldImagePath)) {
-                            unlink($oldImagePath);
-                        }
-                        $image_name = rand().'.'.$image->getClientOriginalExtension();
-                        $image->move(public_path('/images/'), $image_name);
-                    }
-                }
-
-                $update = [
-                    'name' => $name,
-                    'role_name' => $role_name,
-                    'email' => $email,
-                    'position' => $position,
-                    'phone_number' => $phone,
-                    'date_of_birth' => $date_of_birth,
-                    'department' => $department,
-                    'status' => $status,
-                    'avatar' => $image_name,
-                ];
-
-                User::where('user_id', $request->user_id)->firstOrFail()->update($update);
+            if ($request->hasFile('avatar')) {
+                $this->deleteAvatar($user->avatar);
+                $file = $request->file('avatar');
+                $validated['avatar'] = uniqid('avatar_', true).'.'.$file->extension();
+                $file->move(public_path('images'), $validated['avatar']);
             } else {
-                Log::warning('Unauthorized user update attempt', [
-                    'user_id' => $request->user_id,
-                    'role' => $request->user()->role_name?->value,
-                ]);
-                DB::rollback();
-
-                return redirect()->back()->with('error', 'User update failed: Unauthorized access.');
+                unset($validated['avatar']);
             }
 
-            DB::commit();
+            $user->update($validated);
 
             return redirect()->back()->with('success', 'User updated successfully :)');
-
         } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('User update failed', [
-                'error' => $e->getMessage(),
-                'user_id' => $request->user_id,
-                'request_data' => $request->except(['avatar']),
-            ]);
+            Log::error('User update failed', ['error' => $e->getMessage(), 'code' => $user->code]);
 
             return redirect()->back()->with('error', 'User update failed. Please try again.');
         }
@@ -112,32 +80,30 @@ class UserManagementController extends Controller
     /** user delete */
     public function userDelete(Request $request)
     {
-        DB::beginTransaction();
+        if (Gate::denies('manage-users')) {
+            return redirect()->back()->with('error', 'User deleted fail :(');
+        }
+
+        $user = User::where('code', $request->input('code'))->firstOrFail();
+
         try {
-            if (Gate::allows('manage-users')) {
-                $user = User::where('user_id', $request->user_id)->firstOrFail();
-                $user->delete();
-
-                // remove the stored avatar (taken from the database, not the request)
-                $avatarPath = public_path('images/'.$user->avatar);
-                if ($user->avatar && $user->avatar !== 'photo_defaults.jpg' && file_exists($avatarPath)) {
-                    unlink($avatarPath);
-                }
-            } else {
-                DB::rollback();
-
-                return redirect()->back()->with('error', 'User deleted fail :(');
-            }
-
-            DB::commit();
+            $user->delete();
+            // the avatar path comes from the database, never from the request
+            $this->deleteAvatar($user->avatar);
 
             return redirect()->back()->with('success', 'User deleted successfully :)');
-
         } catch (\Exception $e) {
-            Log::info($e);
-            DB::rollback();
+            Log::error('User delete failed', ['error' => $e->getMessage(), 'code' => $user->code]);
 
             return redirect()->back()->with('error', 'User deleted fail :(');
+        }
+    }
+
+    private function deleteAvatar(?string $avatar): void
+    {
+        $path = public_path('images/'.$avatar);
+        if ($avatar && $avatar !== 'photo_defaults.jpg' && File::exists($path)) {
+            File::delete($path);
         }
     }
 
@@ -156,119 +122,39 @@ class UserManagementController extends Controller
         return redirect()->intended('home')->with('success', 'User change successfully :)');
     }
 
-    /** get users data */
+    /** get users data (DataTables server-side) */
     public function getUsersData(Request $request)
     {
-        $draw = $request->get('draw');
-        $start = $request->get('start');
-        $rowPerPage = $request->get('length'); // total number of rows per page
-        $columnIndex_arr = $request->get('order');
-        $columnName_arr = $request->get('columns');
-        $order_arr = $request->get('order');
-        $search_arr = $request->get('search');
+        $searchable = ['name', 'email', 'position', 'phone_number', 'status'];
+        $sortable = ['code', 'name', 'email', 'position', 'phone_number', 'join_date', 'status'];
 
-        $columnIndex = $columnIndex_arr[0]['column']; // Column index
-        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
-        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
-        $searchValue = $search_arr['value']; // Search value
-
-        $users = DB::table('users');
-        $totalRecords = $users->count();
-
-        $totalRecordsWithFilter = $users->where(function ($query) use ($searchValue) {
-            $query->where('name', 'like', '%'.$searchValue.'%');
-            $query->orWhere('email', 'like', '%'.$searchValue.'%');
-            $query->orWhere('position', 'like', '%'.$searchValue.'%');
-            $query->orWhere('phone_number', 'like', '%'.$searchValue.'%');
-            $query->orWhere('status', 'like', '%'.$searchValue.'%');
-        })->count();
-
-        if ($columnName == 'name') {
-            $columnName = 'name';
-        }
-        $records = $users->orderBy($columnName, $columnSortOrder)
-            ->where(function ($query) use ($searchValue) {
-                $query->where('name', 'like', '%'.$searchValue.'%');
-                $query->orWhere('email', 'like', '%'.$searchValue.'%');
-                $query->orWhere('position', 'like', '%'.$searchValue.'%');
-                $query->orWhere('phone_number', 'like', '%'.$searchValue.'%');
-                $query->orWhere('status', 'like', '%'.$searchValue.'%');
-            })
-            ->skip($start)
-            ->take($rowPerPage)
-            ->get();
-        $data_arr = [];
-
-        foreach ($records as $key => $record) {
-            $modify = '
-                <td class="text-right">
-                    <div class="dropdown dropdown-action">
-                        <a href="" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v ellipse_color"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="'.url('users/add/edit/'.$record->user_id).'">
-                                <i class="far fa-edit me-2"></i> Edit
-                            </a>
-                            <a class="dropdown-item" href="'.url('users/delete/'.$record->id).'">
-                            <i class="fas fa-trash-alt m-r-5"></i> Delete
-                        </a>
-                        </div>
-                    </div>
-                </td>
-            ';
-            $avatar = '
+        return $this->dataTableResponse($request, User::query(), $searchable, $sortable, fn (User $user) => [
+            'code' => e($user->code),
+            'avatar' => '
                 <td>
                     <h2 class="table-avatar">
                         <a class="avatar-sm me-2">
-                            <img class="avatar-img rounded-circle avatar" data-avatar='.$record->avatar.' src="/images/'.$record->avatar.'"alt="'.$record->name.'">
+                            <img class="avatar-img rounded-circle avatar" data-avatar="'.e($user->avatar).'" src="'.e($user->avatar_url).'" alt="'.e($user->name).'">
                         </a>
                     </h2>
-                </td>
-            ';
-            if ($record->status === 'Active') {
-                $status = '<td><span class="badge bg-success-dark">'.$record->status.'</span></td>';
-            } elseif ($record->status === 'Disable') {
-                $status = '<td><span class="badge bg-danger-dark">'.$record->status.'</span></td>';
-            } elseif ($record->status === 'Inactive') {
-                $status = '<td><span class="badge badge-warning">'.$record->status.'</span></td>';
-            } else {
-                $status = '<td><span class="badge badge-secondary">'.$record->status.'</span></td>';
-            }
-
-            $modify = '
-                <td class="text-end"> 
+                </td>',
+            'name' => e($user->name),
+            'email' => e($user->email),
+            'position' => e($user->position),
+            'phone_number' => e($user->phone_number),
+            'join_date' => e($user->join_date?->format('Y-m-d')),
+            'status' => '<td><span class="badge '.($user->status?->badgeClass() ?? 'badge-secondary').'">'.e($user->status?->label()).'</span></td>',
+            'modify' => '
+                <td class="text-end">
                     <div class="actions">
-                        <a href="'.url('view/user/edit/'.$record->user_id).'" class="btn btn-sm bg-danger-light">
+                        <a href="'.e(url('view/user/edit/'.$user->code)).'" class="btn btn-sm bg-danger-light">
                             <i class="far fa-edit me-2"></i>
                         </a>
-                        <a class="btn btn-sm bg-danger-light delete user_id" data-bs-toggle="modal" data-user_id="'.$record->user_id.'" data-bs-target="#delete">
-                        <i class="fe fe-trash-2"></i>
+                        <a class="btn btn-sm bg-danger-light delete user_id" data-bs-toggle="modal" data-code="'.e($user->code).'" data-bs-target="#delete">
+                            <i class="fe fe-trash-2"></i>
                         </a>
                     </div>
-                </td>
-            ';
-
-            $data_arr[] = [
-                'user_id' => $record->user_id,
-                'avatar' => $avatar,
-                'name' => $record->name,
-                'email' => $record->email,
-                'position' => $record->position,
-                'phone_number' => $record->phone_number,
-                'join_date' => $record->join_date,
-                'status' => $status,
-                'modify' => $modify,
-            ];
-        }
-
-        $response = [
-            'draw' => intval($draw),
-            'iTotalRecords' => $totalRecords,
-            'iTotalDisplayRecords' => $totalRecordsWithFilter,
-            'aaData' => $data_arr,
-        ];
-
-        return response()->json($response);
+                </td>',
+        ]);
     }
 }

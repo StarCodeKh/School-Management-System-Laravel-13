@@ -263,6 +263,18 @@ return new class extends Migration
             ],
         ]);
 
+        // Insert the "Classes" menu (grade levels and their sections)
+        DB::table('menus')->insert([
+            'title' => 'Classes',
+            'icon' => 'fas fa-school',
+            'route' => 'class/list/page',
+            'active_routes' => json_encode(['class/list/page']),
+            'pattern' => 'class/*',
+            'parent_id' => null,
+            'sort_order' => 7,
+            'is_active' => true,
+        ]);
+
         // Insert the "Subjects" menu
         $subjectMenuId = DB::table('menus')->insertGetId([
             'title' => 'Subjects',
@@ -271,7 +283,7 @@ return new class extends Migration
             'active_routes' => json_encode(['subject/list/page']),
             'pattern' => null,
             'parent_id' => null,
-            'sort_order' => 7,
+            'sort_order' => 8,
             'is_active' => true,
         ]);
 
@@ -306,7 +318,7 @@ return new class extends Migration
             'active_routes' => json_encode(['invoice/list/page']),
             'pattern' => null,
             'parent_id' => null,
-            'sort_order' => 8,
+            'sort_order' => 9,
             'is_active' => true,
         ]);
 
@@ -341,7 +353,7 @@ return new class extends Migration
             'active_routes' => json_encode(['account/fees/collections/page']),
             'pattern' => null,
             'parent_id' => null,
-            'sort_order' => 9,
+            'sort_order' => 10,
             'is_active' => true,
         ]);
 

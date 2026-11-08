@@ -41,13 +41,13 @@
                                             <div class="card-body">
                                                 <div class="student-box flex-fill">
                                                     <div class="student-img">
-                                                        <a href="{{ url('teacher/profile/'.$list->id) }}">
-                                                            <img class="img-fluid" alt="Teachers Info" src="{{ URL::to('images/photo_defaults.jpg') }}" width="20%" height="20%">
+                                                        <a href="{{ url('teacher/edit/'.$list->id) }}">
+                                                            <img class="img-fluid" alt="{{ $list->full_name }}" src="{{ $list->user?->avatar_url ?? asset('images/photo_defaults.jpg') }}" width="20%" height="20%">
                                                         </a>
                                                     </div>
                                                     <div class="student-content pb-0">
-                                                        <h5><a href="{{ url('teacher/profile/'.$list->id) }}">{{ $list->full_name }}</a></h5>
-                                                        <h6>Teacher</h6>
+                                                        <h5><a href="{{ url('teacher/edit/'.$list->id) }}">{{ $list->full_name }}</a></h5>
+                                                        <h6>{{ $list->qualification }}</h6>
                                                     </div>
                                                 </div>
                                             </div>

@@ -55,10 +55,10 @@
                                         <div class="form-group local-forms">
                                             <label>Gender <span class="login-danger">*</span></label>
                                             <select class="form-control select  @error('gender') is-invalid @enderror" name="gender">
-                                                <option selected disabled>Select Gender</option>
-                                                <option value="Female" {{ $studentEdit->gender == 'Female' ? "selected" :"Female"}}>Female</option>
-                                                <option value="Male" {{ $studentEdit->gender == 'Male' ? "selected" :""}}>Male</option>
-                                                <option value="Others" {{ $studentEdit->gender == 'Others' ? "selected" :""}}>Others</option>
+                                                <option value="" disabled @selected(blank(old('gender', $studentEdit->gender?->value)))>Select Gender</option>
+                                                @foreach ($genders as $option)
+                                                    <option value="{{ $option->value }}" @selected(old('gender', $studentEdit->gender?->value) === $option->value)>{{ $option->label() }}</option>
+                                                @endforeach
                                             </select>
                                             @error('gender')
                                                 <span class="invalid-feedback" role="alert">
@@ -93,10 +93,10 @@
                                         <div class="form-group local-forms">
                                             <label>Blood Group <span class="login-danger">*</span></label>
                                             <select class="form-control select @error('blood_group') is-invalid @enderror" name="blood_group">
-                                                <option selected disabled>Please Select Group </option>
-                                                <option value="A+" {{ $studentEdit->blood_group == 'A+' ? "selected" :""}}>A+</option>
-                                                <option value="B+" {{ $studentEdit->blood_group == 'B+' ? "selected" :""}}>B+</option>
-                                                <option value="O+" {{ $studentEdit->blood_group == 'O+' ? "selected" :""}}>O+</option>
+                                                <option value="" disabled @selected(blank(old('blood_group', $studentEdit->blood_group?->value)))>Please Select Group</option>
+                                                @foreach ($bloodGroups as $option)
+                                                    <option value="{{ $option->value }}" @selected(old('blood_group', $studentEdit->blood_group?->value) === $option->value)>{{ $option->label() }}</option>
+                                                @endforeach
                                             </select>
                                             @error('blood_group')
                                                 <span class="invalid-feedback" role="alert">
@@ -109,10 +109,10 @@
                                         <div class="form-group local-forms">
                                             <label>Religion <span class="login-danger">*</span></label>
                                             <select class="form-control select @error('religion') is-invalid @enderror" name="religion">
-                                                <option selected disabled>Please Select Religion </option>
-                                                <option value="Hindu" {{ $studentEdit->religion == 'Hindu' ? "selected" :""}}>Hindu</option>
-                                                <option value="Christian" {{ $studentEdit->religion == 'Christian' ? "selected" :""}}>Christian</option>
-                                                <option value="Others" {{ $studentEdit->religion == 'Others' ? "selected" :""}}>Others</option>
+                                                <option value="" disabled @selected(blank(old('religion', $studentEdit->religion?->value)))>Please Select Religion</option>
+                                                @foreach ($religions as $option)
+                                                    <option value="{{ $option->value }}" @selected(old('religion', $studentEdit->religion?->value) === $option->value)>{{ $option->label() }}</option>
+                                                @endforeach
                                             </select>
                                             @error('religion')
                                                 <span class="invalid-feedback" role="alert">
@@ -135,13 +135,13 @@
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
                                             <label>Class <span class="login-danger">*</span></label>
-                                            <select class="form-control select @error('class') is-invalid @enderror" name="class">
-                                                <option selected disabled>Please Select Class </option>
-                                                <option value="12" {{ $studentEdit->class == '12' ? "selected" :""}}>12</option>
-                                                <option value="11" {{ $studentEdit->class == '11' ? "selected" :""}}>11</option>
-                                                <option value="10" {{ $studentEdit->class == '10' ? "selected" :""}}>10</option>
+                                            <select class="form-control select @error('school_class_id') is-invalid @enderror" name="school_class_id">
+                                                <option value="" disabled @selected(blank(old('school_class_id', $studentEdit->school_class_id)))>Please Select Class</option>
+                                                @foreach ($classes as $class)
+                                                    <option value="{{ $class->id }}" @selected(old('school_class_id', $studentEdit->school_class_id) == $class->id)>{{ $class->name }}</option>
+                                                @endforeach
                                             </select>
-                                            @error('class')
+                                            @error('school_class_id')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -151,13 +151,17 @@
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
                                             <label>Section <span class="login-danger">*</span></label>
-                                            <select class="form-control select @error('section') is-invalid @enderror" name="section">
-                                                <option selected disabled>Please Select Section </option>
-                                                <option value="A" {{ $studentEdit->section == 'A' ? "selected" :""}}>A</option>
-                                                <option value="B" {{ $studentEdit->section == 'B' ? "selected" :""}}>B</option>
-                                                <option value="C" {{ $studentEdit->section == 'C' ? "selected" :""}}>C</option>
+                                            <select class="form-control select @error('section_id') is-invalid @enderror" name="section_id">
+                                                <option value="" disabled @selected(blank(old('section_id', $studentEdit->section_id)))>Please Select Section</option>
+                                                @foreach ($classes as $class)
+                                                    <optgroup label="Class {{ $class->name }}">
+                                                        @foreach ($class->sections as $section)
+                                                            <option value="{{ $section->id }}" @selected(old('section_id', $studentEdit->section_id) == $section->id)>{{ $class->name }} - {{ $section->name }}</option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                @endforeach
                                             </select>
-                                            @error('section')
+                                            @error('section_id')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -192,14 +196,13 @@
                                             <div class="uplod">
                                                 <h2 class="table-avatar">
                                                     <a class="avatar avatar-sm me-2">
-                                                        <img class="avatar-img rounded-circle" src="{{ asset($studentEdit->upload) }}" alt="">
+                                                        <img class="avatar-img rounded-circle" src="{{ $studentEdit->photo_url }}" alt="">
                                                     </a>
                                                 </h2>
-                                                <label class="file-upload image-upbtn mb-0 @error('upload') is-invalid @enderror">
-                                                    Choose File <input type="file" name="upload">
+                                                <label class="file-upload image-upbtn mb-0 @error('photo') is-invalid @enderror">
+                                                    Choose File <input type="file" name="photo" accept="image/*">
                                                 </label>
-                                                <input type="hidden" name="image_hidden" value="{{ $studentEdit->upload }}">
-                                                @error('upload')
+                                                                                                @error('photo')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>

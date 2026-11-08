@@ -8,7 +8,7 @@
                     <div class="col">
                         <h3 class="page-title">Add Subject</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="subjects.html">Subject</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('subject/list/page') }}">Subject</a></li>
                             <li class="breadcrumb-item active">Add Subject</li>
                         </ul>
                     </div>
@@ -28,13 +28,24 @@
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
                                             <label>Subject Name <span class="login-danger">*</span></label>
-                                            <input type="text" class="form-control" name="subject_name" placeholder="Enter Subject Name">
+                                            <input type="text" class="form-control @error('subject_name') is-invalid @enderror" name="subject_name" placeholder="Enter Subject Name" value="{{ old('subject_name') }}">
+                                            @error('subject_name')
+                                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
                                             <label>Class <span class="login-danger">*</span></label>
-                                            <input type="text" class="form-control" name="class" placeholder="Enter Class">
+                                            <select class="form-control select @error('school_class_id') is-invalid @enderror" name="school_class_id">
+                                                <option value="" disabled @selected(blank(old('school_class_id')))>Please Select Class</option>
+                                                @foreach ($classes as $class)
+                                                    <option value="{{ $class->id }}" @selected(old('school_class_id') == $class->id)>{{ $class->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('school_class_id')
+                                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-12">

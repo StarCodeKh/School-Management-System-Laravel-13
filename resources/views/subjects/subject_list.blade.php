@@ -9,7 +9,7 @@
                     <div class="col">
                         <h3 class="page-title">Subjects</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                             <li class="breadcrumb-item active">Subjects</li>
                         </ul>
                     </div>
@@ -85,16 +85,16 @@
                                                         value="something">
                                                 </div>
                                             </td>
-                                            <td class="subject_id">{{ $value->subject_id }}</td>
+                                            <td class="subject_code">{{ $value->code }}</td>
                                             <td>
                                                 <h2>
                                                     <a>{{ $value->subject_name }}</a>
                                                 </h2>
                                             </td>
-                                            <td>{{ $value->class }}</td>
+                                            <td>{{ $value->schoolClass?->name }}</td>
                                             <td class="text-end">
                                                 <div class="actions">
-                                                    <a href="{{ url('subject/edit/'.$value->subject_id) }}" class="btn btn-sm bg-danger-light">
+                                                    <a href="{{ url('subject/edit/'.$value->code) }}" class="btn btn-sm bg-danger-light">
                                                         <i class="far fa-edit me-2"></i>
                                                     </a>
                                                     <a class="btn btn-sm bg-danger-light delete" data-bs-toggle="modal" data-bs-target="#delete">
@@ -127,7 +127,7 @@
                         <div class="row">
                             <form action="{{ route('subject/delete') }}" method="POST">
                                 @csrf
-                                <input type="hidden" name="subject_id" class="e_subject_id" value="">
+                                <input type="hidden" name="code" class="e_subject_code" value="">
                                 <div class="row">
                                     <div class="col-6">
                                         <button type="submit" class="btn btn-primary paid-continue-btn" style="width: 100%;">Delete</button>
@@ -152,7 +152,7 @@
             $(document).on('click','.delete',function()
             {
                 var _this = $(this).parents('tr');
-                $('.e_subject_id').val(_this.find('.subject_id').text());
+                $('.e_subject_code').val(_this.find('.subject_code').text());
             });
         </script>
     @endsection

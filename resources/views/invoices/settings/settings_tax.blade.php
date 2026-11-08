@@ -8,7 +8,7 @@
                     <div class="col-sm-6">
                         <h3 class="page-title">Invoice settings</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a>
                             </li>
                             <li class="breadcrumb-item active">Tax Settings</li>
                         </ul>

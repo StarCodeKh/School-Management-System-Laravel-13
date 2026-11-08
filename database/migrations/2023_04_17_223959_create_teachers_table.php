@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
-            $table->string('full_name');
-            $table->string('gender', 20);
+            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete(); // name/email live on users
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('gender', 10); // App\Enums\Gender
             $table->date('date_of_birth');
             $table->string('qualification');
             $table->unsignedTinyInteger('experience')->default(0); // years

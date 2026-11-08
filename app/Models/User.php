@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Role;
+use App\Enums\UserStatus;
 use App\Models\Concerns\HasDisplayCode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ class User extends Authenticatable
 {
     use HasDisplayCode, HasFactory, Notifiable;
 
-    public const DISPLAY_CODE_COLUMN = 'user_id';
+    public const DISPLAY_CODE_COLUMN = 'code';
 
     public const DISPLAY_CODE_PREFIX = 'USR-';
 
@@ -31,10 +32,9 @@ class User extends Authenticatable
         'join_date',
         'phone_number',
         'status',
-        'role_name',
+        'role',
         'avatar',
         'position',
-        'department',
         'password',
     ];
 
@@ -60,18 +60,25 @@ class User extends Authenticatable
             'date_of_birth' => 'date',
             'join_date' => 'date',
             'password' => 'hashed',
-            'role_name' => Role::class,
+            'role' => Role::class,
+            'status' => UserStatus::class,
         ];
+    }
+
+    /** Public URL of the user's avatar, falling back to the default photo. */
+    public function getAvatarUrlAttribute(): string
+    {
+        return asset('images/'.($this->avatar ?: 'photo_defaults.jpg'));
     }
 
     public function hasRole(Role ...$roles): bool
     {
-        return in_array($this->role_name, $roles, true);
+        return in_array($this->role, $roles, true);
     }
 
     public function isAdmin(): bool
     {
-        return (bool) $this->role_name?->isAdmin();
+        return (bool) $this->role?->isAdmin();
     }
 
     public function teacher(): HasOne
@@ -89,8 +96,9 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class, 'customer_id');
     }
 
-    public function feeCollections(): HasMany
+    /** Departments this user (a teacher) is head of. */
+    public function headedDepartments(): HasMany
     {
-        return $this->hasMany(FeeCollection::class, 'student_id');
+        return $this->hasMany(Department::class, 'head_user_id');
     }
 }

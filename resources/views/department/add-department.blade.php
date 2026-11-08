@@ -8,7 +8,7 @@
                     <div class="col">
                         <h3 class="page-title">Add Department</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="departments.html">Department</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('department/list/page') }}">Department</a></li>
                             <li class="breadcrumb-item active">Add Department</li>
                         </ul>
                     </div>
@@ -33,8 +33,13 @@
                                     </div>
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
-                                            <label>Head of Department <span class="login-danger">*</span></label>
-                                            <input type="text" class="form-control" name="head_of_department">
+                                            <label>Head of Department</label>
+                                            <select class="form-control select @error('head_user_id') is-invalid @enderror" name="head_user_id">
+                                                <option value="">-- No head assigned --</option>
+                                                @foreach ($teachers as $teacher)
+                                                    <option value="{{ $teacher->user_id }}" @selected(old('head_user_id') == $teacher->user_id)>{{ $teacher->full_name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-4">

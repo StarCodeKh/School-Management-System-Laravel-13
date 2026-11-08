@@ -36,11 +36,7 @@ class AccessTest extends TestCase
 
     public function test_guest_cannot_delete_a_student(): void
     {
-        $student = Student::create([
-            'first_name' => 'Sok', 'last_name' => 'Dara', 'gender' => 'Male', 'date_of_birth' => '2010-01-01',
-            'roll' => '1', 'blood_group' => 'O+', 'religion' => 'Buddhism', 'email' => 'sok@example.com',
-            'class' => '10', 'section' => 'A', 'admission_id' => 'ADM-1', 'phone_number' => '012345678',
-        ]);
+        $student = Student::factory()->create(['first_name' => 'Sok', 'last_name' => 'Dara']);
 
         $this->withoutMiddleware(ValidateCsrfToken::class)
             ->post('/student/delete', ['id' => $student->id]);
@@ -79,10 +75,10 @@ class AccessTest extends TestCase
         $this->post('/register', [
             'name' => 'Intruder',
             'email' => 'intruder@example.com',
-            'role_name' => Role::SuperAdmin->value,
+            'role' => Role::SuperAdmin->value,
             'password' => 'Password@123',
             'password_confirmation' => 'Password@123',
-        ])->assertSessionHasErrors('role_name');
+        ])->assertSessionHasErrors('role');
 
         $this->assertDatabaseMissing('users', ['email' => 'intruder@example.com']);
     }

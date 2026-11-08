@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-class Setting extends Controller
+class SettingController extends Controller
 {
     // index page setting
     public function index()

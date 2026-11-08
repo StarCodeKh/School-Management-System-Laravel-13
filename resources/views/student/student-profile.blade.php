@@ -31,7 +31,7 @@
                                     <div class="col-lg-4 col-md-4">
                                         <div class="profile-user-box">
                                             <div class="profile-user-img">
-                                                <img src="{{ asset($studentProfile->upload) }}" alt="Profile">
+                                                <img src="{{ $studentProfile->photo_url }}" alt="Profile">
                                                 <div class="form-group students-up-files profile-edit-icon mb-0">
                                                     <div class="uplod d-flex">
                                                         <label class="file-upload profile-upbtn mb-0">
@@ -123,7 +123,7 @@
                                             </div>
                                             <div class="views-personal">
                                                 <h4>Gender</h4>
-                                                <h5>{{ $studentProfile->gender }}</h5>
+                                                <h5>{{ $studentProfile->gender?->label() }}</h5>
                                             </div>
                                         </div>
                                         <div class="personal-activity">

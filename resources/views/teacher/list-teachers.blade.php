@@ -8,7 +8,7 @@
                 <div class="col">
                     <h3 class="page-title">Teachers</h3>
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active">Teachers</li>
                     </ul>
                 </div>
@@ -49,7 +49,7 @@
                                     <h3 class="page-title">Teachers</h3>
                                 </div>
                                 <div class="col-auto text-end float-end ms-auto download-grp">
-                                    <a href="teachers.html" class="btn btn-outline-gray me-2 active">
+                                    <a href="{{ route('teacher/list/page') }}" class="btn btn-outline-gray me-2 active">
                                         <i class="fa fa-list" aria-hidden="true"></i>
                                     <a href="{{ route('teacher/grid/page') }}" class="btn btn-outline-gray me-2">
                                         <i class="fa fa-th" aria-hidden="true"></i>
@@ -71,10 +71,10 @@
                                         </th>
                                         <th>ID</th>
                                         <th>Name</th>
-                                        <th>Class</th>
+                                        <th>Qualification</th>
                                         <th>Gender</th>
-                                        <th>Subject</th>
-                                        <th>Section</th>
+                                        <th>Experience</th>
+                                        <th>Department</th>
                                         <th>Mobile Number</th>
                                         <th>Address</th>
                                         <th class="text-end">Action</th>
@@ -90,23 +90,19 @@
                                             </div>
                                         </td>
                                         <td hidden class="teacher_id">{{ $list->id }}</td>
-                                        <td>{{ $list->user?->user_id }}</td>
+                                        <td>{{ $list->user?->code }}</td>
                                         <td>
                                             <h2 class="table-avatar">
-                                                <a href="teacher-details.html" class="avatar avatar-sm me-2">
-                                                    @if (!empty($list->user?->avatar))
-                                                        <img class="avatar-img rounded-circle" src="{{ URL::to('images/'.$list->user->avatar) }}" alt="{{ $list->full_name }}">
-                                                    @else
-                                                        <img class="avatar-img rounded-circle" src="{{ URL::to('images/photo_defaults.jpg') }}" alt="{{ $list->full_name }}">
-                                                    @endif
+                                                <a href="{{ url('teacher/edit/'.$list->id) }}" class="avatar avatar-sm me-2">
+                                                    <img class="avatar-img rounded-circle" src="{{ $list->user?->avatar_url ?? asset('images/photo_defaults.jpg') }}" alt="{{ $list->full_name }}">
                                                 </a>
-                                                <a href="teacher-details.html">{{ $list->full_name }}</a>
+                                                <a href="{{ url('teacher/edit/'.$list->id) }}">{{ $list->full_name }}</a>
                                             </h2>
                                         </td>
-                                        <td>10</td>
-                                        <td>{{ $list->gender }}</td>
-                                        <td>Mathematics</td>
-                                        <td>A</td>
+                                        <td>{{ $list->qualification }}</td>
+                                        <td>{{ $list->gender?->label() }}</td>
+                                        <td>{{ $list->experience }} yrs</td>
+                                        <td>{{ $list->department?->department_name }}</td>
                                         <td>{{ $list->phone_number }}</td>
                                         <td>{{ $list->address }}</td>
                                         <td class="text-end">

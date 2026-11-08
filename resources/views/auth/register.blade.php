@@ -21,13 +21,13 @@
                 <input type="hidden" class="image" name="image" value="photo_defaults.jpg">
                 <div class="form-group local-forms">
                     <label>Role Name <span class="login-danger">*</span></label>
-                    <select class="form-control select @error('role_name') is-invalid @enderror" name="role_name" id="role_name">
+                    <select class="form-control select @error('role') is-invalid @enderror" name="role" id="role">
                         <option selected disabled>Role Type</option>
                         @foreach ($roles as $role)
-                            <option value="{{ $role->value }}" @selected(old('role_name') === $role->value)>{{ $role->label() }}</option>
+                            <option value="{{ $role->value }}" @selected(old('role') === $role->value)>{{ $role->label() }}</option>
                         @endforeach
                     </select>
-                    @error('role_name')
+                    @error('role')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
                     </span>

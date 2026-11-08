@@ -8,7 +8,7 @@
                 <div class="col">
                     <h3 class="page-title">Departments</h3>
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active">Departments</li>
                     </ul>
                 </div>
@@ -125,8 +125,8 @@
                 },
                 columns: [
                     {
-                        data: 'department_id',
-                        name: 'department_id',
+                        data: 'code',
+                        name: 'code',
                     },
                     {
                         data: 'department_name',

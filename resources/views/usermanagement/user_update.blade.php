@@ -7,7 +7,7 @@
                     <div class="col">
                         <h3 class="page-title">Edit User</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="time-table.html">Users</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('list/users') }}">Users</a></li>
                             <li class="breadcrumb-item active">Edit User</li>
                         </ul>
                     </div>
@@ -27,7 +27,7 @@
                                         <div class="form-group local-forms">
                                             <label>Name <span class="login-danger">*</span></label>
                                             <input type="text" class="form-control" name="name" value="{{ $users->name }}">
-                                            <input type="hidden" class="form-control" name="user_id" value="{{ $users->user_id }}">
+                                            <input type="hidden" class="form-control" name="code" value="{{ $users->code }}">
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-4">
@@ -52,20 +52,19 @@
                                         <div class="form-group local-forms">
                                             <label>Status <span class="login-danger">*</span></label>
                                             <select class="form-control select" name="status">
-                                                <option disabled>Select Status</option>
-                                                <option value="Active" {{ $users->status == 'Active' ? 'selected' : '' }}>Active</option>
-                                                <option value="Disable" {{ $users->status == 'Disable' ? 'selected' : '' }}>Disable</option>
-                                                <option value="Inactive" {{ $users->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                                @foreach ($statuses as $status)
+                                                    <option value="{{ $status->value }}" @selected($users->status === $status)>{{ $status->label() }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
                                             <label>Role Name <span class="login-danger">*</span></label>
-                                            <select class="form-control select" name="role_name" id="role_name">
+                                            <select class="form-control select" name="role" id="role">
                                                 <option selected disabled>Role Type</option>
                                                 @foreach ($roles as $role)
-                                                    <option value="{{ $role->value }}" @selected($users->role_name === $role)>{{ $role->label() }}</option>
+                                                    <option value="{{ $role->value }}" @selected($users->role === $role)>{{ $role->label() }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -73,25 +72,18 @@
                                     
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
-                                            <label>Profile <span class="login-danger">*</span></label>
-                                            <input type="file" class="form-control" name="avatar" value="{{ $users->avatar }}">
+                                            <label>Profile</label>
+                                            <input type="file" class="form-control" name="avatar" accept="image/*">
                                             <div class="user-img" style="margin-top: -25px;">
-                                                <img class="rounded-circle" src="{{ URL::to('/images/'. $users->avatar) }}">
+                                                <img class="rounded-circle" src="{{ $users->avatar_url }}">
                                             </div>
                                         </div>
-                                        <input type="hidden" name="hidden_avatar" value="{{ $users->avatar }}">
                                     </div>
 
                                     <div class="col-12 col-sm-4">
                                         <div class="form-group local-forms">
-                                            <label>Position <span class="login-danger">*</span></label>
+                                            <label>Position</label>
                                             <input type="text" class="form-control" name="position" value="{{ $users->position }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-4">
-                                        <div class="form-group local-forms">
-                                            <label>Department <span class="login-danger">*</span></label>
-                                            <input type="text" class="form-control" name="department" value="{{ $users->department }}">
                                         </div>
                                     </div>
                                     <div class="col-12 col-sm-4">

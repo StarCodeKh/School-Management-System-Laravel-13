@@ -2,29 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use App\Models\Department;
+use App\Models\FeeCollection;
+use App\Models\Student;
+use App\Models\Teacher;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return Renderable
-     */
-    /** home dashboard */
+    /** home dashboard (routes are already behind the "auth" middleware) */
     public function index()
     {
-        return view('dashboard.home');
+        $stats = [
+            'students' => Student::count(),
+            'teachers' => Teacher::count(),
+            'departments' => Department::count(),
+            'revenue' => FeeCollection::sum('amount'),
+        ];
+
+        $recentStudents = Student::latest()->take(5)->get();
+
+        return view('dashboard.home', compact('stats', 'recentStudents'));
     }
 
     /** profile user */

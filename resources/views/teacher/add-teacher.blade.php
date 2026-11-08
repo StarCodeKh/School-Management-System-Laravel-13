@@ -8,7 +8,7 @@
                 <div class="col">
                     <h3 class="page-title">Add Teachers</h3>
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="teachers.html">Teachers</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('teacher/list/page') }}">Teachers</a></li>
                         <li class="breadcrumb-item active">Add Teachers</li>
                     </ul>
                 </div>
@@ -31,7 +31,7 @@
                                         <select class="select select2s-hidden-accessible @error('user_id') is-invalid @enderror" style="width: 100%;" tabindex="-1" aria-hidden="true" id="user_id" name="user_id">
                                             <option selected disabled>-- Select Name --</option>
                                             @foreach($users as $key => $names)
-                                                <option value="{{ $names->id }}" data-code="{{ $names->user_id }}" @selected(old('user_id') == $names->id)>{{ $names->name }}</option>
+                                                <option value="{{ $names->id }}" data-code="{{ $names->code }}" @selected(old('user_id') == $names->id)>{{ $names->name }}</option>
                                             @endforeach
                                         </select>
                                         @error('user_id')
@@ -51,10 +51,10 @@
                                     <div class="form-group local-forms">
                                         <label>Gender <span class="login-danger">*</span></label>
                                         <select class="form-control select  @error('gender') is-invalid @enderror" name="gender">
-                                            <option selected disabled>Select Gender</option>
-                                            <option value="Female" {{ old('gender') == 'Female' ? "selected" :"Female"}}>Female</option>
-                                            <option value="Male" {{ old('gender') == 'Male' ? "selected" :""}}>Male</option>
-                                            <option value="Others" {{ old('gender') == 'Others' ? "selected" :""}}>Others</option>
+                                            <option value="" disabled @selected(blank(old('gender')))>Select Gender</option>
+                                            @foreach ($genders as $gender)
+                                                <option value="{{ $gender->value }}" @selected(old('gender') === $gender->value)>{{ $gender->label() }}</option>
+                                            @endforeach
                                         </select>
                                         @error('gender')
                                             <span class="invalid-feedback" role="alert">
@@ -75,15 +75,29 @@
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms calendar-icon">
+                                    <div class="form-group local-forms">
                                         <label>Qualification <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control datetimepicker @error('qualification') is-invalid @enderror" name="qualification" placeholder="DD-MM-YYYY" value="{{ old('qualification') }}">
+                                        <input type="text" class="form-control @error('qualification') is-invalid @enderror" name="qualification" placeholder="e.g. MSc Mathematics" value="{{ old('qualification') }}">
                                         @error('qualification')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
                                     </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="form-group local-forms">
+                                        <label>Department</label>
+                                        <select class="form-control select @error('department_id') is-invalid @enderror" name="department_id">
+                                            <option value="">-- No department --</option>
+                                            @foreach ($departments as $department)
+                                                <option value="{{ $department->id }}" @selected(old('department_id') == $department->id)>{{ $department->department_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('department_id')
+                                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                                        @enderror
+                                    </div>
+                                </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
                                     <div class="form-group local-forms calendar-icon">

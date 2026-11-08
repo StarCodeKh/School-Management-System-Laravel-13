@@ -7,10 +7,10 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
-                        <h3 class="page-title">Welcome {{ Session::get('name') }}!</h3>
+                        <h3 class="page-title">Welcome {{ auth()->user()->name }}!</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                            <li class="breadcrumb-item active">{{ Session::get('name') }}</li>
+                            <li class="breadcrumb-item active">{{ auth()->user()->name }}</li>
                         </ul>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
                                 <h6>Students</h6>
-                                <h3>50055</h3>
+                                <h3>{{ number_format($stats['students']) }}</h3>
                             </div>
                             <div class="db-icon">
                                 <img src="{{ URL::to('assets/img/icons/dash-icon-01.svg') }}" alt="Dashboard Icon">
@@ -38,8 +38,8 @@
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Awards</h6>
-                                <h3>50+</h3>
+                                <h6>Teachers</h6>
+                                <h3>{{ number_format($stats['teachers']) }}</h3>
                             </div>
                             <div class="db-icon">
                                 <img src="{{ URL::to('assets/img/icons/dash-icon-02.svg') }}" alt="Dashboard Icon">
@@ -53,8 +53,8 @@
                     <div class="card-body">
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
-                                <h6>Department</h6>
-                                <h3>30+</h3>
+                                <h6>Departments</h6>
+                                <h3>{{ number_format($stats['departments']) }}</h3>
                             </div>
                             <div class="db-icon">
                                 <img src="{{ URL::to('assets/img/icons/dash-icon-03.svg') }}" alt="Dashboard Icon">
@@ -69,7 +69,7 @@
                         <div class="db-widgets d-flex justify-content-between align-items-center">
                             <div class="db-info">
                                 <h6>Revenue</h6>
-                                <h3>$505</h3>
+                                <h3>${{ number_format($stats['revenue'], 2) }}</h3>
                             </div>
                             <div class="db-icon">
                                 <img src="{{ URL::to('assets/img/icons/dash-icon-04.svg') }}" alt="Dashboard Icon">
@@ -135,7 +135,7 @@
 
                 <div class="card flex-fill student-space comman-shadow">
                     <div class="card-header d-flex align-items-center">
-                        <h5 class="card-title">Star Students</h5>
+                        <h5 class="card-title">Recent Students</h5>
                         <ul class="chart-list-out student-ellips">
                             <li class="star-menus"><a href="javascript:;"><i class="fas fa-ellipsis-v"></i></a>
                             </li>
@@ -147,89 +147,32 @@
                                 class="table star-student table-hover table-center table-borderless table-striped">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>ID</th>
+                                        <th>Admission ID</th>
                                         <th>Name</th>
-                                        <th class="text-center">Marks</th>
-                                        <th class="text-center">Percentage</th>
-                                        <th class="text-end">Year</th>
+                                        <th class="text-center">Class</th>
+                                        <th class="text-center">Section</th>
+                                        <th class="text-end">Joined</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE2209</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"src="{{ URL::to('assets/img/profiles/avatar-01.jpg') }}" width="25" alt="Star Students"> Soeng Souy
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1185</td>
-                                        <td class="text-center">98%</td>
-                                        <td class="text-end">
-                                            <div>2019</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE1245</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"src="{{ URL::to('assets/img/profiles/avatar-01.jpg') }}" width="25" alt="Star Students"> Soeng Souy
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1195</td>
-                                        <td class="text-center">99.5%</td>
-                                        <td class="text-end">
-                                            <div>2018</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE1625</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"src="{{ URL::to('assets/img/profiles/avatar-01.jpg') }}" width="25" alt="Star Students"> Soeng Souy
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1196</td>
-                                        <td class="text-center">99.6%</td>
-                                        <td class="text-end">
-                                            <div>2017</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE2516</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"src="{{ URL::to('assets/img/profiles/avatar-01.jpg') }}" width="25" alt="Star Students"> Soeng Souy
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1187</td>
-                                        <td class="text-center">98.2%</td>
-                                        <td class="text-end">
-                                            <div>2016</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-nowrap">
-                                            <div>PRE2209</div>
-                                        </td>
-                                        <td class="text-nowrap">
-                                            <a href="profile.html">
-                                                <img class="rounded-circle"src="{{ URL::to('assets/img/profiles/avatar-01.jpg') }}" width="25" alt="Star Students"> Soeng Souy
-                                            </a>
-                                        </td>
-                                        <td class="text-center">1185</td>
-                                        <td class="text-center">98%</td>
-                                        <td class="text-end">
-                                            <div>2015</div>
-                                        </td>
-                                    </tr>
+                                    @forelse ($recentStudents as $student)
+                                        <tr>
+                                            <td class="text-nowrap">{{ $student->admission_id }}</td>
+                                            <td class="text-nowrap">
+                                                <a href="{{ url('student/profile/'.$student->id) }}">
+                                                    <img class="rounded-circle" src="{{ $student->upload ? asset($student->upload) : asset('images/photo_defaults.jpg') }}" width="25" alt="{{ $student->first_name }}">
+                                                    {{ $student->first_name }} {{ $student->last_name }}
+                                                </a>
+                                            </td>
+                                            <td class="text-center">{{ $student->class }}</td>
+                                            <td class="text-center">{{ $student->section }}</td>
+                                            <td class="text-end">{{ $student->created_at->format('Y') }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No students yet.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -251,7 +194,7 @@
                         <div class="activity-groups">
                             <div class="activity-awards">
                                 <div class="award-boxs">
-                                    <img src="assets/img/icons/award-icon-01.svg" alt="Award">
+                                    <img src="{{ asset('assets/img/icons/award-icon-01.svg') }}" alt="Award">
                                 </div>
                                 <div class="award-list-outs">
                                     <h4>1st place in "Chess”</h4>
@@ -263,7 +206,7 @@
                             </div>
                             <div class="activity-awards">
                                 <div class="award-boxs">
-                                    <img src="assets/img/icons/award-icon-02.svg" alt="Award">
+                                    <img src="{{ asset('assets/img/icons/award-icon-02.svg') }}" alt="Award">
                                 </div>
                                 <div class="award-list-outs">
                                     <h4>Participated in "Carrom"</h4>
@@ -275,7 +218,7 @@
                             </div>
                             <div class="activity-awards">
                                 <div class="award-boxs">
-                                    <img src="assets/img/icons/award-icon-03.svg" alt="Award">
+                                    <img src="{{ asset('assets/img/icons/award-icon-03.svg') }}" alt="Award">
                                 </div>
                                 <div class="award-list-outs">
                                     <h4>Internation conference in "St.John School"</h4>
@@ -287,7 +230,7 @@
                             </div>
                             <div class="activity-awards mb-0">
                                 <div class="award-boxs">
-                                    <img src="assets/img/icons/award-icon-04.svg" alt="Award">
+                                    <img src="{{ asset('assets/img/icons/award-icon-04.svg') }}" alt="Award">
                                 </div>
                                 <div class="award-list-outs">
                                     <h4>Won 1st place in "Chess"</h4>
@@ -312,7 +255,7 @@
                         <h6>50,095</h6>
                     </div>
                     <div class="social-boxs">
-                        <img src="assets/img/icons/social-icon-01.svg" alt="Social Icon">
+                        <img src="{{ asset('assets/img/icons/social-icon-01.svg') }}" alt="Social Icon">
                     </div>
                 </div>
             </div>
@@ -323,7 +266,7 @@
                         <h6>48,596</h6>
                     </div>
                     <div class="social-boxs">
-                        <img src="assets/img/icons/social-icon-02.svg" alt="Social Icon">
+                        <img src="{{ asset('assets/img/icons/social-icon-02.svg') }}" alt="Social Icon">
                     </div>
                 </div>
             </div>
@@ -334,7 +277,7 @@
                         <h6>52,085</h6>
                     </div>
                     <div class="social-boxs">
-                        <img src="assets/img/icons/social-icon-03.svg" alt="Social Icon">
+                        <img src="{{ asset('assets/img/icons/social-icon-03.svg') }}" alt="Social Icon">
                     </div>
                 </div>
             </div>
@@ -345,7 +288,7 @@
                         <h6>69,050</h6>
                     </div>
                     <div class="social-boxs">
-                        <img src="assets/img/icons/social-icon-04.svg" alt="Social Icon">
+                        <img src="{{ asset('assets/img/icons/social-icon-04.svg') }}" alt="Social Icon">
                     </div>
                 </div>
             </div>

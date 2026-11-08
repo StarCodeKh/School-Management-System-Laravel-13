@@ -7,7 +7,7 @@
                 </li>
                 @foreach ($menus as $menu)
                     <li class="submenu {{ set_active($menu->active_routes) }} 
-                        {{ (isset($menu->pattern) && request()->is($menu->pattern)) ? 'active' : '' }}">
+                        {{ $menu->pattern && request()->is(...explode('|', $menu->pattern)) ? 'active' : '' }}">
                         <a href="{{ $menu->route ? route($menu->route) : '#' }}">
                             <i class="{{ $menu->icon }}"></i>
                             <span>{{ $menu->title }}</span>
@@ -21,7 +21,7 @@
                                     <li>
                                         <a href="{{ $child->route ? route($child->route) : '#' }}" 
                                            class="{{ set_active($child->active_routes) }} 
-                                                  {{ (isset($child->pattern) && request()->is($child->pattern)) ? 'active' : '' }}">
+                                                  {{ $child->pattern && request()->is(...explode('|', $child->pattern)) ? 'active' : '' }}">
                                             {{ $child->title }}
                                         </a>
                                     </li>
@@ -34,15 +34,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-

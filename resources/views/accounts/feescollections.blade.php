@@ -8,7 +8,7 @@
                     <div class="col">
                         <h3 class="page-title">Fees Collections</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
                             <li class="breadcrumb-item active">Fees Collections</li>
                         </ul>
                     </div>
@@ -52,17 +52,17 @@
                                     <tbody>
                                         @foreach($feeCollections as $value)
                                             <tr>
-                                                <td>{{ $value->student?->user_id }}</td>
+                                                <td>{{ $value->student?->admission_id }}</td>
                                                 <td>
                                                     <h2 class="table-avatar">
                                                         <a class="avatar avatar-sm me-2">
-                                                            <img class="avatar-img rounded-circle"src="{{ URL::to('/images/'. $value->student?->avatar) }}" alt="{{ $value->student?->name }}">
+                                                            <img class="avatar-img rounded-circle" src="{{ $value->student?->photo_url ?? asset('images/photo_defaults.jpg') }}" alt="{{ $value->student?->full_name }}">
                                                         </a>
-                                                        <a>{{ $value->student?->name }}</a>
+                                                        <a href="{{ url('student/profile/'.$value->student_id) }}">{{ $value->student?->full_name }}</a>
                                                     </h2>
                                                 </td>
                                                 <td>{{ $value->feeType->name }}</td>
-                                                <td>${{ $value->amount }}</td>
+                                                <td>${{ number_format($value->amount, 2) }}</td>
                                                 <td>{{ $value->paid_date->format('d-m-Y') }}</td>
                                                 <td class="text-end">
                                                     <span class="badge badge-success">Paid</span>

@@ -21,12 +21,12 @@
                     <div class="row align-items-center">
                         <div class="col-auto profile-image">
                             <a href="#">
-                                <img class="rounded-circle" alt="{{ Session::get('name') }}" src="/images/{{ Session::get('avatar') }}">
+                                <img class="rounded-circle" alt="{{ auth()->user()->name }}" src="{{ auth()->user()->avatar_url }}">
                             </a>
                         </div>
                         <div class="col ms-md-n2 profile-user-info">
-                            <h4 class="user-name mb-0">{{ Session::get('name') }}</h4>
-                            <h6 class="text-muted">{{ Session::get('position') }}</h6>
+                            <h4 class="user-name mb-0">{{ auth()->user()->name }}</h4>
+                            <h6 class="text-muted">{{ auth()->user()->position }}</h6>
                             <div class="user-Location"><i class="fas fa-map-marker-alt"></i> Combodai Phnom Penh</div>
                             <div class="about-text">Khmer 009</div>
                         </div>
@@ -60,7 +60,7 @@
                                         </h5>
                                         <div class="row">
                                             <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Name</p>
-                                            <p class="col-sm-9">{{ Session::get('name') }}</p>
+                                            <p class="col-sm-9">{{ auth()->user()->name }}</p>
                                         </div>
                                         <div class="row">
                                             <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Date of Birth</p>
@@ -70,12 +70,12 @@
                                             <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Email</p>
                                             <p class="col-sm-9"><a href="/cdn-cgi/l/email-protection"
                                                     class="__cf_email__"
-                                                    data-cfemail="a1cbcec9cfc5cec4e1c4d9c0ccd1cdc48fc2cecc">{{ Session::get('email') }}</a>
+                                                    data-cfemail="a1cbcec9cfc5cec4e1c4d9c0ccd1cdc48fc2cecc">{{ auth()->user()->email }}</a>
                                             </p>
                                         </div>
                                         <div class="row">
                                             <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Mobile</p>
-                                            <p class="col-sm-9">{{ Session::get('phone_number') }}</p>
+                                            <p class="col-sm-9">{{ auth()->user()->phone_number }}</p>
                                         </div>
                                         <div class="row">
                                             <p class="col-sm-3 text-muted text-sm-end mb-0">Address</p>
@@ -92,7 +92,7 @@
                                             <span>Account Status</span>
                                             <a class="edit-link" href="#"><i class="far fa-edit me-1"></i>Edit</a>
                                         </h5>
-                                        <button class="btn btn-success" type="button"><i class="fe fe-check-verified"></i> {{ Session::get('status') }}</button>
+                                        <button class="btn btn-success" type="button"><i class="fe fe-check-verified"></i> {{ auth()->user()->status?->label() }}</button>
                                     </div>
                                 </div>
 

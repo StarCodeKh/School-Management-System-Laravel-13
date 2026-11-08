@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Gender;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,7 @@ class Teacher extends Model
 
     protected $fillable = [
         'user_id',
-        'full_name',
+        'department_id',
         'gender',
         'date_of_birth',
         'qualification',
@@ -30,7 +31,19 @@ class Teacher extends Model
         return [
             'date_of_birth' => 'date',
             'experience' => 'integer',
+            'gender' => Gender::class,
         ];
+    }
+
+    /** The teacher's name is stored once, on the linked user account. */
+    public function getFullNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function user(): BelongsTo

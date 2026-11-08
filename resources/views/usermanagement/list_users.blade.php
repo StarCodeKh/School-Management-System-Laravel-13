@@ -83,8 +83,7 @@
                     <div class="row">
                         <form action="{{ route('user/delete') }}" method="POST">
                             @csrf
-                            <input type="hidden" name="user_id" class="e_user_id" value="">
-                            <input type="hidden" name="avatar" class="e_avatar" value= "">
+                            <input type="hidden" name="code" class="e_user_code" value="">
                             <div class="row">
                                 <div class="col-6">
                                     <button type="submit" class="btn btn-primary paid-continue-btn" style="width: 100%;">Delete</button>
@@ -109,8 +108,7 @@
         $(document).on('click','.delete',function()
         {
             var _this = $(this).parents('tr');
-            $('.e_user_id').val(_this.find('.user_id').data('user_id'));
-            $('.e_avatar').val(_this.find('.avatar').data('avatar'));
+            $('.e_user_code').val(_this.find('.user_id').data('code'));
         });
     </script>
 
@@ -127,8 +125,8 @@
                 },
                 columns: [
                     {
-                        data: 'user_id',
-                        name: 'user_id',
+                        data: 'code',
+                        name: 'code',
                     },
                     {
                         data: 'avatar',

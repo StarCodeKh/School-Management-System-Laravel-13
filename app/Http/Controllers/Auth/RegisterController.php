@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Hash;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
@@ -26,7 +26,7 @@ class RegisterController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
-                'role_name' => ['required', Rule::enum(Role::class)->only(Role::registrable())],
+                'role' => ['required', Rule::enum(Role::class)->only(Role::registrable())],
                 'password' => 'required|string|min:8|confirmed',
                 'password_confirmation' => 'required',
             ]);
@@ -36,7 +36,7 @@ class RegisterController extends Controller
                 'avatar' => $request->image,
                 'email' => $request->email,
                 'join_date' => now(),
-                'role_name' => $request->role_name,
+                'role' => $request->role,
                 'password' => Hash::make($request->password),
             ]);
 

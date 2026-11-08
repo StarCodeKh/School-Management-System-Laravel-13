@@ -13,23 +13,21 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete(); // optional login account
+            $table->string('admission_id', 50)->unique();
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('gender', 20);
+            $table->string('gender', 10);      // App\Enums\Gender
             $table->date('date_of_birth');
-            $table->string('roll', 50);
-            $table->string('blood_group', 10);
-            $table->string('religion', 50);
+            $table->string('blood_group', 5);  // App\Enums\BloodGroup
+            $table->string('religion', 20);    // App\Enums\Religion
             $table->string('email')->unique();
-            $table->string('class', 50);
-            $table->string('section', 50);
-            $table->string('admission_id', 50)->unique();
             $table->string('phone_number', 20);
-            $table->string('upload')->nullable(); // photo path
+            $table->foreignId('school_class_id')->constrained()->restrictOnDelete();
+            $table->foreignId('section_id')->constrained()->restrictOnDelete();
+            $table->string('roll', 20);
+            $table->string('photo')->nullable(); // path under public/
             $table->timestamps();
-
-            $table->index(['class', 'section']);
         });
     }
 

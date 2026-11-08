@@ -2,60 +2,74 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\Role;
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class InvoiceController extends Controller
 {
-    /** index page */
-    public function invoiceList()
+    /** All invoices tab */
+    public function invoiceList(Request $request)
     {
-        $invoiceList = Invoice::with('items')->latest()->get();
-
-        return view('invoices.list_invoices', compact('invoiceList'));
+        return $this->listing($request, 'all');
     }
 
-    /** invoice paid page */
-    public function invoicePaid()
+    /** Paid invoices tab */
+    public function invoicePaid(Request $request)
     {
-        return view('invoices.tab.paid_invoices');
+        return $this->listing($request, 'paid');
     }
 
-    /** incoice overdue page*/
-    public function invoiceOverdue()
+    /** Overdue invoices tab */
+    public function invoiceOverdue(Request $request)
     {
-        return view('invoices.tab.overdue_invoices');
+        return $this->listing($request, 'overdue');
     }
 
-    /** invoice draft */
-    public function invoiceDraft()
+    /** Draft invoices tab */
+    public function invoiceDraft(Request $request)
     {
-        return view('invoices.tab.draft_invoices');
+        return $this->listing($request, 'draft');
     }
 
-    /** recurring invoices.blade */
-    public function invoiceRecurring()
+    /** Recurring invoices tab */
+    public function invoiceRecurring(Request $request)
     {
-        return view('invoices.tab.recurring_invoices');
+        return $this->listing($request, 'recurring');
     }
 
-    /** invoice cancelled */
-    public function invoiceCancelled()
+    /** Cancelled invoices tab */
+    public function invoiceCancelled(Request $request)
     {
-        return view('invoices.tab.cancelled_invoices');
+        return $this->listing($request, 'cancelled');
     }
 
     /** invoice grid */
     public function invoiceGrid()
     {
-        $invoiceList = Invoice::latest()->get();
+        $invoiceList = Invoice::with('customer')->latest()->paginate(12);
 
         return view('invoices.grid_invoice', compact('invoiceList'));
+    }
+
+    /** change an invoice's status (mark as sent / paid / cancelled / draft) */
+    public function updateStatus(Request $request, Invoice $invoice)
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::enum(InvoiceStatus::class)],
+        ]);
+
+        $invoice->update($validated);
+
+        return redirect()->back()->with('success', 'Invoice '.$invoice->invoice_number.' marked as '.$invoice->status->label().'.');
     }
 
     /** invoice add page */
@@ -174,10 +188,46 @@ class InvoiceController extends Controller
         return view('invoices.settings.settings_bank');
     }
 
+    /** one shared, filterable list view for every invoice tab */
+    private function listing(Request $request, string $tab)
+    {
+        $filters = $request->validate([
+            'customers' => 'nullable|array',
+            'customers.*' => 'integer',
+            'categories' => 'nullable|array',
+            'categories.*' => 'string|max:255',
+            'from' => 'nullable|date_format:d-m-Y',
+            'to' => 'nullable|date_format:d-m-Y',
+        ]);
+
+        $invoiceList = Invoice::with(['items', 'customer'])
+            ->forTab($tab)
+            ->when($filters['customers'] ?? null, fn ($q, $ids) => $q->whereIn('customer_id', $ids))
+            ->when($filters['categories'] ?? null, fn ($q, $cats) => $q->whereHas('items', fn ($i) => $i->whereIn('category', $cats)))
+            ->when($filters['from'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '>=', Carbon::createFromFormat('d-m-Y', $d)))
+            ->when($filters['to'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '<=', Carbon::createFromFormat('d-m-Y', $d)))
+            ->latest()
+            ->get();
+
+        $summary = fn ($query) => ['count' => $query->count(), 'amount' => (float) $query->sum('total_amount')];
+        $stats = [
+            'all' => $summary(Invoice::query()),
+            'paid' => $summary(Invoice::where('status', InvoiceStatus::Paid)),
+            'unpaid' => $summary(Invoice::whereIn('status', [InvoiceStatus::Draft, InvoiceStatus::Sent])),
+            'cancelled' => $summary(Invoice::where('status', InvoiceStatus::Cancelled)),
+        ];
+
+        $customers = $this->customers();
+        $categories = InvoiceItem::query()->distinct()->orderBy('category')->pluck('category');
+        $statuses = InvoiceStatus::cases();
+
+        return view('invoices.list_invoices', compact('invoiceList', 'tab', 'stats', 'customers', 'categories', 'statuses', 'filters'));
+    }
+
     /** users who can be billed */
     private function customers()
     {
-        return User::whereIn('role_name', [Role::Student, Role::Client])->orderBy('name')->get();
+        return User::whereIn('role', [Role::Student, Role::Client])->orderBy('name')->get();
     }
 
     private function validateInvoice(Request $request): array

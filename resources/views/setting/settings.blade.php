@@ -17,28 +17,28 @@
             <div class="settings-menu-links">
                 <ul class="nav nav-tabs menu-tabs">
                     <li class="nav-item active">
-                        <a class="nav-link" href="settings.html">General Settings</a>
+                        <a class="nav-link" href="{{ route('setting/page') }}">General Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="localization-details.html">Localization</a>
+                        <a class="nav-link" href="#">Localization</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="payment-settings.html">Payment Settings</a>
+                        <a class="nav-link" href="#">Payment Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="email-settings.html">Email Settings</a>
+                        <a class="nav-link" href="#">Email Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="social-settings.html">Social Media Login</a>
+                        <a class="nav-link" href="#">Social Media Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="social-links.html">Social Links</a>
+                        <a class="nav-link" href="#">Social Links</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="seo-settings.html">SEO Settings</a>
+                        <a class="nav-link" href="#">SEO Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="others-settings.html">Others</a>
+                        <a class="nav-link" href="#">Others</a>
                     </li>
                 </ul>
             </div>

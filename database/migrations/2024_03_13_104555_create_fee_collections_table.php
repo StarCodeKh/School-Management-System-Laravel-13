@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('fee_collections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
+            // payment history is kept: a student with payments cannot be deleted
+            $table->foreignId('student_id')->constrained()->restrictOnDelete();
             $table->foreignId('fee_type_id')->constrained()->restrictOnDelete();
             $table->decimal('amount', 12, 2);
             $table->date('paid_date');

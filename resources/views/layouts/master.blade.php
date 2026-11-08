@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/feather/feather.css') }}">
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/icons/flags/flags.css') }}">
-    <link rel="stylesheet" href="{{ URL::to('assets/css/bootstrap-datetimepicker.min.cs') }}s">
+    <link rel="stylesheet" href="{{ URL::to('assets/css/bootstrap-datetimepicker.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/fontawesome/css/fontawesome.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('assets/plugins/icons/feather/feather.css') }}">
@@ -148,26 +148,28 @@
                 <li class="nav-item dropdown has-arrow new-user-menus">
                     <a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
                         <span class="user-img">
-                            <img class="rounded-circle" src="/images/{{ Session::get('avatar') }}" width="31"alt="">
+                            <img class="rounded-circle" src="{{ auth()->user()->avatar_url }}" width="31" alt="">
                             <div class="user-text">
-                                <h6>{{ Session::get('name') }}</h6>
-                                <p class="text-muted mb-0">{{ auth()->user()?->role_name?->label() }}</p>
+                                <h6>{{ auth()->user()->name }}</h6>
+                                <p class="text-muted mb-0">{{ auth()->user()?->role?->label() }}</p>
                             </div>
                         </span>
                     </a>
                     <div class="dropdown-menu">
                         <div class="user-header">
                             <div class="avatar avatar-sm">
-                                <img src="/images/{{ Session::get('avatar') }}" alt="" class="avatar-img rounded-circle">
+                                <img src="{{ auth()->user()->avatar_url }}" alt="" class="avatar-img rounded-circle">
                             </div>
                             <div class="user-text">
-                                <h6>{{ Session::get('name') }}</h6>
-                                <p class="text-muted mb-0">{{ auth()->user()?->role_name?->label() }}</p>
+                                <h6>{{ auth()->user()->name }}</h6>
+                                <p class="text-muted mb-0">{{ auth()->user()?->role?->label() }}</p>
                             </div>
                         </div>
                         <a class="dropdown-item" href="{{ route('user/profile/page') }}">My Profile</a>
-                        <a class="dropdown-item" href="inbox.html">Inbox</a>
-                        <a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </form>
                     </div>
                 </li>
             </ul>

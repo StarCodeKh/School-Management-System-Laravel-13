@@ -48,18 +48,6 @@ return new class extends Migration
 
             $table->timestamps();
         });
-
-        Schema::create('invoice_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
-            $table->string('item');
-            $table->string('category');
-            $table->decimal('quantity', 10, 2);
-            $table->decimal('price', 12, 2);
-            $table->decimal('amount', 12, 2);
-            $table->decimal('discount', 5, 2)->default(0); // percentage
-            $table->timestamps();
-        });
     }
 
     /**
@@ -67,7 +55,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoice_items');
         Schema::dropIfExists('invoices');
     }
 };

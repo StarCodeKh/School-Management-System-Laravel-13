@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Gender;
 use App\Enums\Role;
+use App\Models\Department;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class TeacherController extends Controller
 {
@@ -14,15 +17,18 @@ class TeacherController extends Controller
     public function teacherAdd()
     {
         // only teacher accounts that don't have a teacher profile yet
-        $users = User::where('role_name', Role::Teacher)->doesntHave('teacher')->orderBy('name')->get();
+        $users = User::where('role', Role::Teacher)->doesntHave('teacher')->orderBy('name')->get();
 
-        return view('teacher.add-teacher', compact('users'));
+        $genders = Gender::cases();
+        $departments = $this->departments();
+
+        return view('teacher.add-teacher', compact('users', 'genders', 'departments'));
     }
 
     /** teacher list */
     public function teacherList()
     {
-        $listTeacher = Teacher::with('user')->latest()->get();
+        $listTeacher = Teacher::with(['user', 'department'])->latest()->get();
 
         return view('teacher.list-teachers', compact('listTeacher'));
     }
@@ -30,7 +36,7 @@ class TeacherController extends Controller
     /** teacher Grid */
     public function teacherGrid()
     {
-        $teacherGrid = Teacher::all();
+        $teacherGrid = Teacher::with('user')->latest()->get();
 
         return view('teacher.teachers-grid', compact('teacherGrid'));
     }
@@ -43,9 +49,7 @@ class TeacherController extends Controller
         ] + $this->profileRules());
 
         try {
-            Teacher::create($validated + [
-                'full_name' => User::findOrFail($validated['user_id'])->name,
-            ]);
+            Teacher::create($validated);
 
             return redirect()->back()->with('success', 'Teacher record saved successfully!');
         } catch (\Exception $e) {
@@ -59,8 +63,10 @@ class TeacherController extends Controller
     public function editRecord(Teacher $teacher)
     {
         $teacher->load('user');
+        $genders = Gender::cases();
+        $departments = $this->departments();
 
-        return view('teacher.edit-teacher', compact('teacher'));
+        return view('teacher.edit-teacher', compact('teacher', 'genders', 'departments'));
     }
 
     /** Update Record */
@@ -72,7 +78,10 @@ class TeacherController extends Controller
         ] + $this->profileRules());
 
         try {
-            Teacher::findOrFail($validated['id'])->update($validated);
+            $teacher = Teacher::with('user')->findOrFail($validated['id']);
+            // the name is stored on the user account, not duplicated on teachers
+            $teacher->user->update(['name' => $validated['full_name']]);
+            $teacher->update(collect($validated)->except(['id', 'full_name'])->all());
 
             return redirect()->back()->with('success', 'Teacher record updated successfully!');
         } catch (\Exception $e) {
@@ -100,11 +109,17 @@ class TeacherController extends Controller
         }
     }
 
+    private function departments()
+    {
+        return Department::orderBy('department_name')->get();
+    }
+
     /** fields shared by the add and edit forms */
     private function profileRules(): array
     {
         return [
-            'gender' => 'required|string|max:20',
+            'department_id' => 'nullable|exists:departments,id',
+            'gender' => ['required', Rule::enum(Gender::class)],
             'experience' => 'required|integer|min:0|max:80',
             'date_of_birth' => 'required|date',
             'qualification' => 'required|string|max:255',

@@ -3,100 +3,42 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Auth;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Session;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except([
-            'logout',
-            'locked',
-            'unlock',
-        ]);
-    }
-
+    /** login page */
     public function login()
     {
         return view('auth.login');
     }
 
+    /** sign the user in; views read the user from auth()->user(), not the session */
     public function authenticate(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string',
+        $credentials = $request->validate([
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        try {
-            $email = $request->email;
-            $password = $request->password;
-
-            if (Auth::attempt(['email' => $email, 'password' => $password])) {
-                $user = Auth::User();
-                Session::put('name', $user->name);
-                Session::put('email', $user->email);
-                Session::put('user_id', $user->user_id);
-                Session::put('join_date', $user->join_date);
-                Session::put('phone_number', $user->phone_number);
-                Session::put('status', $user->status);
-                Session::put('avatar', $user->avatar);
-                Session::put('position', $user->position);
-                Session::put('department', $user->department);
-
-                return redirect()->route('home')->with('success', 'LOGIN SUCCESSFULLY :)');
-            } else {
-                return redirect('login')->with('error', 'WRONG USERNAME OR PASSWORD :(');
-            }
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'FAIL LOGIN :(');
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()->withInput($request->only('email'))->with('error', 'WRONG USERNAME OR PASSWORD :(');
         }
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('home'))->with('success', 'LOGIN SUCCESSFULLY :)');
     }
 
+    /** sign the user out and drop the whole session */
     public function logout(Request $request)
     {
         Auth::logout();
-        // forget login session
-        $request->session()->forget('name');
-        $request->session()->forget('email');
-        $request->session()->forget('user_id');
-        $request->session()->forget('join_date');
-        $request->session()->forget('phone_number');
-        $request->session()->forget('status');
-        $request->session()->forget('avatar');
-        $request->session()->forget('position');
-        $request->session()->forget('department');
-        $request->session()->flush();
 
-        return redirect('login')->with('success', 'LOGOUT SUCCESSFULLY :)');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'LOGOUT SUCCESSFULLY :)');
     }
 }

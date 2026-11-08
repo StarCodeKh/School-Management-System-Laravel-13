@@ -8,7 +8,7 @@
                     <div class="col">
                         <h3 class="page-title">Add Fees</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="fees-collections.html">Accounts</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('account/fees/collections/page') }}">Accounts</a></li>
                             <li class="breadcrumb-item active">Add Fees</li>
                         </ul>
                     </div>
@@ -30,8 +30,8 @@
                                             <label>Student Name <span class="login-danger">*</span></label>
                                             <select class="select select2s-hidden-accessible" style="width: 100%;" tabindex="-1" aria-hidden="true" id="student_id" name="student_id">
                                                 <option selected disabled>-- Select --</option>
-                                                @foreach($users as $key => $names)
-                                                    <option value="{{ $names->id }}" data-code="{{ $names->user_id }}" @selected(old('student_id') == $names->id)>{{ $names->name }}</option>
+                                                @foreach ($students as $student)
+                                                    <option value="{{ $student->id }}" data-code="{{ $student->admission_id }}" @selected(old('student_id') == $student->id)>{{ $student->full_name }} ({{ $student->schoolClass?->name }} - {{ $student->section?->name }})</option>
                                                 @endforeach
                                             </select>
                                         </div>

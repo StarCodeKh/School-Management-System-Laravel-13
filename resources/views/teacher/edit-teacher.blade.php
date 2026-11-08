@@ -40,10 +40,10 @@
                                     <div class="form-group local-forms">
                                         <label>Gender <span class="login-danger">*</span></label>
                                         <select class="form-control select  @error('gender') is-invalid @enderror" name="gender">
-                                            <option selected disabled>Select Gender</option>
-                                            <option value="Female" {{ $teacher->gender == 'Female' ? "selected" :"Female"}}>Female</option>
-                                            <option value="Male" {{ $teacher->gender == 'Male' ? "selected" :""}}>Male</option>
-                                            <option value="Others" {{ $teacher->gender == 'Others' ? "selected" :""}}>Others</option>
+                                            <option value="" disabled @selected(blank(old('gender', $teacher->gender?->value)))>Select Gender</option>
+                                            @foreach ($genders as $gender)
+                                                <option value="{{ $gender->value }}" @selected(old('gender', $teacher->gender?->value) === $gender->value)>{{ $gender->label() }}</option>
+                                            @endforeach
                                         </select>
                                         @error('gender')
                                             <span class="invalid-feedback" role="alert">
@@ -75,15 +75,29 @@
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-4 local-forms">
-                                    <div class="form-group local-forms calendar-icon">
+                                    <div class="form-group local-forms">
                                         <label>Qualification <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control datetimepicker @error('qualification') is-invalid @enderror" name="qualification" placeholder="Enter Joining Date" value="{{ $teacher->qualification }}">
+                                        <input type="text" class="form-control @error('qualification') is-invalid @enderror" name="qualification" placeholder="e.g. MSc Mathematics" value="{{ old('qualification', $teacher->qualification) }}">
                                         @error('qualification')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
                                     </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="form-group local-forms">
+                                        <label>Department</label>
+                                        <select class="form-control select @error('department_id') is-invalid @enderror" name="department_id">
+                                            <option value="">-- No department --</option>
+                                            @foreach ($departments as $department)
+                                                <option value="{{ $department->id }}" @selected(old('department_id', $teacher->department_id) == $department->id)>{{ $department->department_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('department_id')
+                                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                                        @enderror
+                                    </div>
+                                </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
                                     <div class="form-group local-forms">

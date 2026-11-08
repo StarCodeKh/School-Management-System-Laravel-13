@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SchoolClass;
 use App\Models\Subject;
-use DB;
 use Illuminate\Http\Request;
-use Log;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class SubjectController extends Controller
 {
     /** index page */
     public function subjectList()
     {
-        $subjectList = Subject::all();
+        $subjectList = Subject::with('schoolClass')->orderBy('subject_name')->get();
 
         return view('subjects.subject_list', compact('subjectList'));
     }
@@ -20,127 +21,84 @@ class SubjectController extends Controller
     /** subject add */
     public function subjectAdd()
     {
-        return view('subjects.subject_add');
+        $classes = $this->classes();
+
+        return view('subjects.subject_add', compact('classes'));
     }
 
     /** Save Record */
     public function saveRecord(Request $request)
     {
-        // Validate request input
-        $request->validate([
-            'subject_name' => 'required|string',
-            'class' => 'required|string',
-        ]);
+        $validated = $request->validate($this->rules($request));
 
-        DB::beginTransaction();
         try {
-            // Create a new Subject record
-            $saveRecord = new Subject;
-            $saveRecord->subject_name = $request->subject_name;
-            $saveRecord->class = $request->class;
-            $saveRecord->save();
-
-            // Commit the transaction
-            DB::commit();
-
-            // Log success
-            Log::info('Subject record saved successfully', [
-                'subject_name' => $request->subject_name,
-                'class' => $request->class,
-            ]);
+            $subject = Subject::create($validated);
+            Log::info('Subject record saved successfully', ['subject' => $subject->code]);
 
             return redirect()->back()->with('success', 'Subject record saved successfully!');
-
         } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Failed to save Subject record', [
-                'error' => $e->getMessage(),
-                'request' => $request->all(),
-            ]);
+            Log::error('Failed to save Subject record', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->with('error', 'Failed to save Subject record: '.$e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Failed to save Subject record. Please try again.');
         }
     }
 
-    /** subject edit view */
-    public function subjectEdit($subject_id)
+    /** subject edit view (URL uses the display code, e.g. /subject/edit/SUB-00001) */
+    public function subjectEdit(string $code)
     {
-        $subjectEdit = Subject::where('subject_id', $subject_id)->first();
+        $subjectEdit = Subject::where('code', $code)->firstOrFail();
+        $classes = $this->classes();
 
-        return view('subjects.subject_edit', compact('subjectEdit'));
+        return view('subjects.subject_edit', compact('subjectEdit', 'classes'));
     }
 
     /** Update Record */
     public function updateRecord(Request $request)
     {
-        DB::beginTransaction();
+        $subject = Subject::where('code', $request->input('code'))->firstOrFail();
+        $validated = $request->validate($this->rules($request, $subject));
+
         try {
-            // Prepare update data
-            $updateRecord = [
-                'subject_name' => $request->subject_name,
-                'class' => $request->class,
-            ];
-
-            // Update the Subject record
-            Subject::where('subject_id', $request->subject_id)->update($updateRecord);
-
-            // Commit the transaction
-            DB::commit();
-
-            // Log success
-            Log::info('Subject record updated successfully', [
-                'subject_id' => $request->subject_id,
-                'subject_name' => $request->subject_name,
-                'class' => $request->class,
-            ]);
+            $subject->update($validated);
+            Log::info('Subject record updated successfully', ['subject' => $subject->code]);
 
             return redirect()->back()->with('success', 'Subject record updated successfully!');
-
         } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Failed to update Subject record', [
-                'error' => $e->getMessage(),
-                'subject_id' => $request->subject_id,
-                'request' => $request->all(),
-            ]);
+            Log::error('Failed to update Subject record', ['error' => $e->getMessage(), 'subject' => $subject->code]);
 
-            return redirect()->back()->with('error', 'Failed to update Subject record: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update Subject record. Please try again.');
         }
     }
 
     /** Delete Record */
     public function deleteRecord(Request $request)
     {
-        DB::beginTransaction();
-        try {
-            $subject = Subject::where('subject_id', $request->subject_id)->first();
-            if ($subject) {
-                Log::info('Subject record deleted', [
-                    'subject_id' => $request->subject_id,
-                    'subject_name' => $subject->subject_name,
-                ]);
-                $subject->delete();
-                DB::commit();
+        $subject = Subject::where('code', $request->input('code'))->first();
 
-                return redirect()->back()->with('success', 'Subject record deleted successfully!');
-            } else {
-                Log::warning('Subject record not found for deletion', [
-                    'subject_id' => $request->subject_id,
-                ]);
-
-                DB::rollback();
-
-                return redirect()->back()->with('error', 'Subject record not found!');
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Failed to delete Subject record', [
-                'error' => $e->getMessage(),
-                'subject_id' => $request->subject_id,
-                'request' => $request->all(),
-            ]);
-
-            return redirect()->back()->with('error', 'Failed to delete Subject record: '.$e->getMessage());
+        if (! $subject) {
+            return redirect()->back()->with('error', 'Subject record not found!');
         }
+
+        $subject->delete();
+        Log::info('Subject record deleted', ['subject' => $subject->code]);
+
+        return redirect()->back()->with('success', 'Subject record deleted successfully!');
+    }
+
+    private function classes()
+    {
+        return SchoolClass::orderBy('sort_order')->orderBy('name')->get();
+    }
+
+    /** a subject name is unique within one class */
+    private function rules(Request $request, ?Subject $ignore = null): array
+    {
+        return [
+            'subject_name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('subjects')->where('school_class_id', $request->input('school_class_id'))->ignore($ignore?->id),
+            ],
+            'school_class_id' => 'required|exists:school_classes,id',
+        ];
     }
 }

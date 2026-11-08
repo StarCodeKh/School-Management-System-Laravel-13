@@ -92,16 +92,16 @@
                                             </td>
                                             <td>STD{{ ++$key }}</td>
                                             <td hidden class="id">{{ $list->id }}</td>
-                                            <td hidden class="avatar">{{ $list->upload }}</td>
+                                            <td hidden class="avatar">{{ $list->photo }}</td>
                                             <td>
                                                 <h2 class="table-avatar">
-                                                    <a href="student-details.html"class="avatar avatar-sm me-2">
-                                                        <img class="avatar-img rounded-circle" src="{{ asset($list->upload) }}" alt="">
+                                                    <a href="{{ url('student/profile/'.$list->id) }}" class="avatar avatar-sm me-2">
+                                                        <img class="avatar-img rounded-circle" src="{{ $list->photo_url }}" alt="">
                                                     </a>
-                                                    <a href="student-details.html">{{ $list->first_name }} {{ $list->last_name }}</a>
+                                                    <a href="{{ url('student/profile/'.$list->id) }}">{{ $list->first_name }} {{ $list->last_name }}</a>
                                                 </h2>
                                             </td>
-                                            <td>{{ $list->class }} {{ $list->section }}</td>
+                                            <td>{{ $list->schoolClass?->name }} - {{ $list->section?->name }}</td>
                                             <td>{{ $list->date_of_birth?->format('d-m-Y') }}</td>
                                             <td>Soeng Soeng</td>
                                             <td>{{ $list->phone_number }}</td>
