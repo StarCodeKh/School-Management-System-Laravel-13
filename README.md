@@ -1,25 +1,48 @@
 # School Management System (Laravel 13)
 
-A school administration app built with Laravel 13, Tailwind CSS 4 and Alpine.js.
-It manages students, teachers, departments, classes, subjects, invoices and fee payments,
-with role-based dashboards for admins, teachers and students.
+A school administration app built with Laravel 13, Tailwind CSS 4 and Alpine.js,
+with role-based dashboards for admins, teachers, students and parents.
 
 ## Features
 
-- **Dashboards**: admin overview, a teacher dashboard (own profile, department, colleagues)
-  and a student dashboard (class, subjects, fee payments, invoices).
-- **Students**: profiles with photo, class and section, optional link to a login account.
-- **Teachers**: profiles linked to a user account and a department.
-- **Departments**: head of department chosen from the teachers.
-- **Classes and sections**: managed on the Classes page; used by student and subject forms.
-- **Subjects**: per class.
-- **Invoices**: line items, extra charges, discounts and tax with live totals
-  (recalculated on the server), status tabs (paid, overdue, draft, recurring, cancelled),
-  filters, list and grid views, printable invoice page.
-- **Fees collection**: record payments per student and fee type.
-- **User management**: roles (Super Admin, Admin, Teacher, Student, Staff, Client, Normal User)
-  and status; admin-only menus are hidden from other roles.
-- **Settings**: school name and contact, currency symbol, invoice defaults, tax and bank details.
+**People and structure**
+- **Students**: profiles with photo, class and section, login account, parents/guardians.
+  The profile shows fees, attendance, exam results, library loans, transport and hostel.
+- **Teachers**: linked to a user account and a department.
+- **Departments, classes and sections, subjects** (subjects per class).
+- **Users**: roles Super Admin, Admin, Teacher, Staff, Student, Parent, Client, Normal User.
+
+**Academics**
+- **Attendance**: daily register per section (present, absent, late, excused) and a date-range report.
+- **Exams**: marks entry per subject, result sheet with grades and ranks, printable report cards.
+- **Timetable**: weekly timetable per section; a teacher cannot be booked twice in one period.
+
+**Finance**
+- **Fee structures** per class, **fee balances** per student, **fee collection**.
+- **Invoices**: line items, charges, discounts and tax (totals calculated on the server),
+  status tabs, filters, printable invoice.
+- **Expenses**, **payroll** (net salary calculated, copy to next month) and a monthly **finance overview**.
+
+**Communication**
+- **Notice board** and **events calendar**, each targeted at everyone, staff, teachers, students or parents.
+- **Parent dashboard**: each linked child's fees, attendance, results and school services.
+
+**Operations**
+- **Library**: books, issue and return, overdue list, daily late fine.
+- **Transport**: vehicles, routes with stops, students per route within seat capacity.
+- **Hostel**: rooms and bed allocations.
+
+**Settings**: school name and contact, currency, invoice defaults, tax, bank details, library rules.
+
+## Who can do what
+
+| Role | Access |
+|------|--------|
+| Super Admin, Admin | Everything |
+| Teacher | Teacher dashboard; view students, teachers, departments, subjects; take attendance; enter marks |
+| Student | Own dashboard: class, subjects, attendance, results, fees, timetable |
+| Parent | Dashboard with each linked child |
+| Everyone | Notice board, events, timetable, own profile |
 
 ## Requirements
 

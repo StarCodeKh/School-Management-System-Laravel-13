@@ -32,6 +32,9 @@ class Setting extends Model
         'bank_name' => null,
         'bank_ifsc_code' => null,
         'bank_account_number' => null,
+        // library
+        'library_loan_days' => '14',
+        'library_fine_per_day' => '0',
     ];
 
     private const CACHE_KEY = 'settings.all';

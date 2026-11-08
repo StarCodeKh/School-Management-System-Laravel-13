@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('study', fn (User $user) => $user->hasRole(Role::Student));
         Gate::define('guard-children', fn (User $user) => $user->hasRole(Role::Parent));
         Gate::define('manage-communication', fn (User $user) => $user->isAdmin());
+        Gate::define('manage-operations', fn (User $user) => $user->isAdmin());
 
         // only the sidebar needs the menu tree
         View::composer('components.sidebar', fn ($view) => $view->with('menus', Menu::sidebar()));

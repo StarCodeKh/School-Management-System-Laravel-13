@@ -4,6 +4,7 @@
         'invoice' => ['label' => 'Invoice', 'route' => 'invoice/settings/page'],
         'tax' => ['label' => 'Tax', 'route' => 'invoice/settings/tax/page'],
         'bank' => ['label' => 'Bank', 'route' => 'invoice/settings/bank/page'],
+        'library' => ['label' => 'Library', 'route' => 'setting/library'],
     ];
 @endphp
 
@@ -47,6 +48,10 @@
                         <x-form.input name="bank_name" label="Bank name" :value="$settings['bank_name']" />
                         <x-form.input name="bank_ifsc_code" label="IFSC / SWIFT code" :value="$settings['bank_ifsc_code']" />
                         <x-form.input name="bank_account_number" label="Account number" :value="$settings['bank_account_number']" />
+                        @break
+                    @case('library')
+                        <x-form.input name="library_loan_days" type="number" min="1" max="365" label="Loan period (days)" :value="$settings['library_loan_days']" required hint="Default due date for new loans." />
+                        <x-form.input name="library_fine_per_day" type="number" step="0.01" min="0" :label="'Late fine per day ('.setting('currency_symbol').')'" :value="$settings['library_fine_per_day']" required hint="Charged when a book is returned late. 0 = no fine." />
                         @break
                 @endswitch
             </div>

@@ -1,4 +1,4 @@
-{{-- Fees, attendance and exam results of one student. Needs $student, $fees, $attendanceRate, $recentAttendance, $examRows. --}}
+{{-- Fees, attendance, exam results and school services of one student (data from StudentController::overview()). --}}
 <div class="grid gap-6 xl:grid-cols-3">
     <x-card title="Fees">
         <div class="grid grid-cols-3 gap-2 text-center">
@@ -53,5 +53,45 @@
                 <li class="px-5 py-8 text-center text-sm text-slate-500">No exam results yet.</li>
             @endforelse
         </ul>
+    </x-card>
+</div>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-3">
+    <x-card title="Library books" :padding="false">
+        <ul class="divide-y divide-slate-100">
+            @forelse ($activeLoans as $loan)
+                <li class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                    <span class="font-medium text-slate-900">{{ $loan->book?->title }}</span>
+                    @if ($loan->isOverdue())
+                        <x-badge color="red">Overdue since {{ $loan->due_on->format('d M') }}</x-badge>
+                    @else
+                        <span class="text-xs text-slate-500">Due {{ $loan->due_on->format('d M Y') }}</span>
+                    @endif
+                </li>
+            @empty
+                <li class="px-5 py-6 text-center text-sm text-slate-500">No books on loan.</li>
+            @endforelse
+        </ul>
+    </x-card>
+
+    <x-card title="Transport">
+        @if ($transport)
+            <p class="font-semibold text-slate-900">{{ $transport->route?->name }}</p>
+            <p class="text-sm text-slate-500">Pickup: {{ $transport->pickup_stop ?: 'not set' }}</p>
+            @if ($transport->route?->vehicle)
+                <p class="mt-2 text-sm text-slate-600">{{ $transport->route->vehicle->registration_number }} &middot; driver {{ $transport->route->vehicle->driver_name ?: '-' }} {{ $transport->route->vehicle->driver_phone }}</p>
+            @endif
+        @else
+            <p class="text-sm text-slate-500">Not using school transport.</p>
+        @endif
+    </x-card>
+
+    <x-card title="Hostel">
+        @if ($hostel)
+            <p class="font-semibold text-slate-900">{{ $hostel->room?->label() }}</p>
+            <p class="text-sm text-slate-500">Since {{ $hostel->allocated_on->format('d M Y') }}</p>
+        @else
+            <p class="text-sm text-slate-500">Not staying in the hostel.</p>
+        @endif
     </x-card>
 </div>

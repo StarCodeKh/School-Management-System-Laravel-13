@@ -44,7 +44,7 @@ class MenuSeeder extends Seeder
             ['title' => 'Exams & Results', 'route' => 'exams.index', 'routes' => ['exams.*']],
         ]],
         ['title' => 'Timetable', 'icon' => 'calendar', 'route' => 'timetable.index'],
-        ['title' => 'Notice Board', 'icon' => 'information', 'route' => 'notices.index', 'routes' => ['notices.*']],
+        ['title' => 'Notice Board', 'icon' => 'megaphone', 'route' => 'notices.index', 'routes' => ['notices.*']],
         ['title' => 'Events', 'icon' => 'calendar', 'route' => 'events.index', 'routes' => ['events.*']],
         ['title' => 'Invoices', 'icon' => 'document', 'ability' => 'manage-finance', 'pattern' => 'invoice/edit/*|invoice/view/*', 'children' => [
             ['title' => 'Invoices List', 'route' => 'invoice/list/page', 'routes' => [
@@ -61,11 +61,18 @@ class MenuSeeder extends Seeder
             ['title' => 'Expenses', 'route' => 'expenses.index', 'routes' => ['expenses.*']],
             ['title' => 'Payroll', 'route' => 'payroll.index', 'routes' => ['payroll.*']],
         ]],
+        ['title' => 'Library', 'icon' => 'library', 'ability' => 'manage-operations', 'children' => [
+            ['title' => 'Books', 'route' => 'books.index', 'routes' => ['books.*']],
+            ['title' => 'Loans', 'route' => 'loans.index', 'routes' => ['loans.*']],
+        ]],
+        ['title' => 'Transport', 'icon' => 'truck', 'ability' => 'manage-operations', 'route' => 'transport.index', 'routes' => ['transport.*']],
+        ['title' => 'Hostel', 'icon' => 'home-modern', 'ability' => 'manage-operations', 'route' => 'hostel.index', 'routes' => ['hostel.*']],
         ['title' => 'Settings', 'icon' => 'cog', 'ability' => 'manage-settings', 'children' => [
             ['title' => 'General', 'route' => 'setting/page'],
             ['title' => 'Invoice', 'route' => 'invoice/settings/page'],
             ['title' => 'Tax', 'route' => 'invoice/settings/tax/page'],
             ['title' => 'Bank', 'route' => 'invoice/settings/bank/page'],
+            ['title' => 'Library', 'route' => 'setting/library'],
         ]],
     ];
 

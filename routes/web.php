@@ -4,6 +4,8 @@ use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\BookLoanController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ExamController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\FeeStructureController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\GuardianController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HostelController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PayrollController;
@@ -22,6 +25,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimetableController;
+use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +76,7 @@ Route::middleware('auth')->group(function () {
         Route::get('invoice/settings/page', 'invoice')->name('invoice/settings/page');
         Route::get('invoice/settings/tax/page', 'tax')->name('invoice/settings/tax/page');
         Route::get('invoice/settings/bank/page', 'bank')->name('invoice/settings/bank/page');
+        Route::get('setting/library', 'library')->name('setting/library');
         Route::post('setting/{group}', 'update')->name('setting/update');
     });
 
@@ -208,4 +213,35 @@ Route::middleware('auth')->group(function () {
     Route::get('events', [EventController::class, 'index'])->name('events.index');
     Route::post('students/{student}/guardians', [GuardianController::class, 'store'])->middleware('can:manage-school')->name('guardians.store');
     Route::delete('students/{student}/guardians/{guardian}', [GuardianController::class, 'destroy'])->middleware('can:manage-school')->name('guardians.destroy');
+
+    // 13. OPERATIONS: library, transport, hostel (admins)
+    Route::middleware('can:manage-operations')->group(function () {
+        Route::resource('books', BookController::class)->except('show');
+        Route::get('library/loans', [BookLoanController::class, 'index'])->name('loans.index');
+        Route::get('library/loans/create', [BookLoanController::class, 'create'])->name('loans.create');
+        Route::post('library/loans', [BookLoanController::class, 'store'])->name('loans.store');
+        Route::post('library/loans/{loan}/return', [BookLoanController::class, 'return'])->name('loans.return');
+
+        Route::controller(TransportController::class)->prefix('transport')->name('transport.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('routes', 'storeRoute')->name('routes.store');
+            Route::get('routes/{transportRoute}', 'showRoute')->name('routes.show');
+            Route::put('routes/{transportRoute}', 'updateRoute')->name('routes.update');
+            Route::delete('routes/{transportRoute}', 'destroyRoute')->name('routes.destroy');
+            Route::post('routes/{transportRoute}/students', 'assign')->name('routes.assign');
+            Route::delete('assignments/{assignment}', 'unassign')->name('assignments.destroy');
+            Route::post('vehicles', 'storeVehicle')->name('vehicles.store');
+            Route::put('vehicles/{vehicle}', 'updateVehicle')->name('vehicles.update');
+            Route::delete('vehicles/{vehicle}', 'destroyVehicle')->name('vehicles.destroy');
+        });
+
+        Route::controller(HostelController::class)->prefix('hostel')->name('hostel.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('rooms', 'storeRoom')->name('rooms.store');
+            Route::put('rooms/{room}', 'updateRoom')->name('rooms.update');
+            Route::delete('rooms/{room}', 'destroyRoom')->name('rooms.destroy');
+            Route::post('allocations', 'allocate')->name('allocations.store');
+            Route::delete('allocations/{allocation}', 'deallocate')->name('allocations.destroy');
+        });
+    });
 });

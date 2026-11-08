@@ -161,6 +161,9 @@ class StudentController extends Controller
             'attendanceRate' => $student->attendanceRate(),
             'recentAttendance' => $student->attendances()->latest('date')->take(10)->get(),
             'examRows' => $exams->map(fn (Exam $exam) => ['exam' => $exam, 'row' => $exam->resultSheet()->firstWhere('student.id', $student->id)]),
+            'activeLoans' => $student->bookLoans()->active()->with('book')->orderBy('due_on')->get(),
+            'transport' => $student->transportAssignment()->with('route.vehicle')->first(),
+            'hostel' => $student->hostelAllocation()->with('room')->first(),
         ];
     }
 

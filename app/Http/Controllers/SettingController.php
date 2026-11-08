@@ -26,6 +26,10 @@ class SettingController extends Controller
             'tax_name' => 'required|string|max:50',
             'tax_rate' => 'required|numeric|min:0|max:100',
         ],
+        'library' => [
+            'library_loan_days' => 'required|integer|min:1|max:365',
+            'library_fine_per_day' => 'required|numeric|min:0|max:1000',
+        ],
         'bank' => [
             'bank_account_holder' => 'nullable|string|max:255',
             'bank_name' => 'nullable|string|max:255',
@@ -53,6 +57,11 @@ class SettingController extends Controller
     public function bank()
     {
         return $this->show('bank');
+    }
+
+    public function library()
+    {
+        return $this->show('library');
     }
 
     /** save one tab */

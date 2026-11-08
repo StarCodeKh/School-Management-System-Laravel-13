@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
 class Student extends Model
@@ -123,5 +124,20 @@ class Student extends Model
     public function guardians(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'guardian_student')->withPivot('relationship')->withTimestamps();
+    }
+
+    public function bookLoans(): HasMany
+    {
+        return $this->hasMany(BookLoan::class);
+    }
+
+    public function transportAssignment(): HasOne
+    {
+        return $this->hasOne(TransportAssignment::class);
+    }
+
+    public function hostelAllocation(): HasOne
+    {
+        return $this->hasOne(HostelAllocation::class);
     }
 }
