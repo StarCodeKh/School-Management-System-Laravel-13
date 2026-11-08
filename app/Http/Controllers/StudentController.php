@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\BloodGroup;
 use App\Enums\Gender;
 use App\Enums\Religion;
+use App\Enums\Role;
 use App\Models\SchoolClass;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
@@ -16,19 +18,37 @@ use Illuminate\Validation\Rule;
 class StudentController extends Controller
 {
     /** index page student list */
-    public function student()
+    public function student(Request $request)
     {
-        $studentList = Student::with(['schoolClass', 'section'])->latest()->get();
-
-        return view('student.student', compact('studentList'));
+        return view('student.student', $this->listing($request, 15));
     }
 
     /** index page student grid */
-    public function studentGrid()
+    public function studentGrid(Request $request)
     {
-        $studentList = Student::with(['schoolClass', 'section'])->latest()->get();
+        return view('student.student-grid', $this->listing($request, 12));
+    }
 
-        return view('student.student-grid', compact('studentList'));
+    /** students filtered by search text and class, shared by the list and grid views */
+    private function listing(Request $request, int $perPage): array
+    {
+        $search = trim((string) $request->query('search'));
+        $classId = $request->integer('class') ?: null;
+
+        $studentList = Student::with(['schoolClass', 'section'])
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('admission_id', 'like', "%{$search}%")
+                ->orWhere('phone_number', 'like', "%{$search}%")))
+            ->when($classId, fn ($q) => $q->where('school_class_id', $classId))
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $classes = SchoolClass::orderBy('sort_order')->orderBy('name')->get();
+
+        return compact('studentList', 'search', 'classId', 'classes');
     }
 
     /** student add page */
@@ -41,6 +61,7 @@ class StudentController extends Controller
     public function studentSave(Request $request)
     {
         $validated = $request->validate($this->rules($request) + [
+            'user_id' => 'nullable|exists:users,id|unique:students,user_id',
             'email' => 'required|email|max:255|unique:students,email',
             'admission_id' => 'required|string|max:50|unique:students,admission_id',
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -61,7 +82,7 @@ class StudentController extends Controller
     /** View */
     public function studentEdit(Student $student)
     {
-        return view('student.edit-student', ['studentEdit' => $student] + $this->formOptions());
+        return view('student.edit-student', ['studentEdit' => $student] + $this->formOptions($student));
     }
 
     /** Update Record */
@@ -70,6 +91,7 @@ class StudentController extends Controller
         $student = Student::findOrFail($request->input('id'));
 
         $validated = $request->validate($this->rules($request) + [
+            'user_id' => ['nullable', 'exists:users,id', Rule::unique('students', 'user_id')->ignore($student->id)],
             'email' => ['required', 'email', 'max:255', Rule::unique('students', 'email')->ignore($student->id)],
             'admission_id' => ['required', 'string', 'max:50', Rule::unique('students', 'admission_id')->ignore($student->id)],
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -122,20 +144,30 @@ class StudentController extends Controller
     /** student profile page */
     public function studentProfile(Student $student)
     {
-        $student->load(['schoolClass', 'section']);
+        $student->load(['schoolClass', 'section', 'user']);
 
         return view('student.student-profile', ['studentProfile' => $student]);
     }
 
     /** select options shared by the add and edit forms */
-    private function formOptions(): array
+    private function formOptions(?Student $student = null): array
     {
         return [
+            'accounts' => $this->loginAccounts($student),
             'classes' => SchoolClass::with('sections')->orderBy('sort_order')->orderBy('name')->get(),
             'genders' => Gender::cases(),
             'bloodGroups' => BloodGroup::cases(),
             'religions' => Religion::cases(),
         ];
+    }
+
+    /** student-role accounts not yet linked to a student (plus the current one when editing) */
+    private function loginAccounts(?Student $student = null)
+    {
+        return User::where('role', Role::Student)
+            ->where(fn ($q) => $q->doesntHave('student')->when($student?->user_id, fn ($q, $id) => $q->orWhere('id', $id)))
+            ->orderBy('name')
+            ->get();
     }
 
     /** fields shared by the add and edit forms */

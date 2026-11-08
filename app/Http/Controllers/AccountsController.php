@@ -13,7 +13,7 @@ class AccountsController extends Controller
     /** index page */
     public function index()
     {
-        $feeCollections = FeeCollection::with(['student', 'feeType'])->latest('paid_date')->get();
+        $feeCollections = FeeCollection::with(['student', 'feeType'])->latest('paid_date')->paginate(15);
 
         return view('accounts.feescollections', compact('feeCollections'));
     }

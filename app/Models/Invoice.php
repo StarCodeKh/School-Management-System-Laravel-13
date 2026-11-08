@@ -26,6 +26,8 @@ class Invoice extends Model
         'due_date',
         'status',
         'enable_tax',
+        'tax_rate',
+        'tax_amount',
         'is_recurring',
         'recurring_by_month',
         'recurring_month',
@@ -54,6 +56,8 @@ class Invoice extends Model
             'due_date' => 'date',
             'enable_tax' => 'boolean',
             'is_recurring' => 'boolean',
+            'tax_rate' => 'decimal:2',
+            'tax_amount' => 'decimal:2',
             'taxable_amount' => 'decimal:2',
             'round_off' => 'decimal:2',
             'total_amount' => 'decimal:2',
@@ -79,11 +83,6 @@ class Invoice extends Model
     public function statusLabel(): string
     {
         return $this->isOverdue() ? 'Overdue' : $this->status->label();
-    }
-
-    public function statusBadgeClass(): string
-    {
-        return $this->isOverdue() ? 'bg-warning-light' : $this->status->badgeClass();
     }
 
     public function scopeOverdue(Builder $query): void

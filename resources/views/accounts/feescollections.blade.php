@@ -1,81 +1,31 @@
-@extends('layouts.master')
-@section('content')
-    <div class="page-wrapper">
-        <div class="content container-fluid">
+<x-layouts.app title="Fees Collection">
+    <x-page-header title="Fees Collection" :breadcrumbs="['Dashboard' => route('home'), 'Fees Collection' => null]">
+        <x-slot:actions>
+            <x-button :href="route('add/fees/collection/page')" icon="plus">Add payment</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
-            <div class="page-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h3 class="page-title">Fees Collections</h3>
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Fees Collections</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card card-table">
-                        <div class="card-body">
-
-                            <div class="page-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h3 class="page-title">Fees Collections</h3>
-                                    </div>
-                                    <div class="col-auto text-end float-end ms-auto download-grp">
-                                        <a href="#" class="btn btn-outline-primary me-2">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                        <a href="{{ route('add/fees/collection/page') }}" class="btn btn-primary">
-                                            <i class="fas fa-plus"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table
-                                    class="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
-                                    <thead class="student-thread">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Fees Type</th>
-                                            <th>Amount</th>
-                                            <th>Paid Date</th>
-                                            <th class="text-end">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($feeCollections as $value)
-                                            <tr>
-                                                <td>{{ $value->student?->admission_id }}</td>
-                                                <td>
-                                                    <h2 class="table-avatar">
-                                                        <a class="avatar avatar-sm me-2">
-                                                            <img class="avatar-img rounded-circle" src="{{ $value->student?->photo_url ?? asset('images/photo_defaults.jpg') }}" alt="{{ $value->student?->full_name }}">
-                                                        </a>
-                                                        <a href="{{ url('student/profile/'.$value->student_id) }}">{{ $value->student?->full_name }}</a>
-                                                    </h2>
-                                                </td>
-                                                <td>{{ $value->feeType->name }}</td>
-                                                <td>${{ number_format($value->amount, 2) }}</td>
-                                                <td>{{ $value->paid_date->format('d-m-Y') }}</td>
-                                                <td class="text-end">
-                                                    <span class="badge badge-success">Paid</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
+    <x-table>
+        <x-slot:head>
+            <tr><th>Admission ID</th><th>Student</th><th>Fee type</th><th>Amount</th><th>Paid date</th><th class="text-right">Status</th></tr>
+        </x-slot:head>
+        @forelse ($feeCollections as $payment)
+            <tr class="hover:bg-slate-50">
+                <td class="font-medium text-slate-900">{{ $payment->student?->admission_id }}</td>
+                <td>
+                    <a href="{{ url('student/profile/'.$payment->student_id) }}" class="flex items-center gap-3 hover:text-primary-600">
+                        <x-avatar :src="$payment->student?->photo_url" :alt="$payment->student?->full_name" size="size-8" />
+                        <span class="font-medium">{{ $payment->student?->full_name }}</span>
+                    </a>
+                </td>
+                <td>{{ $payment->feeType?->name }}</td>
+                <td class="font-semibold text-slate-900">{{ money($payment->amount) }}</td>
+                <td>{{ $payment->paid_date->format('d M Y') }}</td>
+                <td class="text-right"><x-badge color="green">Paid</x-badge></td>
+            </tr>
+        @empty
+            <x-empty-row colspan="6" message="No payments recorded yet." />
+        @endforelse
+        <x-slot:footer>{{ $feeCollections->links() }}</x-slot:footer>
+    </x-table>
+</x-layouts.app>

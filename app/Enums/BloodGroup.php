@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum BloodGroup: string
 {
+    use HasOptions;
+
     case APositive = 'A+';
     case ANegative = 'A-';
     case BPositive = 'B+';

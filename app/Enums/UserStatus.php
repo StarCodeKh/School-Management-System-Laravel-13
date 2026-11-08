@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum UserStatus: string
 {
+    use HasOptions;
+
     case Active = 'active';
     case Inactive = 'inactive';
     case Disabled = 'disabled';
@@ -11,15 +15,5 @@ enum UserStatus: string
     public function label(): string
     {
         return ucfirst($this->value);
-    }
-
-    /** Badge class used in the users table. */
-    public function badgeClass(): string
-    {
-        return match ($this) {
-            self::Active => 'bg-success-dark',
-            self::Inactive => 'badge-warning',
-            self::Disabled => 'bg-danger-dark',
-        };
     }
 }

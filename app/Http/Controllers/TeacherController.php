@@ -26,19 +26,32 @@ class TeacherController extends Controller
     }
 
     /** teacher list */
-    public function teacherList()
+    public function teacherList(Request $request)
     {
-        $listTeacher = Teacher::with(['user', 'department'])->latest()->get();
-
-        return view('teacher.list-teachers', compact('listTeacher'));
+        return view('teacher.list-teachers', $this->listing($request, 15));
     }
 
     /** teacher Grid */
-    public function teacherGrid()
+    public function teacherGrid(Request $request)
     {
-        $teacherGrid = Teacher::with('user')->latest()->get();
+        return view('teacher.teachers-grid', $this->listing($request, 12));
+    }
 
-        return view('teacher.teachers-grid', compact('teacherGrid'));
+    /** teachers filtered by search text, shared by the list and grid views */
+    private function listing(Request $request, int $perPage): array
+    {
+        $search = trim((string) $request->query('search'));
+
+        $teachers = Teacher::with(['user', 'department'])
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->whereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
+                ->orWhere('qualification', 'like', "%{$search}%")
+                ->orWhere('phone_number', 'like', "%{$search}%")))
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return compact('teachers', 'search');
     }
 
     /** Save Record */

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('due_date');
             $table->string('status', 20)->default('draft')->index();
             $table->boolean('enable_tax')->default(false);
+            $table->decimal('tax_rate', 5, 2)->default(0);     // % copied from settings when saved
             $table->boolean('is_recurring')->default(false);
             $table->string('recurring_by_month', 20)->nullable();
             $table->string('recurring_month', 50)->nullable();
@@ -28,7 +29,8 @@ return new class extends Migration
             $table->text('invoice_to')->nullable();
 
             // Totals
-            $table->decimal('taxable_amount', 12, 2)->default(0);
+            $table->decimal('taxable_amount', 12, 2)->default(0); // subtotal of the line items
+            $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('round_off', 12, 2)->default(0);
             $table->json('additional_charges')->nullable(); // list of amounts
             $table->json('discounts')->nullable();          // list of percentages

@@ -104,16 +104,14 @@ class PagesTest extends TestCase
             ->assertSee('value="'.$student->section_id.'" selected', false);
     }
 
-    public function test_department_datatable_shows_head_teacher_name(): void
+    public function test_department_list_searches_by_head_teacher_name(): void
     {
-        $this->actingAs($this->admin)->getJson('/department/get-data-list?'.http_build_query([
-            'draw' => 1, 'start' => 0, 'length' => 10,
-            'order' => [['column' => 2, 'dir' => 'desc']],
-            'columns' => [['data' => 'code'], ['data' => 'department_name'], ['data' => 'head_of_department']],
-            'search' => ['value' => 'Science'],
-        ]))->assertOk()
-            ->assertJsonPath('iTotalDisplayRecords', 1)
-            ->assertJsonPath('aaData.0.head_of_department', e(Teacher::first()->full_name));
+        $head = Teacher::first()->full_name;
+
+        $this->actingAs($this->admin)->get('/department/list/page?search='.urlencode($head))
+            ->assertOk()->assertSee('Science')->assertSee($head);
+        $this->actingAs($this->admin)->get('/department/list/page?search=nothing-matches')
+            ->assertOk()->assertDontSee('Science')->assertSee('No departments found.');
     }
 
     public function test_dashboard_shows_real_counts_and_escapes_user_name(): void
@@ -145,17 +143,13 @@ class PagesTest extends TestCase
         $this->assertSame(InvoiceStatus::Paid, $this->overdue->fresh()->status);
     }
 
-    public function test_users_datatable_ignores_unknown_sort_column_and_escapes_html(): void
+    public function test_user_list_searches_and_escapes_html(): void
     {
-        $response = $this->actingAs($this->admin)->getJson('/get-users-data?'.http_build_query([
-            'draw' => 1, 'start' => 0, 'length' => 10,
-            'order' => [['column' => 0, 'dir' => 'asc']],
-            'columns' => [['data' => 'password']],
-            'search' => ['value' => 'Admin'],
-        ]))->assertOk();
-
-        $this->assertSame(1, $response->json('iTotalDisplayRecords'));
-        $this->assertSame('Admin &lt;b&gt;X&lt;/b&gt;', $response->json('aaData.0.name'));
+        $this->actingAs($this->admin)->get('/list/users?search=Admin')
+            ->assertOk()
+            ->assertSee('Admin &lt;b&gt;X&lt;/b&gt;', false)
+            ->assertDontSee('Admin <b>X</b>', false)
+            ->assertDontSee('Client One');
     }
 
     public function test_logout_requires_post_and_ends_session(): void

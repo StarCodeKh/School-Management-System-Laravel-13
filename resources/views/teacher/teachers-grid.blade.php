@@ -1,65 +1,26 @@
+<x-layouts.app title="Teachers">
+    <x-page-header title="Teachers" :breadcrumbs="['Dashboard' => route('home'), 'Teachers' => null]">
+        <x-slot:actions>
+            <x-button :href="route('teacher/add/page')" icon="plus">Add teacher</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
-@extends('layouts.master')
-@section('content')
-    <div class="page-wrapper">
-        <div class="content container-fluid">
-            <div class="page-header">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="page-sub-header">
-                            <h3 class="page-title">Teachers</h3>
-                            <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('student/list') }}">Teacher</a></li>
-                                <li class="breadcrumb-item active">All Teachers</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    @include('teacher._toolbar')
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card card-table comman-shadow">
-                        <div class="card-body pb-0">
-                            <div class="page-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h3 class="page-title">Teachers</h3>
-                                    </div>
-                                    <div class="col-auto text-end float-end ms-auto download-grp">
-                                        <a href="{{ route('teacher/list/page') }}" class="btn btn-outline-gray me-2"><i class="fa fa-list"></i></a>
-                                        <a href="{{ route('teacher/grid/page') }}" class="btn btn-outline-gray me-2 active"><i class="fa fa-th"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="student-pro-list">
-                                <div class="row">
-                                    @foreach ($teacherGrid as $key=>$list )
-                                    <div class="col-xl-3 col-lg-4 col-md-6 d-flex">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="student-box flex-fill">
-                                                    <div class="student-img">
-                                                        <a href="{{ url('teacher/edit/'.$list->id) }}">
-                                                            <img class="img-fluid" alt="{{ $list->full_name }}" src="{{ $list->user?->avatar_url ?? asset('images/photo_defaults.jpg') }}" width="20%" height="20%">
-                                                        </a>
-                                                    </div>
-                                                    <div class="student-content pb-0">
-                                                        <h5><a href="{{ url('teacher/edit/'.$list->id) }}">{{ $list->full_name }}</a></h5>
-                                                        <h6>{{ $list->qualification }}</h6>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        @forelse ($teachers as $teacher)
+            <a href="{{ url('teacher/edit/'.$teacher->id) }}" class="group rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm transition hover:border-primary-300 hover:shadow-md">
+                <x-avatar :src="$teacher->user?->avatar_url" :alt="$teacher->full_name" size="size-20" class="mx-auto" />
+                <p class="mt-3 font-semibold text-slate-900 group-hover:text-primary-600">{{ $teacher->full_name }}</p>
+                <p class="text-sm text-slate-500">{{ $teacher->qualification }}</p>
+                @if ($teacher->department)
+                    <x-badge color="indigo" class="mt-2">{{ $teacher->department->department_name }}</x-badge>
+                @endif
+            </a>
+        @empty
+            <p class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No teachers found.</p>
+        @endforelse
     </div>
-@endsection
+
+    <div class="mt-6">{{ $teachers->links() }}</div>
+</x-layouts.app>

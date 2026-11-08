@@ -1,65 +1,24 @@
+<x-layouts.app title="Students">
+    <x-page-header title="Students" :breadcrumbs="['Dashboard' => route('home'), 'Students' => null]">
+        <x-slot:actions>
+            <x-button :href="route('student/add/page')" icon="plus">Add student</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
-@extends('layouts.master')
-@section('content')
-    <div class="page-wrapper">
-        <div class="content container-fluid">
-            <div class="page-header">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="page-sub-header">
-                            <h3 class="page-title">Students</h3>
-                            <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="{{ route('student/list') }}">Student</a></li>
-                                <li class="breadcrumb-item active">All Students</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    @include('student._toolbar')
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card card-table comman-shadow">
-                        <div class="card-body pb-0">
-                            <div class="page-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h3 class="page-title">Students</h3>
-                                    </div>
-                                    <div class="col-auto text-end float-end ms-auto download-grp">
-                                        <a href="{{ route('student/list') }}" class="btn btn-outline-gray me-2"><i class="fa fa-list"></i></a>
-                                        <a href="{{ route('student/grid') }}" class="btn btn-outline-gray me-2 active"><i class="fa fa-th"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="student-pro-list">
-                                <div class="row">
-                                    @foreach ($studentList as $key=>$list )
-                                    <div class="col-xl-3 col-lg-4 col-md-6 d-flex">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="student-box flex-fill">
-                                                    <div class="student-img">
-                                                        <a href="{{ url('student/profile/'.$list->id) }}">
-                                                            <img class="img-fluid" alt="Students Info" src="{{ $list->photo_url }}" width="20%" height="20%">
-                                                        </a>
-                                                    </div>
-                                                    <div class="student-content pb-0">
-                                                        <h5><a href="{{ url('student/profile/'.$list->id) }}">{{ $list->first_name }} {{ $list->last_name }}</a></h5>
-                                                        <h6>Class {{ $list->schoolClass?->name }} - {{ $list->section?->name }}</h6>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        @forelse ($studentList as $student)
+            <a href="{{ url('student/profile/'.$student->id) }}" class="group rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm transition hover:border-primary-300 hover:shadow-md">
+                <x-avatar :src="$student->photo_url" :alt="$student->full_name" size="size-20" class="mx-auto" />
+                <p class="mt-3 font-semibold text-slate-900 group-hover:text-primary-600">{{ $student->full_name }}</p>
+                <p class="text-sm text-slate-500">{{ $student->admission_id }}</p>
+                <x-badge color="indigo" class="mt-2">Class {{ $student->schoolClass?->name }} - {{ $student->section?->name }}</x-badge>
+            </a>
+        @empty
+            <p class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No students found.</p>
+        @endforelse
     </div>
-@endsection
+
+    <div class="mt-6">{{ $studentList->links() }}</div>
+</x-layouts.app>

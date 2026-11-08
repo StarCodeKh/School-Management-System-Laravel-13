@@ -28,9 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Gate::define('manage-users', fn (User $user) => $user->isAdmin());
+        Gate::define('manage-settings', fn (User $user) => $user->isAdmin());
 
-        View::composer('*', fn ($view) => $view->with('menus', Menu::whereNull('parent_id')->where('is_active', true)->with('children')->orderBy('sort_order')->get()
-        )
-        );
+        // only the sidebar needs the menu tree
+        View::composer('components.sidebar', fn ($view) => $view->with('menus', Menu::sidebar()));
     }
 }

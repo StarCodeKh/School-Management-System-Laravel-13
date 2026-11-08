@@ -1,205 +1,25 @@
+<x-layouts.app title="Add Teacher">
+    <x-page-header title="Add Teacher" :breadcrumbs="['Teachers' => route('teacher/list/page'), 'Add Teacher' => null]" />
 
-@extends('layouts.master')
-@section('content')
-<div class="page-wrapper">
-    <div class="content container-fluid">
-        <div class="page-header">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h3 class="page-title">Add Teachers</h3>
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('teacher/list/page') }}">Teachers</a></li>
-                        <li class="breadcrumb-item active">Add Teachers</li>
-                    </ul>
+    <x-card>
+        <form method="POST" action="{{ route('teacher/save') }}" class="space-y-8"
+              x-data="{ codes: @js($users->pluck('code', 'id')), userId: @js((string) old('user_id', '')) }">
+            @csrf
+            <div>
+                <h2 class="text-base font-semibold text-slate-900">Account</h2>
+                <p class="mt-1 text-sm text-slate-500">Teachers are linked to a user account with the Teacher role. The name and email come from that account.</p>
+                <div class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <x-form.select name="user_id" label="Teacher account" :options="$users->pluck('name', 'id')" placeholder="Select account" required x-model="userId"
+                                   :hint="$users->isEmpty() ? 'Every Teacher account already has a profile. Register a new Teacher account first.' : null" />
+                    <x-form.field label="User ID">
+                        <input type="text" readonly :value="codes[userId] ?? ''" class="block w-full rounded-lg border-slate-300 bg-slate-50 text-sm text-slate-500 shadow-sm">
+                    </x-form.field>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                        <form action="{{ route('teacher/save') }}" method="POST">
-                            @csrf
-                            <div class="row">
-                                <div class="col-12">
-                                    <h5 class="form-title"><span>Basic Details</span></h5>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Full Name<span class="login-danger">*</span></label>
-                                        <select class="select select2s-hidden-accessible @error('user_id') is-invalid @enderror" style="width: 100%;" tabindex="-1" aria-hidden="true" id="user_id" name="user_id">
-                                            <option selected disabled>-- Select Name --</option>
-                                            @foreach($users as $key => $names)
-                                                <option value="{{ $names->id }}" data-code="{{ $names->code }}" @selected(old('user_id') == $names->id)>{{ $names->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('user_id')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Teacher ID <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control" id="teacher_code" placeholder="Teacher ID" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Gender <span class="login-danger">*</span></label>
-                                        <select class="form-control select  @error('gender') is-invalid @enderror" name="gender">
-                                            <option value="" disabled @selected(blank(old('gender')))>Select Gender</option>
-                                            @foreach ($genders as $gender)
-                                                <option value="{{ $gender->value }}" @selected(old('gender') === $gender->value)>{{ $gender->label() }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('gender')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Experience <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('experience') is-invalid @enderror" name="experience" placeholder="Enter Experience" value="{{ old('experience') }}">
-                                        @error('experience')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Qualification <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('qualification') is-invalid @enderror" name="qualification" placeholder="e.g. MSc Mathematics" value="{{ old('qualification') }}">
-                                        @error('qualification')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Department</label>
-                                        <select class="form-control select @error('department_id') is-invalid @enderror" name="department_id">
-                                            <option value="">-- No department --</option>
-                                            @foreach ($departments as $department)
-                                                <option value="{{ $department->id }}" @selected(old('department_id') == $department->id)>{{ $department->department_name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('department_id')
-                                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms calendar-icon">
-                                        <label>Date Of Birth <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control datetimepicker @error('date_of_birth') is-invalid @enderror" name="date_of_birth" placeholder="DD-MM-YYYY" value="{{ old('date_of_birth') }}">
-                                        @error('date_of_birth')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
+            @include('teacher._profile-fields', ['teacher' => null])
 
-                                <div class="col-12">
-                                    <h5 class="form-title"><span>Address</span></h5>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-group local-forms">
-                                        <label>Address <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" placeholder="Enter address" value="{{ old('address') }}">
-                                        @error('address')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="form-group local-forms">
-                                        <label>Phone </label>
-                                        <input class="form-control @error('phone_number') is-invalid @enderror" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');" name="phone_number" placeholder="Enter Phone Number" value="{{ old('phone_number') }}">
-                                        @error('phone_number')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>City <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('city') is-invalid @enderror" name="city" placeholder="Enter City" value="{{ old('city') }}">
-                                        @error('city')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>State <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('state') is-invalid @enderror" name="state" placeholder="Enter State" value="{{ old('state') }}">
-                                        @error('state')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Zip Code <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('zip_code') is-invalid @enderror" name="zip_code" placeholder="Enter Zip" value="{{ old('zip_code') }}">
-                                        @error('zip_code')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-4">
-                                    <div class="form-group local-forms">
-                                        <label>Country <span class="login-danger">*</span></label>
-                                        <input type="text" class="form-control @error('country') is-invalid @enderror" name="country" placeholder="Enter Country" value="{{ old('country') }}">
-                                        @error('country')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="student-submit">
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@section('script')
-<script>
-    // select auto teacher id
-    $('#user_id').on('change',function()
-    {
-        $('#teacher_code').val($(this).find(':selected').data('code'));
-    });
-</script>
-@endsection
-@endsection
+            <x-form.actions submit="Save teacher" :cancel="route('teacher/list/page')" />
+        </form>
+    </x-card>
+</x-layouts.app>

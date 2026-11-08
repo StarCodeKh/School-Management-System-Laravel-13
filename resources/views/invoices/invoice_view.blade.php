@@ -1,152 +1,103 @@
-@extends('layouts.master')
-@section('content')
-    <div class="page-wrapper">
-        <div class="content container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-xl-10">
-                    <div class="card invoice-info-card">
-                        <div class="card-body">
-                            <div class="invoice-item invoice-item-one">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="invoice-logo">
-                                            <img src="{{ URL::to('assets/img/logo.png') }}" alt="logo">
-                                        </div>
-                                        <div class="invoice-head">
-                                            <h2>Invoice</h2>
-                                            <p>Invoice Number : {{ $invoice->invoice_number }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="invoice-info">
-                                            <strong class="customer-text-one">Invoice From</strong>
-                                            <h6 class="invoice-name">Company Name</h6>
-                                            <p class="invoice-details">
-                                                {!! nl2br(e($invoice->invoice_to)) !!}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<x-layouts.app :title="$invoice->invoice_number">
+    <x-page-header :title="'Invoice '.$invoice->invoice_number" :breadcrumbs="['Invoices' => route('invoice/list/page'), $invoice->invoice_number => null]">
+        <x-slot:actions>
+            <x-button variant="secondary" icon="printer" type="button" onclick="window.print()">Print</x-button>
+            <x-button :href="route('invoice/edit/page', $invoice)" icon="pencil">Edit</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
-                            <div class="invoice-item invoice-item-two">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="invoice-info">
-                                            <strong class="customer-text-one">Billed to</strong>
-                                            <h6 class="invoice-name"></h6>
-                                            <p class="invoice-details invoice-details-two">
-                                                {!! nl2br(e($invoice->invoice_from)) !!}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="invoice-info invoice-info2">
-                                            <strong class="customer-text-one">Payment Details</strong>
-                                            <p class="invoice-details">
-                                                Debit Card <br>
-                                                XXXXXXXXXXXX-{{ $invoice->account_number }} <br>
-                                                {{  $invoice->bank_name }}
-                                            </p>
-                                            <div class="invoice-item-box">
-                                                <p>Recurring : 15 Months</p>
-                                                <p class="mb-0">PO Number : {{ $invoice->po_number }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="invoice-issues-box">
-                                <div class="row">
-                                    <div class="col-lg-4 col-md-4">
-                                        <div class="invoice-issues-date">
-                                            <p>Issue Date : 27 Jul 2022</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4">
-                                        <div class="invoice-issues-date">
-                                            <p>Due Date : 27 Aug 2022</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4">
-                                        <div class="invoice-issues-date">
-                                            <p>Due Amount : ₹ 1,54,22 </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="invoice-item invoice-table-wrap">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="table-responsive">
-                                            <table class="invoice-table table table-center mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Iteams</th>
-                                                        <th>Category</th>
-                                                        <th>Rate/Item</th>
-                                                        <th>Quantity</th>
-                                                        <th>Discount (%)</th>
-                                                        <th class="text-end">Price</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($invoice->items as $key => $value)
-                                                        <tr>
-                                                            <td>{{ $value->item }}</td>
-                                                            <td>{{ $value->category }}</td>
-                                                            <td>${{ $value->amount }}</td>
-                                                            <th>{{ $value->quantity }}</th>
-                                                            <th>{{ $value->discount }}%</th>
-                                                            <td class="text-end">${{ $value->price }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row align-items-center justify-content-center">
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="invoice-terms">
-                                        <h6>Notes:</h6>
-                                        <p class="mb-0">Enter customer notes or any other details</p>
-                                    </div>
-                                    <div class="invoice-terms">
-                                        <h6>Terms and Conditions:</h6>
-                                        <p class="mb-0">Enter customer notes or any other details</p>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="invoice-total-card">
-                                        <div class="invoice-total-box">
-                                            <div class="invoice-total-inner">
-                                                <p>Taxable <span>$6,660.00</span></p>
-                                                <p>Additional Charges <span>$6,660.00</span></p>
-                                                <p>Discount <span>$3,300.00</span></p>
-                                                <p class="mb-0">Sub total <span>$3,300.00</span></p>
-                                            </div>
-                                            <div class="invoice-total-footer">
-                                                <h4>Total Amount <span>${{ $invoice->total_amount }}</span></h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="invoice-sign text-end">
-                                <img class="img-fluid d-inline-block" src="{{ asset($invoice->signature_path) }}" alt="sign" style="width: 10%;">
-                                <span class="d-block">{{ $invoice->signatory_name }}</span>
-                            </div>
-                        </div>
-                    </div>
+    <article class="mx-auto max-w-4xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10 print:border-0 print:shadow-none">
+        <header class="flex flex-col gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:justify-between">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="grid size-10 place-items-center rounded-lg bg-primary-600 text-white"><x-icon name="academic-cap" /></span>
+                    <span class="text-lg font-bold text-slate-900">{{ setting('school_name') }}</span>
                 </div>
+                <p class="mt-3 text-sm whitespace-pre-line text-slate-500">{{ $invoice->invoice_from }}</p>
             </div>
+            <div class="sm:text-right">
+                <p class="text-2xl font-bold text-slate-900">INVOICE</p>
+                <p class="text-sm text-slate-500">{{ $invoice->invoice_number }}</p>
+                <div class="mt-2"><x-invoice-status :invoice="$invoice" /></div>
+            </div>
+        </header>
+
+        <section class="grid gap-6 border-b border-slate-200 py-6 text-sm sm:grid-cols-3">
+            <div>
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Billed to</p>
+                <p class="mt-1 font-semibold text-slate-900">{{ $invoice->customer_name }}</p>
+                <p class="whitespace-pre-line text-slate-500">{{ $invoice->invoice_to }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Dates</p>
+                <p class="mt-1 text-slate-700">Issued: {{ $invoice->invoice_date?->format('d M Y') }}</p>
+                <p class="text-slate-700">Due: {{ $invoice->due_date->format('d M Y') }}</p>
+                <p class="text-slate-700">PO: {{ $invoice->po_number }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Payment</p>
+                <p class="mt-1 text-slate-700">{{ $invoice->bank_name ?: '-' }}</p>
+                <p class="text-slate-700">{{ $invoice->account_holder_name }}</p>
+                <p class="text-slate-700">{{ $invoice->account_number }}</p>
+                @if ($invoice->ifsc_code)<p class="text-slate-700">Code: {{ $invoice->ifsc_code }}</p>@endif
+            </div>
+        </section>
+
+        <div class="overflow-x-auto py-6">
+            <table class="min-w-full text-sm">
+                <thead class="border-b border-slate-200 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                    <tr><th class="py-2 pr-4">Item</th><th class="py-2 pr-4">Category</th><th class="py-2 pr-4 text-right">Qty</th><th class="py-2 pr-4 text-right">Price</th><th class="py-2 pr-4 text-right">Discount</th><th class="py-2 text-right">Amount</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach ($invoice->items as $item)
+                        <tr>
+                            <td class="py-3 pr-4 font-medium text-slate-900">{{ $item->item }}</td>
+                            <td class="py-3 pr-4 text-slate-500">{{ $item->category }}</td>
+                            <td class="py-3 pr-4 text-right">{{ rtrim(rtrim($item->quantity, '0'), '.') }}</td>
+                            <td class="py-3 pr-4 text-right">{{ money($item->price) }}</td>
+                            <td class="py-3 pr-4 text-right">{{ (float) $item->discount }}%</td>
+                            <td class="py-3 text-right font-medium text-slate-900">{{ money($item->amount) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </div>
-@endsection
+
+        <div class="flex flex-col gap-6 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
+            <div class="space-y-4 text-sm sm:max-w-sm">
+                @if ($invoice->notes)
+                    <div><p class="font-semibold text-slate-900">Notes</p><p class="whitespace-pre-line text-slate-500">{{ $invoice->notes }}</p></div>
+                @endif
+                @if ($invoice->terms_and_conditions)
+                    <div><p class="font-semibold text-slate-900">Terms and conditions</p><p class="whitespace-pre-line text-slate-500">{{ $invoice->terms_and_conditions }}</p></div>
+                @endif
+            </div>
+
+            <dl class="w-full space-y-2 text-sm sm:w-72">
+                <div class="flex justify-between"><dt class="text-slate-500">Subtotal</dt><dd>{{ money($invoice->taxable_amount) }}</dd></div>
+                @if ($invoice->enable_tax)
+                    <div class="flex justify-between"><dt class="text-slate-500">{{ setting('tax_name', 'Tax') }} ({{ (float) $invoice->tax_rate }}%)</dt><dd>{{ money($invoice->tax_amount) }}</dd></div>
+                @endif
+                @foreach ($invoice->additional_charges ?? [] as $charge)
+                    <div class="flex justify-between"><dt class="text-slate-500">Additional charge</dt><dd>{{ money($charge) }}</dd></div>
+                @endforeach
+                @foreach ($invoice->discounts ?? [] as $discount)
+                    <div class="flex justify-between"><dt class="text-slate-500">Discount ({{ (float) $discount }}%)</dt><dd>-{{ money($invoice->taxable_amount * $discount / 100) }}</dd></div>
+                @endforeach
+                @if ((float) $invoice->round_off)
+                    <div class="flex justify-between"><dt class="text-slate-500">Round off</dt><dd>{{ money($invoice->round_off) }}</dd></div>
+                @endif
+                <div class="flex justify-between border-t border-slate-200 pt-2 text-base font-bold text-slate-900"><dt>Total</dt><dd>{{ money($invoice->total_amount) }}</dd></div>
+            </dl>
+        </div>
+
+        <footer class="mt-10 flex justify-end">
+            <div class="text-center">
+                @if ($invoice->signature_path)
+                    <img src="{{ asset($invoice->signature_path) }}" alt="Signature" class="mx-auto h-16 w-auto">
+                @endif
+                <p class="mt-2 border-t border-slate-300 pt-2 text-sm font-semibold text-slate-900">{{ $invoice->signatory_name }}</p>
+            </div>
+        </footer>
+    </article>
+</x-layouts.app>

@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum Religion: string
 {
+    use HasOptions;
+
     case Buddhism = 'buddhism';
     case Christianity = 'christianity';
     case Islam = 'islam';

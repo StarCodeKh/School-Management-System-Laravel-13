@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\Role;
 use App\Enums\UserStatus;
-use App\Http\Controllers\Concerns\HandlesDataTables;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -15,11 +14,22 @@ use Illuminate\Validation\Rules\Password;
 
 class UserManagementController extends Controller
 {
-    use HandlesDataTables;
-
-    public function index()
+    /** user list with search and pagination */
+    public function index(Request $request)
     {
-        return view('usermanagement.list_users');
+        $search = trim((string) $request->query('search'));
+
+        $users = User::query()
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('code', 'like', "%{$search}%")
+                ->orWhere('phone_number', 'like', "%{$search}%")))
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('usermanagement.list_users', compact('users', 'search'));
     }
 
     /** user view (URL uses the display code, e.g. /view/user/edit/USR-00001) */
@@ -120,41 +130,5 @@ class UserManagementController extends Controller
         $request->user()->update(['password' => $request->new_password]);
 
         return redirect()->intended('home')->with('success', 'User change successfully :)');
-    }
-
-    /** get users data (DataTables server-side) */
-    public function getUsersData(Request $request)
-    {
-        $searchable = ['name', 'email', 'position', 'phone_number', 'status'];
-        $sortable = ['code', 'name', 'email', 'position', 'phone_number', 'join_date', 'status'];
-
-        return $this->dataTableResponse($request, User::query(), $searchable, $sortable, fn (User $user) => [
-            'code' => e($user->code),
-            'avatar' => '
-                <td>
-                    <h2 class="table-avatar">
-                        <a class="avatar-sm me-2">
-                            <img class="avatar-img rounded-circle avatar" data-avatar="'.e($user->avatar).'" src="'.e($user->avatar_url).'" alt="'.e($user->name).'">
-                        </a>
-                    </h2>
-                </td>',
-            'name' => e($user->name),
-            'email' => e($user->email),
-            'position' => e($user->position),
-            'phone_number' => e($user->phone_number),
-            'join_date' => e($user->join_date?->format('Y-m-d')),
-            'status' => '<td><span class="badge '.($user->status?->badgeClass() ?? 'badge-secondary').'">'.e($user->status?->label()).'</span></td>',
-            'modify' => '
-                <td class="text-end">
-                    <div class="actions">
-                        <a href="'.e(url('view/user/edit/'.$user->code)).'" class="btn btn-sm bg-danger-light">
-                            <i class="far fa-edit me-2"></i>
-                        </a>
-                        <a class="btn btn-sm bg-danger-light delete user_id" data-bs-toggle="modal" data-code="'.e($user->code).'" data-bs-target="#delete">
-                            <i class="fe fe-trash-2"></i>
-                        </a>
-                    </div>
-                </td>',
-        ]);
     }
 }

@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Concerns\HandlesDataTables;
 use App\Models\Department;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
-    use HandlesDataTables;
-
     /** index page department */
     public function indexDepartment()
     {
@@ -31,45 +27,22 @@ class DepartmentController extends Controller
         return view('department.edit-department', compact('department', 'teachers'));
     }
 
-    /** department list */
-    public function departmentList()
+    /** department list with search and pagination */
+    public function departmentList(Request $request)
     {
-        return view('department.list-department');
-    }
+        $search = trim((string) $request->query('search'));
 
-    /** get data list (DataTables server-side) */
-    public function getDataList(Request $request)
-    {
-        $query = DB::table('departments')
-            ->leftJoin('users', 'users.id', '=', 'departments.head_user_id')
-            ->select('departments.*', 'users.name as head_of_department');
+        $departments = Department::with('head')
+            ->withCount('teachers')
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->where('department_name', 'like', "%{$search}%")
+                ->orWhere('code', 'like', "%{$search}%")
+                ->orWhereHas('head', fn ($h) => $h->where('name', 'like', "%{$search}%"))))
+            ->orderBy('department_name')
+            ->paginate(15)
+            ->withQueryString();
 
-        $sortable = [
-            'code' => 'departments.code',
-            'department_name' => 'departments.department_name',
-            'head_of_department' => 'users.name',
-            'department_start_date' => 'departments.department_start_date',
-            'no_of_students' => 'departments.no_of_students',
-        ];
-
-        return $this->dataTableResponse($request, $query, array_values($sortable), $sortable, fn ($record) => [
-            'code' => e($record->code),
-            'department_name' => e($record->department_name),
-            'head_of_department' => e($record->head_of_department),
-            'department_start_date' => e($record->department_start_date),
-            'no_of_students' => e($record->no_of_students),
-            'modify' => '
-                <td class="text-end">
-                    <div class="actions">
-                        <a href="'.e(url('department/edit/'.$record->code)).'" class="btn btn-sm bg-danger-light">
-                            <i class="far fa-edit me-2"></i>
-                        </a>
-                        <a class="btn btn-sm bg-danger-light delete department_id" data-bs-toggle="modal" data-department_id="'.e($record->id).'" data-bs-target="#delete">
-                            <i class="fe fe-trash-2"></i>
-                        </a>
-                    </div>
-                </td>',
-        ]);
+        return view('department.list-department', compact('departments', 'search'));
     }
 
     /** Save Record */

@@ -51,7 +51,14 @@ Route::middleware('auth')->group(function () {
         Route::get('teacher/dashboard', 'teacherDashboardIndex')->name('teacher/dashboard');
         Route::get('student/dashboard', 'studentDashboardIndex')->name('student/dashboard');
     });
-    Route::get('setting/page', [SettingController::class, 'index'])->name('setting/page');
+    // settings: admins only
+    Route::controller(SettingController::class)->middleware('can:manage-settings')->group(function () {
+        Route::get('setting/page', 'index')->name('setting/page');
+        Route::get('invoice/settings/page', 'invoice')->name('invoice/settings/page');
+        Route::get('invoice/settings/tax/page', 'tax')->name('invoice/settings/tax/page');
+        Route::get('invoice/settings/bank/page', 'bank')->name('invoice/settings/bank/page');
+        Route::post('setting/{group}', 'update')->name('setting/update');
+    });
 
     // 2. USERS
     Route::controller(UserManagementController::class)->group(function () {
@@ -60,7 +67,6 @@ Route::middleware('auth')->group(function () {
         Route::get('view/user/edit/{code}', 'userView');
         Route::post('user/update', 'userUpdate')->name('user/update');
         Route::post('user/delete', 'userDelete')->name('user/delete');
-        Route::get('get-users-data', 'getUsersData')->name('get-users-data');
     });
 
     // 3. STUDENTS
@@ -94,7 +100,6 @@ Route::middleware('auth')->group(function () {
         Route::post('save', 'saveRecord')->name('department/save');
         Route::post('update', 'updateRecord')->name('department/update');
         Route::post('delete', 'deleteRecord')->name('department/delete');
-        Route::get('get-data-list', 'getDataList')->name('get-data-list');
     });
 
     // 6. CLASSES & SECTIONS
@@ -131,9 +136,6 @@ Route::middleware('auth')->group(function () {
         Route::post('delete', 'deleteRecord')->name('invoice/delete');
         Route::post('status/{invoice}', 'updateStatus')->name('invoice/status');
         Route::get('view/{invoice}', 'invoiceView')->name('invoice/view/page');
-        Route::get('settings/page', 'invoiceSettings')->name('invoice/settings/page');
-        Route::get('settings/tax/page', 'invoiceSettingsTax')->name('invoice/settings/tax/page');
-        Route::get('settings/bank/page', 'invoiceSettingsBank')->name('invoice/settings/bank/page');
     });
 
     // 9. ACCOUNTS

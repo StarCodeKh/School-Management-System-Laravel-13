@@ -8,7 +8,6 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -170,24 +169,6 @@ class InvoiceController extends Controller
         return view('invoices.invoice_view', compact('invoice'));
     }
 
-    /** invoice settings */
-    public function invoiceSettings()
-    {
-        return view('invoices.settings.settings_invoices');
-    }
-
-    /** invoice settingst tax */
-    public function invoiceSettingsTax()
-    {
-        return view('invoices.settings.settings_tax');
-    }
-
-    /** invoice settings bank */
-    public function invoiceSettingsBank()
-    {
-        return view('invoices.settings.settings_bank');
-    }
-
     /** one shared, filterable list view for every invoice tab */
     private function listing(Request $request, string $tab)
     {
@@ -196,18 +177,19 @@ class InvoiceController extends Controller
             'customers.*' => 'integer',
             'categories' => 'nullable|array',
             'categories.*' => 'string|max:255',
-            'from' => 'nullable|date_format:d-m-Y',
-            'to' => 'nullable|date_format:d-m-Y',
+            'from' => 'nullable|date',
+            'to' => 'nullable|date',
         ]);
 
         $invoiceList = Invoice::with(['items', 'customer'])
             ->forTab($tab)
             ->when($filters['customers'] ?? null, fn ($q, $ids) => $q->whereIn('customer_id', $ids))
             ->when($filters['categories'] ?? null, fn ($q, $cats) => $q->whereHas('items', fn ($i) => $i->whereIn('category', $cats)))
-            ->when($filters['from'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '>=', Carbon::createFromFormat('d-m-Y', $d)))
-            ->when($filters['to'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '<=', Carbon::createFromFormat('d-m-Y', $d)))
+            ->when($filters['from'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '>=', $d))
+            ->when($filters['to'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '<=', $d))
             ->latest()
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
 
         $summary = fn ($query) => ['count' => $query->count(), 'amount' => (float) $query->sum('total_amount')];
         $stats = [
@@ -219,9 +201,8 @@ class InvoiceController extends Controller
 
         $customers = $this->customers();
         $categories = InvoiceItem::query()->distinct()->orderBy('category')->pluck('category');
-        $statuses = InvoiceStatus::cases();
 
-        return view('invoices.list_invoices', compact('invoiceList', 'tab', 'stats', 'customers', 'categories', 'statuses', 'filters'));
+        return view('invoices.list_invoices', compact('invoiceList', 'tab', 'stats', 'customers', 'categories', 'filters'));
     }
 
     /** users who can be billed */
@@ -235,55 +216,69 @@ class InvoiceController extends Controller
         return $request->validate([
             'customer_id' => 'required|exists:users,id',
             'po_number' => 'required|string|max:50',
-            'date' => 'nullable|date',
-            'due_date' => 'required|date',
-            'by_month' => 'nullable|string|max:20',
-            'month' => 'nullable|string|max:50',
-            'invoice_from' => 'nullable|string',
-            'invoice_to' => 'nullable|string',
+            'invoice_date' => 'nullable|date',
+            'due_date' => 'required|date|after_or_equal:invoice_date',
+            'recurring_by_month' => 'nullable|required_if_accepted:is_recurring|string|max:20',
+            'recurring_month' => 'nullable|string|max:50',
+            'invoice_from' => 'nullable|string|max:1000',
+            'invoice_to' => 'nullable|string|max:1000',
             'items' => 'required|array|min:1',
-            'items.*' => 'required|string|max:255',
-            'category.*' => 'required|string|max:255',
-            'quantity.*' => 'required|numeric|min:0',
-            'price.*' => 'required|numeric|min:0',
-            'amount.*' => 'required|numeric|min:0',
-            'discount.*' => 'nullable|numeric|min:0|max:100',
-            'taxable_amount' => 'nullable|numeric',
-            'round_off' => 'nullable|numeric',
-            'total_amount' => 'nullable|numeric',
-            'service_charge.*' => 'numeric',
-            'offer_new.*' => 'numeric',
+            'items.*.item' => 'required|string|max:255',
+            'items.*.category' => 'required|string|max:255',
+            'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.discount' => 'nullable|numeric|min:0|max:100',
+            'charges' => 'nullable|array',
+            'charges.*' => 'numeric|min:0',
+            'discounts' => 'nullable|array',
+            'discounts.*' => 'numeric|min:0|max:100',
+            'round_off' => 'nullable|numeric|between:-1000,1000',
             'account_holder_name' => 'nullable|string|max:255',
             'bank_name' => 'nullable|string|max:255',
             'ifsc_code' => 'nullable|string|max:20',
             'account_number' => 'nullable|string|max:50',
-            'terms_and_conditions' => 'nullable|string',
-            'notes' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string|max:2000',
+            'notes' => 'nullable|string|max:2000',
             'signature' => 'nullable|image|max:2048',
             'signatory_name' => 'required|string|max:255',
         ]);
     }
 
-    /** map validated form input to invoice columns */
+    /**
+     * Map validated form input to invoice columns.
+     * Totals are calculated here, never taken from the browser.
+     */
     private function invoiceAttributes(Request $request, array $validated): array
     {
+        $subtotal = collect($this->itemRows($validated))->sum('amount');
+        $enableTax = $request->boolean('enable_tax');
+        $taxRate = $enableTax ? (float) setting('tax_rate', 0) : 0;
+        $taxAmount = round($subtotal * $taxRate / 100, 2);
+        $charges = array_values(array_map('floatval', $validated['charges'] ?? []));
+        $discounts = array_values(array_map('floatval', $validated['discounts'] ?? []));
+        $discountAmount = round(array_sum(array_map(fn ($percent) => $subtotal * $percent / 100, $discounts)), 2);
+        $roundOff = (float) ($validated['round_off'] ?? 0);
+        $isRecurring = $request->boolean('is_recurring');
+
         return [
             'customer_id' => $validated['customer_id'],
             'customer_name' => User::findOrFail($validated['customer_id'])->name,
             'po_number' => $validated['po_number'],
-            'invoice_date' => $validated['date'] ?? now(),
+            'invoice_date' => $validated['invoice_date'] ?? now(),
             'due_date' => $validated['due_date'],
-            'enable_tax' => $request->boolean('enable_tax'),
-            'is_recurring' => $request->boolean('is_recurring'),
-            'recurring_by_month' => $validated['by_month'] ?? null,
-            'recurring_month' => $validated['month'] ?? null,
+            'enable_tax' => $enableTax,
+            'tax_rate' => $taxRate,
+            'tax_amount' => $taxAmount,
+            'is_recurring' => $isRecurring,
+            'recurring_by_month' => $isRecurring ? ($validated['recurring_by_month'] ?? null) : null,
+            'recurring_month' => $isRecurring ? ($validated['recurring_month'] ?? null) : null,
             'invoice_from' => $validated['invoice_from'] ?? null,
             'invoice_to' => $validated['invoice_to'] ?? null,
-            'taxable_amount' => $validated['taxable_amount'] ?? 0,
-            'round_off' => $validated['round_off'] ?? 0,
-            'additional_charges' => array_values($validated['service_charge'] ?? []),
-            'discounts' => array_values($validated['offer_new'] ?? []),
-            'total_amount' => $validated['total_amount'] ?? 0,
+            'taxable_amount' => $subtotal,
+            'round_off' => $roundOff,
+            'additional_charges' => $charges,
+            'discounts' => $discounts,
+            'total_amount' => max(0, round($subtotal + $taxAmount + array_sum($charges) - $discountAmount + $roundOff, 2)),
             'account_holder_name' => $validated['account_holder_name'] ?? null,
             'bank_name' => $validated['bank_name'] ?? null,
             'ifsc_code' => $validated['ifsc_code'] ?? null,
@@ -294,17 +289,22 @@ class InvoiceController extends Controller
         ];
     }
 
-    /** build invoice_items rows from the parallel form arrays */
+    /** invoice_items rows; amount = quantity x price minus the line discount (%) */
     private function itemRows(array $validated): array
     {
-        return collect($validated['items'])->map(fn ($item, $key) => [
-            'item' => $item,
-            'category' => $validated['category'][$key],
-            'quantity' => $validated['quantity'][$key],
-            'price' => $validated['price'][$key],
-            'amount' => $validated['amount'][$key],
-            'discount' => $validated['discount'][$key] ?? 0,
-        ])->values()->all();
+        return collect($validated['items'])->map(function (array $row) {
+            $gross = (float) $row['quantity'] * (float) $row['price'];
+            $discount = (float) ($row['discount'] ?? 0);
+
+            return [
+                'item' => $row['item'],
+                'category' => $row['category'],
+                'quantity' => $row['quantity'],
+                'price' => $row['price'],
+                'discount' => $discount,
+                'amount' => round($gross - $gross * $discount / 100, 2),
+            ];
+        })->values()->all();
     }
 
     private function storeSignature(Request $request): ?string

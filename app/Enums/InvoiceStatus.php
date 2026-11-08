@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasOptions;
+
 enum InvoiceStatus: string
 {
+    use HasOptions;
+
     case Draft = 'draft';
     case Sent = 'sent';
     case Paid = 'paid';
@@ -12,16 +16,5 @@ enum InvoiceStatus: string
     public function label(): string
     {
         return ucfirst($this->value);
-    }
-
-    /** Bootstrap badge class used in the invoice list and grid. */
-    public function badgeClass(): string
-    {
-        return match ($this) {
-            self::Draft => 'bg-default-light',
-            self::Sent => 'bg-primary-light',
-            self::Paid => 'bg-success-light',
-            self::Cancelled => 'bg-danger-light',
-        };
     }
 }

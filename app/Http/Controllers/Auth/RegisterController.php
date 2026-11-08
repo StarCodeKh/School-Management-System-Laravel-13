@@ -33,7 +33,6 @@ class RegisterController extends Controller
 
             User::create([
                 'name' => $request->name,
-                'avatar' => $request->image,
                 'email' => $request->email,
                 'join_date' => now(),
                 'role' => $request->role,
