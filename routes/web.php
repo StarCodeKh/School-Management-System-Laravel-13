@@ -5,13 +5,16 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FeeBalanceController;
 use App\Http\Controllers\FeeStructureController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\GuardianController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SettingController;
@@ -61,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::get('user/profile/page', 'userProfile')->name('user/profile/page');
         Route::get('teacher/dashboard', 'teacherDashboardIndex')->middleware('can:teach')->name('teacher/dashboard');
         Route::get('student/dashboard', 'studentDashboardIndex')->name('student/dashboard');
+        Route::get('parent/dashboard', 'parentDashboard')->middleware('can:guard-children')->name('parent/dashboard');
     });
     // settings: admins only
     Route::controller(SettingController::class)->middleware('can:manage-settings')->group(function () {
@@ -196,4 +200,12 @@ Route::middleware('auth')->group(function () {
         Route::post('payroll/{payroll}/pay', [PayrollController::class, 'markPaid'])->name('payroll.pay');
         Route::resource('payroll', PayrollController::class)->except('show');
     });
+
+    // 12. COMMUNICATION: everyone reads, admins publish
+    Route::resource('notices', NoticeController::class)->except(['index', 'show'])->middleware('can:manage-communication');
+    Route::get('notices', [NoticeController::class, 'index'])->name('notices.index');
+    Route::resource('events', EventController::class)->except(['index', 'show'])->middleware('can:manage-communication');
+    Route::get('events', [EventController::class, 'index'])->name('events.index');
+    Route::post('students/{student}/guardians', [GuardianController::class, 'store'])->middleware('can:manage-school')->name('guardians.store');
+    Route::delete('students/{student}/guardians/{guardian}', [GuardianController::class, 'destroy'])->middleware('can:manage-school')->name('guardians.destroy');
 });

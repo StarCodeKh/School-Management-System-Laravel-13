@@ -145,9 +145,10 @@ class StudentController extends Controller
     /** student profile page */
     public function studentProfile(Student $student)
     {
-        $student->load(['schoolClass', 'section', 'user']);
+        $student->load(['schoolClass', 'section', 'user', 'guardians']);
+        $parentAccounts = User::where('role', Role::Parent)->whereNotIn('id', $student->guardians->pluck('id'))->orderBy('name')->pluck('name', 'id');
 
-        return view('student.student-profile', ['studentProfile' => $student] + self::overview($student));
+        return view('student.student-profile', ['studentProfile' => $student, 'parentAccounts' => $parentAccounts] + self::overview($student));
     }
 
     /** fees, attendance and exam results shown on the profile (and to the student's guardians) */

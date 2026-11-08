@@ -42,4 +42,33 @@
     <div class="mt-6">
         @include('student._overview')
     </div>
+    <x-card title="Parents & guardians" :padding="false" class="mt-6">
+        <ul class="divide-y divide-slate-100">
+            @forelse ($student->guardians as $guardian)
+                <li class="flex items-center gap-3 px-5 py-3 text-sm">
+                    <x-avatar :src="$guardian->avatar_url" :alt="$guardian->name" size="size-8" />
+                    <div class="flex-1">
+                        <p class="font-medium text-slate-900">{{ $guardian->name }}</p>
+                        <p class="text-xs text-slate-500">{{ $guardian->email }}@if ($guardian->phone_number) &middot; {{ $guardian->phone_number }}@endif</p>
+                    </div>
+                    <x-badge>{{ \App\Enums\GuardianRelationship::tryFrom($guardian->pivot->relationship)?->label() }}</x-badge>
+                    @can('manage-school')
+                        <x-delete-button :action="route('guardians.destroy', [$student, $guardian])" :fields="['_method' => 'DELETE']" title="Unlink parent"
+                                         :message="'Unlink '.$guardian->name.' from '.$student->full_name.'? The parent account is kept.'" />
+                    @endcan
+                </li>
+            @empty
+                <li class="px-5 py-6 text-center text-sm text-slate-500">No parents linked.</li>
+            @endforelse
+        </ul>
+        @can('manage-school')
+            <form method="POST" action="{{ route('guardians.store', $student) }}" class="grid gap-4 border-t border-slate-200 p-5 sm:grid-cols-[1fr_12rem_auto] sm:items-start">
+                @csrf
+                <x-form.select name="user_id" label="Parent account" :options="$parentAccounts" placeholder="Select a Parent account"
+                               :hint="$parentAccounts->isEmpty() ? 'No other Parent accounts. Parents can sign up on the register page as Parent.' : null" />
+                <x-form.select name="relationship" label="Relationship" :options="\App\Enums\GuardianRelationship::options()" :placeholder="false" />
+                <x-button icon="plus" class="sm:mt-7">Link</x-button>
+            </form>
+        @endcan
+    </x-card>
 </x-layouts.app>

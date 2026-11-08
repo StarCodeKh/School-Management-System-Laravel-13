@@ -79,4 +79,5 @@
             </div>
         </x-card>
     </div>
+    <div class="mt-6"><x-noticeboard /></div>
 </x-layouts.app>

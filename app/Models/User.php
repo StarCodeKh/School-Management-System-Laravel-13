@@ -7,6 +7,7 @@ use App\Enums\Role;
 use App\Enums\UserStatus;
 use App\Models\Concerns\HasDisplayCode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -104,11 +105,18 @@ class User extends Authenticatable
 
     /**
      * Whether this user may see a student's personal records (report cards, attendance):
-     * the student's own account. Guardians are added in the Communication module.
+     * the student's own account or a linked parent/guardian.
      */
     public function canViewStudent(Student $student): bool
     {
-        return $student->user_id === $this->id;
+        return $student->user_id === $this->id
+            || ($this->hasRole(Role::Parent) && $this->children()->whereKey($student->id)->exists());
+    }
+
+    /** Students this parent/guardian account is linked to. */
+    public function children(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'guardian_student')->withPivot('relationship')->withTimestamps();
     }
 
     public function payrolls(): HasMany

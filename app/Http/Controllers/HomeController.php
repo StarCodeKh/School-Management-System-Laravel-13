@@ -25,6 +25,7 @@ class HomeController extends Controller
             return match (true) {
                 $user->hasRole(Role::Teacher) => redirect()->route('teacher/dashboard'),
                 $user->hasRole(Role::Student) => redirect()->route('student/dashboard'),
+                $user->hasRole(Role::Parent) => redirect()->route('parent/dashboard'),
                 default => redirect()->route('user/profile/page'),
             };
         }
@@ -84,6 +85,15 @@ class HomeController extends Controller
         $academics = $this->academicSummary($student);
 
         return view('dashboard.student_dashboard', compact('student', 'subjects', 'classmates', 'invoices', 'outstanding') + $academics);
+    }
+
+    /** dashboard for a parent: one overview per linked child */
+    public function parentDashboard(Request $request)
+    {
+        $children = $request->user()->children()->with(['schoolClass', 'section'])->orderBy('first_name')->get()
+            ->map(fn (Student $student) => ['student' => $student] + StudentController::overview($student));
+
+        return view('dashboard.parent_dashboard', compact('children'));
     }
 
     /** overview data shared with the student profile, plus today's timetable */

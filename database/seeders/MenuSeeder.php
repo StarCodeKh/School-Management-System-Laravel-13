@@ -16,6 +16,7 @@ class MenuSeeder extends Seeder
             ['title' => 'Admin Dashboard', 'route' => 'home', 'ability' => 'manage-school'],
             ['title' => 'Teacher Dashboard', 'route' => 'teacher/dashboard', 'ability' => 'teach'],
             ['title' => 'Student Dashboard', 'route' => 'student/dashboard', 'ability' => 'study'],
+            ['title' => 'Parent Dashboard', 'route' => 'parent/dashboard', 'ability' => 'guard-children'],
         ]],
         ['title' => 'User Management', 'icon' => 'shield', 'ability' => 'manage-users', 'pattern' => 'view/user/edit/*', 'children' => [
             ['title' => 'List Users', 'route' => 'list/users'],
@@ -43,6 +44,8 @@ class MenuSeeder extends Seeder
             ['title' => 'Exams & Results', 'route' => 'exams.index', 'routes' => ['exams.*']],
         ]],
         ['title' => 'Timetable', 'icon' => 'calendar', 'route' => 'timetable.index'],
+        ['title' => 'Notice Board', 'icon' => 'information', 'route' => 'notices.index', 'routes' => ['notices.*']],
+        ['title' => 'Events', 'icon' => 'calendar', 'route' => 'events.index', 'routes' => ['events.*']],
         ['title' => 'Invoices', 'icon' => 'document', 'ability' => 'manage-finance', 'pattern' => 'invoice/edit/*|invoice/view/*', 'children' => [
             ['title' => 'Invoices List', 'route' => 'invoice/list/page', 'routes' => [
                 'invoice/list/page', 'invoice/paid/page', 'invoice/overdue/page', 'invoice/draft/page',

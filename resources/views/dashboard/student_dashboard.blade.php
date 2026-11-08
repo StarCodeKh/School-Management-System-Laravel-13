@@ -108,4 +108,5 @@
             @endforelse
         </x-table>
     </x-card>
+    <div class="mt-6"><x-noticeboard /></div>
 </x-layouts.app>

@@ -116,4 +116,5 @@
             @endif
         </div>
     @endif
+    <div class="mt-6"><x-noticeboard /></div>
 </x-layouts.app>

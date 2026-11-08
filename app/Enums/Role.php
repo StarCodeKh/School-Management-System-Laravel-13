@@ -15,6 +15,7 @@ enum Role: string
     case Student = 'student';
     case Staff = 'staff';
     case Client = 'client';
+    case Parent = 'parent';
 
     /** Display name shown in the UI. */
     public function label(): string

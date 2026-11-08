@@ -8,6 +8,7 @@ use App\Enums\Religion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
@@ -116,5 +117,11 @@ class Student extends Model
         $paid = (float) $paidByType->sum();
 
         return ['due' => $due, 'paid' => $paid, 'balance' => max(0, $due - $paid), 'by_type' => $byType];
+    }
+
+    /** Parent/guardian accounts linked to this student. */
+    public function guardians(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'guardian_student')->withPivot('relationship')->withTimestamps();
     }
 }
