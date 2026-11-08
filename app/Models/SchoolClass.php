@@ -53,4 +53,9 @@ class SchoolClass extends Model
                 'Class '.$class->name => $class->sections->mapWithKeys(fn (Section $section) => [$section->id => $class->name.' - '.$section->name])->all(),
             ])->all();
     }
+
+    public function feeStructures(): HasMany
+    {
+        return $this->hasMany(FeeStructure::class);
+    }
 }

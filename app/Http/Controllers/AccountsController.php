@@ -23,8 +23,9 @@ class AccountsController extends Controller
     {
         $students = Student::with(['schoolClass', 'section'])->orderBy('first_name')->orderBy('last_name')->get();
         $feeTypes = FeeType::orderBy('name')->get();
+        $balances = $students->mapWithKeys(fn (Student $student) => [$student->id => money($student->feeSummary()['balance'])]);
 
-        return view('accounts.add-fees-collection', compact('students', 'feeTypes'));
+        return view('accounts.add-fees-collection', compact('students', 'feeTypes', 'balances'));
     }
 
     /** Save Record */

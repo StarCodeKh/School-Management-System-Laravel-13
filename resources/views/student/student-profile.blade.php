@@ -36,4 +36,8 @@
             </dl>
         </x-card>
     </div>
+
+    <div class="mt-6">
+        @include('student._overview')
+    </div>
 </x-layouts.app>

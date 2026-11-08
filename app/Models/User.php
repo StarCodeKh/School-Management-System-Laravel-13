@@ -110,4 +110,9 @@ class User extends Authenticatable
     {
         return $student->user_id === $this->id;
     }
+
+    public function payrolls(): HasMany
+    {
+        return $this->hasMany(Payroll::class);
+    }
 }

@@ -43,16 +43,20 @@ class MenuSeeder extends Seeder
             ['title' => 'Exams & Results', 'route' => 'exams.index', 'routes' => ['exams.*']],
         ]],
         ['title' => 'Timetable', 'icon' => 'calendar', 'route' => 'timetable.index'],
-        ['title' => 'Invoices', 'icon' => 'document', 'pattern' => 'invoice/edit/*|invoice/view/*', 'children' => [
+        ['title' => 'Invoices', 'icon' => 'document', 'ability' => 'manage-finance', 'pattern' => 'invoice/edit/*|invoice/view/*', 'children' => [
             ['title' => 'Invoices List', 'route' => 'invoice/list/page', 'routes' => [
                 'invoice/list/page', 'invoice/paid/page', 'invoice/overdue/page', 'invoice/draft/page',
                 'invoice/recurring/page', 'invoice/cancelled/page', 'invoice/grid/page',
             ]],
             ['title' => 'Add Invoice', 'route' => 'invoice/add/page'],
         ]],
-        ['title' => 'Accounts', 'icon' => 'banknotes', 'children' => [
-            ['title' => 'Fees Collection', 'route' => 'account/fees/collections/page'],
-            ['title' => 'Add Fees', 'route' => 'add/fees/collection/page'],
+        ['title' => 'Finance', 'icon' => 'banknotes', 'ability' => 'manage-finance', 'children' => [
+            ['title' => 'Overview', 'route' => 'finance.index'],
+            ['title' => 'Fees Collection', 'route' => 'account/fees/collections/page', 'routes' => ['account/fees/collections/page', 'add/fees/collection/page']],
+            ['title' => 'Fee Balances', 'route' => 'fees.balances'],
+            ['title' => 'Fee Structures', 'route' => 'fee-structures.index'],
+            ['title' => 'Expenses', 'route' => 'expenses.index', 'routes' => ['expenses.*']],
+            ['title' => 'Payroll', 'route' => 'payroll.index', 'routes' => ['payroll.*']],
         ]],
         ['title' => 'Settings', 'icon' => 'cog', 'ability' => 'manage-settings', 'children' => [
             ['title' => 'General', 'route' => 'setting/page'],

@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         // academics: admins plan exams and timetables; teachers record attendance and marks
         Gate::define('manage-academics', fn (User $user) => $user->isAdmin());
         Gate::define('teach', fn (User $user) => $user->isAdmin() || $user->hasRole(Role::Teacher));
+        Gate::define('manage-finance', fn (User $user) => $user->isAdmin());
 
         // only the sidebar needs the menu tree
         View::composer('components.sidebar', fn ($view) => $view->with('menus', Menu::sidebar()));

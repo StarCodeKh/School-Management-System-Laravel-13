@@ -37,4 +37,14 @@ enum Role: string
     {
         return array_values(array_filter(self::cases(), fn (self $role) => ! $role->isAdmin()));
     }
+
+    /**
+     * Roles that are school employees (can receive salary).
+     *
+     * @return array<int, self>
+     */
+    public static function staff(): array
+    {
+        return [self::SuperAdmin, self::Admin, self::Teacher, self::Staff];
+    }
 }

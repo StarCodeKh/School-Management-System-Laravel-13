@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\InvoiceStatus;
 use App\Enums\Weekday;
 use App\Models\Department;
-use App\Models\Exam;
 use App\Models\FeeCollection;
 use App\Models\Invoice;
 use App\Models\SchoolClass;
@@ -77,19 +76,14 @@ class HomeController extends Controller
         return view('dashboard.student_dashboard', compact('student', 'subjects', 'classmates', 'invoices', 'outstanding') + $academics);
     }
 
-    /** attendance rate, latest exam results and today's timetable for one student */
+    /** overview data shared with the student profile, plus today's timetable */
     private function academicSummary(?Student $student): array
     {
         if (! $student) {
-            return ['attendanceRate' => null, 'latestExam' => null, 'examRow' => null, 'todayTimetable' => collect()];
+            return ['fees' => null, 'todayTimetable' => collect()];
         }
 
-        $latestExam = Exam::where('school_class_id', $student->school_class_id)->whereHas('results')->latest('start_date')->first();
-
-        return [
-            'attendanceRate' => $student->attendanceRate(),
-            'latestExam' => $latestExam,
-            'examRow' => $latestExam?->resultSheet()->firstWhere('student.id', $student->id),
+        return StudentController::overview($student) + [
             'todayTimetable' => Weekday::today()
                 ? TimetableEntry::with(['subject', 'teacher.user'])->where('section_id', $student->section_id)->where('day_of_week', Weekday::today())->orderBy('period')->get()
                 : collect(),

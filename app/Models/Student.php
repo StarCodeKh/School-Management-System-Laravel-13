@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Student extends Model
 {
@@ -92,5 +93,28 @@ class Student extends Model
         }
 
         return round($statuses->filter(fn ($status) => $status->isAttending())->count() / $statuses->count() * 100, 1);
+    }
+
+    /**
+     * Fees due for the student's class, paid so far and the remaining balance,
+     * overall and per fee type.
+     *
+     * @return array{due: float, paid: float, balance: float, by_type: Collection}
+     */
+    public function feeSummary(): array
+    {
+        $structures = FeeStructure::with('feeType')->where('school_class_id', $this->school_class_id)->get();
+        $paidByType = $this->feeCollections()->selectRaw('fee_type_id, SUM(amount) as total')->groupBy('fee_type_id')->pluck('total', 'fee_type_id');
+
+        $byType = $structures->map(fn (FeeStructure $structure) => [
+            'fee_type' => $structure->feeType,
+            'due' => (float) $structure->amount,
+            'paid' => (float) ($paidByType[$structure->fee_type_id] ?? 0),
+            'due_date' => $structure->due_date,
+        ]);
+        $due = $byType->sum('due');
+        $paid = (float) $paidByType->sum();
+
+        return ['due' => $due, 'paid' => $paid, 'balance' => max(0, $due - $paid), 'by_type' => $byType];
     }
 }

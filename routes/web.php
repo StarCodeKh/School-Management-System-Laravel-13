@@ -6,8 +6,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FeeBalanceController;
+use App\Http\Controllers\FeeStructureController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StudentController;
@@ -124,7 +129,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // 8. INVOICES
-    Route::prefix('invoice')->controller(InvoiceController::class)->group(function () {
+    Route::prefix('invoice')->controller(InvoiceController::class)->middleware('can:manage-finance')->group(function () {
         Route::get('list/page', 'invoiceList')->name('invoice/list/page');
         Route::get('paid/page', 'invoicePaid')->name('invoice/paid/page');
         Route::get('overdue/page', 'invoiceOverdue')->name('invoice/overdue/page');
@@ -142,7 +147,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // 9. ACCOUNTS
-    Route::controller(AccountsController::class)->group(function () {
+    Route::controller(AccountsController::class)->middleware('can:manage-finance')->group(function () {
         Route::get('account/fees/collections/page', 'index')->name('account/fees/collections/page');
         Route::get('add/fees/collection/page', 'addFeesCollection')->name('add/fees/collection/page');
         Route::post('fees/collection/save', 'saveRecord')->name('fees/collection/save');
@@ -165,4 +170,15 @@ Route::middleware('auth')->group(function () {
     Route::get('timetable', [TimetableController::class, 'index'])->name('timetable.index');
     Route::post('timetable', [TimetableController::class, 'store'])->middleware('can:manage-academics')->name('timetable.store');
     Route::delete('timetable/{timetable}', [TimetableController::class, 'destroy'])->middleware('can:manage-academics')->name('timetable.destroy');
+
+    // 11. FINANCE (admins)
+    Route::middleware('can:manage-finance')->group(function () {
+        Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
+        Route::get('fees/balances', [FeeBalanceController::class, 'index'])->name('fees.balances');
+        Route::resource('fee-structures', FeeStructureController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('expenses', ExpenseController::class)->except('show');
+        Route::post('payroll/generate', [PayrollController::class, 'generate'])->name('payroll.generate');
+        Route::post('payroll/{payroll}/pay', [PayrollController::class, 'markPaid'])->name('payroll.pay');
+        Route::resource('payroll', PayrollController::class)->except('show');
+    });
 });

@@ -6,6 +6,7 @@ use App\Enums\BloodGroup;
 use App\Enums\Gender;
 use App\Enums\Religion;
 use App\Enums\Role;
+use App\Models\Exam;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\User;
@@ -146,7 +147,20 @@ class StudentController extends Controller
     {
         $student->load(['schoolClass', 'section', 'user']);
 
-        return view('student.student-profile', ['studentProfile' => $student]);
+        return view('student.student-profile', ['studentProfile' => $student] + self::overview($student));
+    }
+
+    /** fees, attendance and exam results shown on the profile (and to the student's guardians) */
+    public static function overview(Student $student): array
+    {
+        $exams = Exam::where('school_class_id', $student->school_class_id)->whereHas('results')->latest('start_date')->take(5)->get();
+
+        return [
+            'fees' => $student->feeSummary(),
+            'attendanceRate' => $student->attendanceRate(),
+            'recentAttendance' => $student->attendances()->latest('date')->take(10)->get(),
+            'examRows' => $exams->map(fn (Exam $exam) => ['exam' => $exam, 'row' => $exam->resultSheet()->firstWhere('student.id', $student->id)]),
+        ];
     }
 
     /** select options shared by the add and edit forms */
