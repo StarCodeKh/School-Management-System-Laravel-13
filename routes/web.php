@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SchoolClassController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -144,4 +147,22 @@ Route::middleware('auth')->group(function () {
         Route::get('add/fees/collection/page', 'addFeesCollection')->name('add/fees/collection/page');
         Route::post('fees/collection/save', 'saveRecord')->name('fees/collection/save');
     });
+
+    // 10. ACADEMICS: attendance, exams and timetable
+    Route::middleware('can:teach')->group(function () {
+        Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+        Route::get('attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
+
+        Route::get('exams/{exam}/marks', [ExamController::class, 'marks'])->name('exams.marks');
+        Route::post('exams/{exam}/marks', [ExamController::class, 'saveMarks'])->name('exams.marks.save');
+    });
+    // create/edit first, so "exams/create" is not taken as an exam id by exams/{exam}
+    Route::resource('exams', ExamController::class)->except(['index', 'show'])->middleware('can:manage-academics');
+    Route::resource('exams', ExamController::class)->only(['index', 'show'])->middleware('can:teach');
+    Route::get('exams/{exam}/report-card/{student}', [ExamController::class, 'reportCard'])->name('exams.report-card');
+
+    Route::get('timetable', [TimetableController::class, 'index'])->name('timetable.index');
+    Route::post('timetable', [TimetableController::class, 'store'])->middleware('can:manage-academics')->name('timetable.store');
+    Route::delete('timetable/{timetable}', [TimetableController::class, 'destroy'])->middleware('can:manage-academics')->name('timetable.destroy');
 });

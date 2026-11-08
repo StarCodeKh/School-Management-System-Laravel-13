@@ -15,6 +15,46 @@
         <x-stat-card label="Outstanding invoices" :value="money($outstanding)" icon="document" :color="$outstanding > 0 ? 'red' : 'green'" />
     </div>
 
+    @if ($student)
+        <div class="mt-6 grid gap-6 xl:grid-cols-3">
+            <x-card title="Attendance">
+                @if ($attendanceRate === null)
+                    <p class="text-sm text-slate-500">No attendance recorded yet.</p>
+                @else
+                    <p class="text-4xl font-bold {{ $attendanceRate >= 90 ? 'text-emerald-600' : ($attendanceRate >= 75 ? 'text-amber-600' : 'text-red-600') }}">{{ $attendanceRate }}%</p>
+                    <p class="mt-1 text-sm text-slate-500">of recorded school days attended</p>
+                    <div class="mt-4 h-2 rounded-full bg-slate-100"><div class="h-2 rounded-full bg-primary-500" style="width: {{ $attendanceRate }}%"></div></div>
+                @endif
+            </x-card>
+
+            <x-card :title="$latestExam ? 'Latest exam: '.$latestExam->name : 'Exam results'">
+                @if ($examRow)
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div><p class="text-xs text-slate-500 uppercase">Score</p><p class="text-2xl font-bold text-slate-900">{{ $examRow['percentage'] }}%</p></div>
+                        <div><p class="text-xs text-slate-500 uppercase">Grade</p><p class="text-2xl font-bold text-slate-900">{{ $examRow['grade']->value }}</p></div>
+                        <div><p class="text-xs text-slate-500 uppercase">Rank</p><p class="text-2xl font-bold text-slate-900">{{ $examRow['rank'] }}</p></div>
+                    </div>
+                    <x-button class="mt-4 w-full" variant="secondary" size="sm" :href="route('exams.report-card', [$latestExam, $student])" icon="document">View report card</x-button>
+                @else
+                    <p class="text-sm text-slate-500">No exam results yet.</p>
+                @endif
+            </x-card>
+
+            <x-card :title="'Today\'s timetable'" :padding="false">
+                <ul class="divide-y divide-slate-100">
+                    @forelse ($todayTimetable as $entry)
+                        <li class="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
+                            <span class="font-medium text-slate-900">{{ $entry->subject?->subject_name }}</span>
+                            <span class="text-slate-500">{{ $entry->timeRange() }}</span>
+                        </li>
+                    @empty
+                        <li class="px-5 py-8 text-center text-sm text-slate-500">No classes today.</li>
+                    @endforelse
+                </ul>
+            </x-card>
+        </div>
+    @endif
+
     <div class="mt-6 grid gap-6 xl:grid-cols-3">
         <x-card title="My details">
             @if ($student)

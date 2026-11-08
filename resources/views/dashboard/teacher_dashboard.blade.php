@@ -15,6 +15,27 @@
         <x-stat-card label="Department colleagues" :value="number_format($stats['colleagues'])" icon="users" color="green" />
     </div>
 
+    @if ($teacher)
+        <x-card :title="'Today\'s classes'.(\App\Enums\Weekday::today() ? ' ('.\App\Enums\Weekday::today()->label().')' : '')" :padding="false" class="mt-6">
+            <x-slot:actions>
+                <x-button variant="ghost" size="sm" :href="route('attendance.index')">Take attendance</x-button>
+            </x-slot:actions>
+            <ul class="divide-y divide-slate-100">
+                @forelse ($todayClasses as $entry)
+                    <li class="flex items-center gap-4 px-5 py-3 text-sm">
+                        <span class="w-24 font-medium text-slate-500">{{ $entry->timeRange() }}</span>
+                        <span class="flex-1 font-semibold text-slate-900">{{ $entry->subject?->subject_name }}</span>
+                        <x-badge color="indigo">Section {{ $entry->section?->label() }}</x-badge>
+                        <span class="hidden text-slate-500 sm:block">{{ $entry->room }}</span>
+                        <x-button size="sm" variant="secondary" :href="route('attendance.index', ['section_id' => $entry->section_id])">Attendance</x-button>
+                    </li>
+                @empty
+                    <li class="px-5 py-8 text-center text-sm text-slate-500">No classes scheduled for you today.</li>
+                @endforelse
+            </ul>
+        </x-card>
+    @endif
+
     <div class="mt-6 grid gap-6 xl:grid-cols-3">
         <x-card title="My profile">
             @if ($teacher)

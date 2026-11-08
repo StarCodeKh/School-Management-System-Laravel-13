@@ -71,4 +71,26 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function examResults(): HasMany
+    {
+        return $this->hasMany(ExamResult::class);
+    }
+
+    /** Share of recorded days the student attended (present or late), or null when nothing is recorded. */
+    public function attendanceRate(): ?float
+    {
+        $statuses = $this->attendances()->pluck('status');
+
+        if ($statuses->isEmpty()) {
+            return null;
+        }
+
+        return round($statuses->filter(fn ($status) => $status->isAttending())->count() / $statuses->count() * 100, 1);
+    }
 }

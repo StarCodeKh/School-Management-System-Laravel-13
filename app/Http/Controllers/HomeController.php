@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\Weekday;
 use App\Models\Department;
+use App\Models\Exam;
 use App\Models\FeeCollection;
 use App\Models\Invoice;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\TimetableEntry;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -51,9 +54,12 @@ class HomeController extends Controller
         ];
 
         $headedDepartments = $request->user()->headedDepartments()->withCount('teachers')->get();
+        $todayClasses = $teacher && Weekday::today()
+            ? $teacher->timetableEntries()->with(['section.schoolClass', 'subject'])->where('day_of_week', Weekday::today())->get()
+            : collect();
         $classes = SchoolClass::with('sections')->withCount(['students', 'subjects'])->orderBy('sort_order')->orderBy('name')->get();
 
-        return view('dashboard.teacher_dashboard', compact('teacher', 'stats', 'headedDepartments', 'classes'));
+        return view('dashboard.teacher_dashboard', compact('teacher', 'stats', 'headedDepartments', 'classes', 'todayClasses'));
     }
 
     /** dashboard for the logged-in student */
@@ -66,6 +72,27 @@ class HomeController extends Controller
         $invoices = $request->user()->invoices()->latest()->take(5)->get();
         $outstanding = $request->user()->invoices()->whereIn('status', [InvoiceStatus::Draft, InvoiceStatus::Sent])->sum('total_amount');
 
-        return view('dashboard.student_dashboard', compact('student', 'subjects', 'classmates', 'invoices', 'outstanding'));
+        $academics = $this->academicSummary($student);
+
+        return view('dashboard.student_dashboard', compact('student', 'subjects', 'classmates', 'invoices', 'outstanding') + $academics);
+    }
+
+    /** attendance rate, latest exam results and today's timetable for one student */
+    private function academicSummary(?Student $student): array
+    {
+        if (! $student) {
+            return ['attendanceRate' => null, 'latestExam' => null, 'examRow' => null, 'todayTimetable' => collect()];
+        }
+
+        $latestExam = Exam::where('school_class_id', $student->school_class_id)->whereHas('results')->latest('start_date')->first();
+
+        return [
+            'attendanceRate' => $student->attendanceRate(),
+            'latestExam' => $latestExam,
+            'examRow' => $latestExam?->resultSheet()->firstWhere('student.id', $student->id),
+            'todayTimetable' => Weekday::today()
+                ? TimetableEntry::with(['subject', 'teacher.user'])->where('section_id', $student->section_id)->where('day_of_week', Weekday::today())->orderBy('period')->get()
+                : collect(),
+        ];
     }
 }

@@ -101,4 +101,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Department::class, 'head_user_id');
     }
+
+    /**
+     * Whether this user may see a student's personal records (report cards, attendance):
+     * the student's own account. Guardians are added in the Communication module.
+     */
+    public function canViewStudent(Student $student): bool
+    {
+        return $student->user_id === $this->id;
+    }
 }

@@ -25,4 +25,15 @@ class Section extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    public function timetableEntries(): HasMany
+    {
+        return $this->hasMany(TimetableEntry::class)->orderBy('day_of_week')->orderBy('period');
+    }
+
+    /** "10 - A" */
+    public function label(): string
+    {
+        return $this->schoolClass?->name.' - '.$this->name;
+    }
 }

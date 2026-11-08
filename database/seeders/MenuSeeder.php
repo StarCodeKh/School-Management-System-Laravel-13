@@ -37,6 +37,12 @@ class MenuSeeder extends Seeder
             ['title' => 'Subject List', 'route' => 'subject/list/page'],
             ['title' => 'Subject Add', 'route' => 'subject/add/page'],
         ]],
+        ['title' => 'Academics', 'icon' => 'clipboard', 'ability' => 'teach', 'pattern' => 'exams/*', 'children' => [
+            ['title' => 'Attendance', 'route' => 'attendance.index'],
+            ['title' => 'Attendance Report', 'route' => 'attendance.report'],
+            ['title' => 'Exams & Results', 'route' => 'exams.index', 'routes' => ['exams.*']],
+        ]],
+        ['title' => 'Timetable', 'icon' => 'calendar', 'route' => 'timetable.index'],
         ['title' => 'Invoices', 'icon' => 'document', 'pattern' => 'invoice/edit/*|invoice/view/*', 'children' => [
             ['title' => 'Invoices List', 'route' => 'invoice/list/page', 'routes' => [
                 'invoice/list/page', 'invoice/paid/page', 'invoice/overdue/page', 'invoice/draft/page',

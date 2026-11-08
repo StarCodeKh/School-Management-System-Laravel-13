@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\Role;
 use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('manage-users', fn (User $user) => $user->isAdmin());
         Gate::define('manage-settings', fn (User $user) => $user->isAdmin());
+        // academics: admins plan exams and timetables; teachers record attendance and marks
+        Gate::define('manage-academics', fn (User $user) => $user->isAdmin());
+        Gate::define('teach', fn (User $user) => $user->isAdmin() || $user->hasRole(Role::Teacher));
 
         // only the sidebar needs the menu tree
         View::composer('components.sidebar', fn ($view) => $view->with('menus', Menu::sidebar()));

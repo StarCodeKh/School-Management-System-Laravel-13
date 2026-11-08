@@ -37,4 +37,20 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Subject::class);
     }
+
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class)->latest('start_date');
+    }
+
+    /**
+     * Sections grouped by class for <x-form.select>, e.g. ['Class 10' => [1 => '10 - A']].
+     */
+    public static function sectionOptions(): array
+    {
+        return static::with('sections')->orderBy('sort_order')->orderBy('name')->get()
+            ->mapWithKeys(fn (self $class) => [
+                'Class '.$class->name => $class->sections->mapWithKeys(fn (Section $section) => [$section->id => $class->name.' - '.$section->name])->all(),
+            ])->all();
+    }
 }
