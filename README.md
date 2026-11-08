@@ -41,7 +41,17 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Create a database (default name `school_sm_db`), set the `DB_*` values in `.env`, then:
+Create a database (default name `school_sm_db`) and set these values in `.env`:
+
+| Key | Purpose | Default |
+|-----|---------|---------|
+| `APP_NAME` | School name until it is changed under Settings | `School Management System` |
+| `DB_*` | Database connection | MySQL, `school_sm_db` |
+| `ADMIN_NAME` | Name of the first Super Admin | `Super Admin` |
+| `ADMIN_EMAIL` | Login email of the first Super Admin | `admin@system.com` |
+| `ADMIN_PASSWORD` | Password of the first Super Admin | `Password@123` |
+
+Then:
 
 ```bash
 php artisan migrate --seed
@@ -49,15 +59,12 @@ npm run build
 php artisan serve
 ```
 
-Open http://127.0.0.1:8000 and log in with the seeded admin account:
-
-| Email               | Password       |
-|---------------------|----------------|
-| `admin@system.com`  | `Password@123` |
-
-Change this password after the first login (Profile → Change password).
+Open http://127.0.0.1:8000 and log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`
+(by default `admin@system.com` / `Password@123`). Change the password after the first login
+(Profile → Change password).
 
 The seeder also creates the sidebar menu, classes 10–12 with sections A–C and the default fee types.
+It is safe to run again (`php artisan db:seed`): existing records are kept and only missing ones are added.
 
 ### Development
 

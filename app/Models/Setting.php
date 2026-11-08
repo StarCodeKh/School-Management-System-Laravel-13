@@ -14,8 +14,8 @@ class Setting extends Model
 
     /** Every known setting with its default value. Saved rows override these. */
     public const DEFAULTS = [
-        // general
-        'school_name' => 'School Management System',
+        // general (school_name falls back to APP_NAME, see allValues())
+        'school_name' => null,
         'school_email' => null,
         'school_phone' => null,
         'school_address' => null,
@@ -39,10 +39,13 @@ class Setting extends Model
     /** All settings, defaults merged with saved values (cached until the next save). */
     public static function allValues(): array
     {
-        return array_merge(self::DEFAULTS, Cache::rememberForever(
+        $values = array_merge(self::DEFAULTS, Cache::rememberForever(
             self::CACHE_KEY,
             fn () => static::query()->pluck('value', 'key')->all()
         ));
+        $values['school_name'] = $values['school_name'] ?: config('app.name');
+
+        return $values;
     }
 
     public static function value(string $key, mixed $default = null): mixed
