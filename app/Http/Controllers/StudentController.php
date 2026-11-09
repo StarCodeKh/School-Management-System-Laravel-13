@@ -92,7 +92,13 @@ class StudentController extends Controller
     /** View */
     public function studentEdit(Student $student)
     {
-        return view('student.edit-student', ['studentEdit' => $student] + $this->formOptions($student));
+        $student->load(['schoolClass', 'section', 'user', 'guardians']);
+
+        return view('student.edit-student', [
+            'studentEdit' => $student,
+            'attendanceRate' => $student->attendanceRate(),
+            'feeBalance' => $student->feeSummary()['balance'],
+        ] + $this->formOptions($student));
     }
 
     /** Update Record */

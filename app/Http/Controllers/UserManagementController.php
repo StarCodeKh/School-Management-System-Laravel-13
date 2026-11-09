@@ -37,7 +37,7 @@ class UserManagementController extends Controller
     /** user view (URL uses the display code, e.g. /view/user/edit/USR-00001) */
     public function userView(string $code)
     {
-        $users = User::where('code', $code)->firstOrFail();
+        $users = User::where('code', $code)->with(['teacher.department', 'student.schoolClass', 'student.section', 'children'])->firstOrFail();
         $roles = Role::cases();
         $statuses = UserStatus::cases();
 

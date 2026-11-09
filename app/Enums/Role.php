@@ -23,6 +23,18 @@ enum Role: string
         return ucwords(str_replace('_', ' ', $this->value));
     }
 
+    /** Badge colour (see <x-badge>). */
+    public function color(): string
+    {
+        return match ($this) {
+            self::SuperAdmin, self::Admin => 'indigo',
+            self::Teacher => 'blue',
+            self::Student => 'green',
+            self::Parent => 'amber',
+            default => 'slate',
+        };
+    }
+
     /** Roles allowed to manage other users. */
     public function isAdmin(): bool
     {

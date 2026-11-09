@@ -23,12 +23,12 @@
                         </div>
                     </div>
                 </td>
-                <td>{{ $user->role?->label() }}</td>
+                <td>@if ($user->role)<x-badge :color="$user->role->color()">{{ $user->role->label() }}</x-badge>@endif</td>
                 <td>{{ $user->position ?: '-' }}</td>
                 <td>{{ $user->phone_number ?: '-' }}</td>
                 <td>{{ $user->join_date?->format('d M Y') }}</td>
                 <td>
-                    <x-badge :color="['active' => 'green', 'inactive' => 'amber', 'disabled' => 'red'][$user->status?->value] ?? 'slate'">{{ $user->status?->label() }}</x-badge>
+                    <x-badge :color="$user->status?->color() ?? 'slate'">{{ $user->status?->label() }}</x-badge>
                 </td>
                 <td class="text-right">
                     <x-icon-link :href="url('view/user/edit/'.$user->code)" icon="pencil" label="Edit" tone="primary" />

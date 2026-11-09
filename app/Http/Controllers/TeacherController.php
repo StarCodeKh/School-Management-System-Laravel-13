@@ -81,7 +81,7 @@ class TeacherController extends Controller
     /** Edit Record */
     public function editRecord(Teacher $teacher)
     {
-        $teacher->load('user');
+        $teacher->load(['user', 'department'])->loadCount('timetableEntries');
         $genders = Gender::cases();
         $departments = $this->departments();
 

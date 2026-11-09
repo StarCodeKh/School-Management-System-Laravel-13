@@ -29,11 +29,6 @@
     <x-form.section title="Contact" description="How the school reaches this student." icon="phone" cols="3">
         <x-form.input name="email" type="email" label="Email" :value="$student?->email" required />
         <x-form.input name="phone_number" type="tel" label="Phone" :value="$student?->phone_number" inputmode="numeric" required />
-        <div class="flex items-end gap-4">
-            @if ($student)
-                <x-avatar :src="$student->photo_url" :alt="$student->full_name" size="size-12" />
-            @endif
-            <x-form.input name="photo" type="file" label="Photo" accept="image/*" :required="! $student" wrapper="flex-1" hint="JPG, PNG or GIF, up to 2 MB." />
-        </div>
+        <x-form.image-upload name="photo" label="Photo" :current="$student?->photo_url" :required="! $student" wrapper="sm:col-span-2 lg:col-span-3" />
     </x-form.section>
 </div>

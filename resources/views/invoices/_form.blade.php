@@ -92,7 +92,7 @@
             <x-card title="Signature">
                 <div class="grid gap-5 sm:grid-cols-2">
                     <x-form.input name="signatory_name" label="Signatory name" :value="$invoice?->signatory_name ?? auth()->user()->name" required />
-                    <x-form.input name="signature" type="file" label="Signature image" accept="image/*" hint="Optional, up to 2 MB." />
+                    <x-form.image-upload name="signature" label="Signature image" shape="wide" :current="$invoice?->signature_path ? asset($invoice->signature_path) : null" hint="Optional. JPG, PNG or GIF, up to 2 MB." />
                     @if ($invoice?->signature_path)
                         <img src="{{ asset($invoice->signature_path) }}" alt="Current signature" class="h-16 w-auto rounded border border-slate-200 p-1">
                     @endif

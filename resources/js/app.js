@@ -564,6 +564,57 @@ window.addEventListener('popstate', (event) => {
 });
 
 /**
+ * Image upload with preview (<x-form.image-upload>): pick or drop a file, see it at once, undo.
+ * Wrong types and files over the size limit are rejected in the browser with a toast, before
+ * anything is sent. The chosen image is also broadcast as `image-preview` (detail: { name, url })
+ * so other parts of the page, such as a summary card, can show it too.
+ */
+Alpine.data('imageUpload', (config = {}) => ({
+    current: config.current ?? null,
+    preview: null,
+    fileName: '',
+    fileSize: '',
+    dragging: false,
+
+    get shown() {
+        return this.preview ?? this.current;
+    },
+    choose() {
+        this.$refs.input.click();
+    },
+    onChange() {
+        const file = this.$refs.input.files[0];
+        if (!file) return this.reset();
+        if (!file.type.startsWith('image/')) return this.reject('Please choose an image file (JPG, PNG or GIF).');
+        if (file.size > config.maxKb * 1024) return this.reject(`The image is too large. The limit is ${config.maxKb / 1024} MB.`);
+        if (this.preview) URL.revokeObjectURL(this.preview);
+        this.preview = URL.createObjectURL(file);
+        this.fileName = file.name;
+        this.fileSize = file.size > 1024 * 1024 ? `${(file.size / 1024 / 1024).toFixed(1)} MB` : `${Math.ceil(file.size / 1024)} KB`;
+        this.$dispatch('image-preview', { name: config.name, url: this.preview });
+    },
+    onDrop(event) {
+        this.dragging = false;
+        const files = event.dataTransfer?.files;
+        if (!files?.length) return;
+        this.$refs.input.files = files;
+        this.onChange();
+    },
+    reject(message) {
+        window.toast(message, 'error');
+        this.reset();
+    },
+    reset() {
+        this.$refs.input.value = '';
+        if (this.preview) URL.revokeObjectURL(this.preview);
+        this.preview = null;
+        this.fileName = '';
+        this.fileSize = '';
+        this.$dispatch('image-preview', { name: config.name, url: this.current });
+    },
+}));
+
+/**
  * Confirmation dialog (<x-confirm-dialog> in the app layout). Any button or link with
  * data-confirm="message" asks first (optional data-confirm-title, -label and -tone = danger|primary),
  * then carries on: a submit button submits its form, a link is followed.
