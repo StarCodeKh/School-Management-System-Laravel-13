@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,12 @@ class LoginController extends Controller
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()->withInput($request->only('email'))->with('error', 'Incorrect email or password.');
+        }
+
+        if ($request->user()->status !== UserStatus::Active) {
+            Auth::logout();
+
+            return back()->withInput($request->only('email'))->with('error', 'Your account is inactive. Please contact the school office.');
         }
 
         $request->session()->regenerate();

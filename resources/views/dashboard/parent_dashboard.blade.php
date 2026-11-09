@@ -14,10 +14,7 @@
             @include('student._overview', $child)
         </section>
     @empty
-        <div class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            <x-icon name="information" class="mt-0.5" />
-            <p>No children are linked to your account yet. Ask the school office to link you on your child's student profile.</p>
-        </div>
+        <x-alert type="warning" title="No children linked yet" class="mb-6">No children are linked to your account yet. Ask the school office to link you on your child's student profile.</x-alert>
     @endforelse
 
     <x-noticeboard />

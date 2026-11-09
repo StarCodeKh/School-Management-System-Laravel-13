@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
+use App\Enums\UserStatus;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -81,5 +82,25 @@ class AccessTest extends TestCase
         ])->assertSessionHasErrors('role');
 
         $this->assertDatabaseMissing('users', ['email' => 'intruder@example.com']);
+    }
+
+    public function test_inactive_user_cannot_log_in(): void
+    {
+        $user = User::factory()->create(['password' => 'secret-pass', 'status' => UserStatus::Inactive]);
+
+        $this->post('/login', ['email' => $user->email, 'password' => 'secret-pass'])
+            ->assertRedirect()->assertSessionHas('error', 'Your account is inactive. Please contact the school office.');
+        $this->assertGuest();
+    }
+
+    public function test_user_deactivated_while_logged_in_is_signed_out(): void
+    {
+        $user = User::factory()->create(['role' => Role::Teacher]);
+        $this->actingAs($user)->get('/user/profile/page')->assertOk();
+
+        $user->update(['status' => UserStatus::Inactive]);
+
+        $this->actingAs($user)->get('/user/profile/page')->assertRedirect('/login');
+        $this->assertGuest();
     }
 }

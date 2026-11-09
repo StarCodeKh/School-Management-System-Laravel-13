@@ -10,10 +10,7 @@
         <x-form.input name="password" type="password" label="Password" required autocomplete="current-password" />
 
         <div class="flex items-center justify-between">
-            <label class="flex items-center gap-2 text-sm text-slate-600">
-                <input type="checkbox" name="remember" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500" @checked(old('remember'))>
-                Remember me
-            </label>
+            <x-form.checkbox name="remember">Remember me</x-form.checkbox>
             <a href="{{ route('password.request') }}" class="text-sm font-semibold text-primary-600 hover:text-primary-700">Forgot password?</a>
         </div>
 

@@ -14,7 +14,8 @@
     </div>
 
     @if ($missingStaff > 0)
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-800">
+        <x-alert type="info" class="mb-4 items-center">
+            <div class="flex flex-wrap items-center justify-between gap-3">
             <p>{{ $missingStaff }} staff {{ \Illuminate\Support\Str::plural('member', $missingStaff) }} have no salary record for {{ $monthLabel }}.</p>
             <form method="POST" action="{{ route('payroll.generate') }}">
                 @csrf
@@ -22,7 +23,8 @@
                 <x-button size="sm" variant="secondary" icon="copy" confirm-tone="primary" confirm-title="Copy salaries" confirm-label="Create records"
                           :confirm="'Create '.$missingStaff.' pending salary '.\Illuminate\Support\Str::plural('record', $missingStaff).' for '.$monthLabel.' from each person\'s most recent month?'">Copy from previous months</x-button>
             </form>
-        </div>
+            </div>
+        </x-alert>
     @endif
 
     <x-table>

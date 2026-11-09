@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Models\Menu;
 use App\Models\User;
 use App\Support\TableQuery;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -47,6 +48,9 @@ class AppServiceProvider extends ServiceProvider
 
         // ->sortable() and ->paginateFromRequest() for list pages, and the shared pagination design
         TableQuery::register();
+
+        // outside production, fail loudly on N+1 queries (a relation loaded inside a loop)
+        Model::preventLazyLoading(! $this->app->isProduction());
         Paginator::defaultView('pagination.table');
     }
 }

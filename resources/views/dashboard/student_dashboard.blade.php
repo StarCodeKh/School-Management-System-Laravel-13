@@ -2,10 +2,7 @@
     <x-page-header :title="'Welcome, '.auth()->user()->name.'!'" :breadcrumbs="['Home' => route('home'), 'Student Dashboard' => null]" />
 
     @unless ($student)
-        <div class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            <x-icon name="information" class="mt-0.5" />
-            <p>Your account is not linked to a student record yet. An administrator can link it from the student's edit page (<strong>Login account</strong>).</p>
-        </div>
+        <x-alert type="warning" title="Account not linked yet" class="mb-6">Your account is not linked to a student record yet. An administrator can link it from the student's edit page (<strong>Login account</strong>).</x-alert>
     @endunless
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -28,10 +28,7 @@
         </div>
 
         <div class="mt-5 border-t border-slate-200 pt-5">
-            <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <input type="checkbox" name="is_recurring" value="1" x-model="isRecurring" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                Recurring invoice
-            </label>
+            <x-form.checkbox name="is_recurring" switch x-model="isRecurring" hint="Bill this customer again every month.">Recurring invoice</x-form.checkbox>
             <div x-show="isRecurring" x-cloak class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <x-form.select name="recurring_by_month" label="Starting month" :options="$months" :value="$invoice?->recurring_by_month" placeholder="Select month" />
                 <x-form.input name="recurring_month" type="number" min="1" max="60" label="Number of months" :value="$invoice?->recurring_month" />
@@ -109,10 +106,7 @@
 
                 <div class="flex items-center justify-between gap-4">
                     <dt>
-                        <label class="flex items-center gap-2 text-slate-500">
-                            <input type="checkbox" name="enable_tax" value="1" x-model="enableTax" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            <span>{{ setting('tax_name', 'Tax') }} (<span x-text="taxRate"></span>%)</span>
-                        </label>
+                        <x-form.checkbox name="enable_tax" switch x-model="enableTax">{{ setting('tax_name', 'Tax') }} (<span x-text="taxRate"></span>%)</x-form.checkbox>
                     </dt>
                     <dd class="font-medium text-slate-900" x-text="money(taxAmount)"></dd>
                 </div>

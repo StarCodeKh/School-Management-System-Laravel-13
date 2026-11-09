@@ -27,26 +27,18 @@
         </div>
         <div x-show="open" x-cloak class="mt-3 grid gap-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2 xl:grid-cols-4">
             <x-form.field label="Customers">
-                <div class="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2">
+                <div class="flex max-h-40 flex-col gap-1.5 overflow-y-auto rounded-lg border border-slate-200 p-2.5">
                     @forelse ($customers as $customer)
-                        <label class="flex items-center gap-2 text-sm">
-                            <input type="checkbox" name="customers[]" value="{{ $customer->id }}" @checked(in_array($customer->id, array_map('intval', $filters['customers'] ?? []), true))
-                                   class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            {{ $customer->name }}
-                        </label>
+                        <x-form.checkbox name="customers[]" :value="$customer->id" :checked="in_array($customer->id, array_map('intval', $filters['customers'] ?? []), true)" class="w-full">{{ $customer->name }}</x-form.checkbox>
                     @empty
                         <p class="text-sm text-slate-500">No customers yet.</p>
                     @endforelse
                 </div>
             </x-form.field>
             <x-form.field label="Categories">
-                <div class="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2">
+                <div class="flex max-h-40 flex-col gap-1.5 overflow-y-auto rounded-lg border border-slate-200 p-2.5">
                     @forelse ($categories as $category)
-                        <label class="flex items-center gap-2 text-sm">
-                            <input type="checkbox" name="categories[]" value="{{ $category }}" @checked(in_array($category, $filters['categories'] ?? [], true))
-                                   class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            {{ $category }}
-                        </label>
+                        <x-form.checkbox name="categories[]" :value="$category" :checked="in_array($category, $filters['categories'] ?? [], true)">{{ $category }}</x-form.checkbox>
                     @empty
                         <p class="text-sm text-slate-500">No categories yet.</p>
                     @endforelse
