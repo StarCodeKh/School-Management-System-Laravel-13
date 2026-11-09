@@ -89,6 +89,42 @@ Open http://127.0.0.1:8000 and log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`
 The seeder also creates the sidebar menu, classes 10–12 with sections A–C and the default fee types.
 It is safe to run again (`php artisan db:seed`): existing records are kept and only missing ones are added.
 
+### Demo data
+
+To try the system with a full sample school instead of empty pages:
+
+```bash
+php artisan school:demo --fresh
+```
+
+This rebuilds the database and fills every module with connected, realistic data (Cambodian names,
+phone numbers and holidays): teachers in six departments, students with parents (siblings share
+an account), a clash-free weekly timetable, months of attendance, exams with marks, fee structures
+with paid, part-paid and unpaid students, invoices, expenses, payroll, library loans (some overdue),
+bus routes, hostels, notices and events. It takes about two seconds.
+
+| Option | Meaning | Default |
+|--------|---------|---------|
+| `--fresh` | Drop all tables and migrate first (asks to confirm) | off |
+| `--students=N` | Students per section | `18` (270 in total) |
+| `--teachers=N` | Number of teachers | enough for the timetable |
+| `--months=N` | Months of attendance, fees, payroll and expenses | `3` |
+| `--seed=N` | Random seed: the same seed always builds the same school | `2026` |
+
+Defaults live in `config/school.php` (`DEMO_*` in `.env`). Every demo account uses the password
+`password` (`DEMO_PASSWORD`):
+
+| Role | Email |
+|------|-------|
+| Teacher | `teacher@school.test` |
+| Staff | `staff@school.test` |
+| Student | `student@school.test` |
+| Parent | `parent@school.test` |
+| Client | `client@school.test` |
+
+The command refuses to run twice on the same database and refuses production unless you pass `--force`.
+Never load demo data into a database with real records.
+
 ### Development
 
 ```bash
@@ -114,7 +150,7 @@ invoice total calculation, settings and dashboards.
 | `app/Http/Controllers` | One controller per area (students, teachers, invoices, settings, ...) |
 | `app/Models` | Eloquent models; `Setting` holds school-wide settings |
 | `database/migrations` | One table per migration file |
-| `database/seeders` | Admin user, sidebar menu, classes and fee types |
+| `database/seeders` | Admin user, sidebar menu, classes and fee types; `Demo/` builds the sample school for `school:demo` |
 | `resources/views/components` | Shared Blade components: layouts, sidebar, form fields, tables, buttons |
 | `resources/js/app.js` | Alpine.js setup and the invoice form component |
 | `resources/css/app.css` | Tailwind CSS entry point and theme |

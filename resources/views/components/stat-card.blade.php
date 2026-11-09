@@ -10,13 +10,14 @@
     ];
 @endphp
 
-<div {{ $attributes->class('flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm') }}>
+<div {{ $attributes->class('@container flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm') }}>
     <span class="grid size-12 shrink-0 place-items-center rounded-xl {{ $tones[$color] ?? $tones['indigo'] }}">
         <x-icon :name="$icon" class="size-6" />
     </span>
     <div class="min-w-0">
         <p class="text-sm text-slate-500">{{ $label }}</p>
-        <p class="truncate text-2xl font-bold text-slate-900">
+        {{-- the number shrinks on narrow cards; if it still doesn't fit, the tooltip shows it in full --}}
+        <p class="truncate text-lg font-bold text-slate-900 tabular-nums @[14rem]:text-xl @[16rem]:text-2xl" data-tooltip="{{ $value }}">
             @if ($href)<a href="{{ $href }}" class="hover:text-primary-600">{{ $value }}</a>@else{{ $value }}@endif
         </p>
     </div>
