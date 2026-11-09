@@ -18,7 +18,7 @@
     @include('invoices._tabs')
 
     {{-- filters --}}
-    <form method="GET" x-data="{ open: @js(request()->hasAny(['customers', 'categories', 'from', 'to'])) }" class="mb-4">
+    <form method="GET" data-live x-data="{ open: @js(request()->hasAny(['customers', 'categories', 'from', 'to'])) }" class="mb-4">
         <div class="flex items-center gap-2">
             <x-button type="button" variant="secondary" size="sm" icon="search" @click="open = !open">Filters</x-button>
             @if (request()->hasAny(['customers', 'categories', 'from', 'to']))
@@ -60,9 +60,9 @@
         </div>
     </form>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Invoice</th><th>Category</th><th>Created</th><th>Customer</th><th>Amount</th><th>Due date</th><th>Status</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="invoice">Invoice</x-th><th>Category</th><x-th sort="created">Created</x-th><x-th sort="customer">Customer</x-th><x-th sort="amount">Amount</x-th><x-th sort="due_date">Due date</x-th><x-th sort="status">Status</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($invoiceList as $invoice)
             <tr class="hover:bg-slate-50">

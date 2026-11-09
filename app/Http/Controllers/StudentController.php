@@ -8,6 +8,7 @@ use App\Enums\Religion;
 use App\Enums\Role;
 use App\Models\Exam;
 use App\Models\SchoolClass;
+use App\Models\Section;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -43,9 +44,17 @@ class StudentController extends Controller
                 ->orWhere('admission_id', 'like', "%{$search}%")
                 ->orWhere('phone_number', 'like', "%{$search}%")))
             ->when($classId, fn ($q) => $q->where('school_class_id', $classId))
-            ->latest()
-            ->paginate($perPage)
-            ->withQueryString();
+            ->sortable([
+                'admission_id' => 'admission_id',
+                'name' => ['first_name', 'last_name'],
+                'class' => fn ($q, $d) => $q
+                    ->orderBy(SchoolClass::select('sort_order')->whereColumn('school_classes.id', 'students.school_class_id'), $d)
+                    ->orderBy(SchoolClass::select('name')->whereColumn('school_classes.id', 'students.school_class_id'), $d)
+                    ->orderBy(Section::select('name')->whereColumn('sections.id', 'students.section_id'), $d),
+                'date_of_birth' => 'date_of_birth',
+                'newest' => 'created_at',
+            ], 'newest', 'desc')
+            ->paginateFromRequest($perPage);
 
         $classes = SchoolClass::orderBy('sort_order')->orderBy('name')->get();
 

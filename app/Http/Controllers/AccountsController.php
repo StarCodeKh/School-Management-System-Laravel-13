@@ -13,7 +13,15 @@ class AccountsController extends Controller
     /** index page */
     public function index()
     {
-        $feeCollections = FeeCollection::with(['student', 'feeType'])->latest('paid_date')->paginate(15);
+        $feeCollections = FeeCollection::with(['student', 'feeType'])
+            ->sortable([
+                'admission_id' => fn ($q, $d) => $q->orderBy(Student::select('admission_id')->whereColumn('students.id', 'fee_collections.student_id'), $d),
+                'student' => fn ($q, $d) => $q->orderBy(Student::select('first_name')->whereColumn('students.id', 'fee_collections.student_id'), $d),
+                'fee_type' => fn ($q, $d) => $q->orderBy(FeeType::select('name')->whereColumn('fee_types.id', 'fee_collections.fee_type_id'), $d),
+                'amount' => 'amount',
+                'paid_date' => 'paid_date',
+            ], 'paid_date', 'desc')
+            ->paginateFromRequest(15);
 
         return view('accounts.feescollections', compact('feeCollections'));
     }

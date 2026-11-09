@@ -20,9 +20,16 @@ class ExamController extends Controller
 
         $exams = Exam::with('schoolClass')->withCount('results')
             ->when($classId, fn ($q) => $q->where('school_class_id', $classId))
-            ->latest('start_date')
-            ->paginate(15)
-            ->withQueryString();
+            ->sortable([
+                'name' => 'name',
+                'class' => fn ($q, $d) => $q->orderBy(SchoolClass::select('sort_order')->whereColumn('school_classes.id', 'exams.school_class_id'), $d)
+                    ->orderBy(SchoolClass::select('name')->whereColumn('school_classes.id', 'exams.school_class_id'), $d),
+                'term' => 'term',
+                'dates' => 'start_date',
+                'max_marks' => 'max_marks',
+                'marks' => 'results_count',
+            ], 'dates', 'desc')
+            ->paginateFromRequest(15);
 
         $classes = SchoolClass::orderBy('sort_order')->orderBy('name')->get();
 

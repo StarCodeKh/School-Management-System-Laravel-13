@@ -17,9 +17,9 @@
                        placeholder="All classes" icon="academic-cap" wrapper="sm:w-48" />
     </x-search-bar>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Student</th><th>Class</th><th class="text-right">Due</th><th class="text-right">Paid</th><th class="text-right">Balance</th><th class="text-right">Status</th></tr>
+            <tr><x-th sort="student">Student</x-th><x-th sort="class">Class</x-th><th class="text-right">Due</th><th class="text-right">Paid</th><th class="text-right">Balance</th><th class="text-right">Status</th></tr>
         </x-slot:head>
         @forelse ($students as $student)
             @php($b = $balances[$student->id])

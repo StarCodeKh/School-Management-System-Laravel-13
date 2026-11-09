@@ -25,7 +25,12 @@ class ExpenseController extends Controller
 
         $total = (clone $query)->sum('amount');
         $byCategory = (clone $query)->selectRaw('category, SUM(amount) as total')->groupBy('category')->pluck('total', 'category');
-        $expenses = $query->with('recorder')->latest('expense_date')->paginate(20)->withQueryString();
+        $expenses = $query->with('recorder')
+            ->sortable([
+                'date' => 'expense_date', 'title' => 'title', 'category' => 'category', 'paid_to' => 'paid_to',
+                'method' => 'payment_method', 'amount' => 'amount',
+            ], 'date', 'desc')
+            ->paginateFromRequest(20);
 
         return view('finance.expenses.index', compact('expenses', 'month', 'total', 'byCategory', 'filters'));
     }

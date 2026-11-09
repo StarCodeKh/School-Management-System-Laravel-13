@@ -479,6 +479,91 @@ Alpine.data('datePicker', (config = {}) => ({
 }));
 
 /**
+ * Live tables. On a page with an <x-table live> (marked [data-live-region]):
+ *  - GET forms marked [data-live] (the search bar, filters, rows-per-page) reload just the
+ *    regions: on submit, on change, and while typing in a search box (debounced);
+ *  - links marked [data-live-link] inside a region (sort headers, pagination) do the same.
+ * The new page is fetched as normal HTML and every [data-live-region="key"] is swapped for its
+ * fresh copy; the URL is updated, so refresh, back/forward and shared links all still work.
+ * Without a live region, or without JavaScript, the same forms and links simply load the page.
+ */
+const liveRegions = () => document.querySelectorAll('[data-live-region]');
+let liveRequest = null;
+
+async function liveLoad(url, { history: mode = 'push' } = {}) {
+    liveRequest?.abort();
+    const request = (liveRequest = new AbortController());
+    const regions = liveRegions();
+    regions.forEach((region) => region.setAttribute('aria-busy', 'true'));
+    try {
+        const response = await fetch(url, { signal: request.signal, headers: { Accept: 'text/html' } });
+        // a redirect (e.g. the session expired) or an error page: hand over to a normal page load
+        if (!response.ok || response.redirected) return void (window.location.href = response.url || url);
+        const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+        regions.forEach((region) => {
+            const fresh = page.querySelector(`[data-live-region="${region.dataset.liveRegion}"]`);
+            if (fresh) region.replaceWith(document.importNode(fresh, true));
+        });
+        if (mode === 'push') window.history.pushState({ live: true }, '', url);
+        if (mode === 'replace') window.history.replaceState({ live: true }, '', url);
+    } catch (error) {
+        if (error.name !== 'AbortError') window.location.href = url;
+    } finally {
+        if (liveRequest === request) {
+            liveRequest = null;
+            liveRegions().forEach((region) => region.removeAttribute('aria-busy'));
+        }
+    }
+}
+
+const liveFormUrl = (form) => {
+    const url = new URL(form.getAttribute('action') || window.location.pathname, window.location.href);
+    // keep what the form doesn't control (sort, page size, other filters); replace what it does
+    const params = new URLSearchParams(window.location.search);
+    const bases = [...form.elements].map((el) => el.name).filter(Boolean).map((name) => name.replace(/\[\]$/, ''));
+    [...params.keys()].forEach((key) => {
+        if (bases.some((base) => key === base || key === `${base}[]` || key.startsWith(`${base}[`))) params.delete(key);
+    });
+    params.delete('page'); // a new search or filter starts again from the first page
+    new FormData(form).forEach((value, key) => value !== '' && params.append(key, value));
+    url.search = params.toString();
+    return url.toString();
+};
+
+document.addEventListener('submit', (event) => {
+    const form = event.target.closest('form[data-live]');
+    if (!form || !liveRegions().length || event.defaultPrevented) return;
+    event.preventDefault();
+    liveLoad(liveFormUrl(form));
+});
+
+document.addEventListener('change', (event) => {
+    const form = event.target.closest?.('form[data-live]');
+    if (!form || event.target.type === 'search' || event.target.type === 'text') return;
+    liveRegions().length ? liveLoad(liveFormUrl(form)) : form.requestSubmit();
+});
+
+let liveTyping = null;
+document.addEventListener('input', (event) => {
+    const form = event.target.closest?.('form[data-live]');
+    if (!form || event.target.type !== 'search' || !liveRegions().length) return;
+    clearTimeout(liveTyping);
+    liveTyping = setTimeout(() => liveLoad(liveFormUrl(form), { history: 'replace' }), 350);
+});
+
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[data-live-link]');
+    if (!link || !link.closest('[data-live-region]') || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    event.preventDefault();
+    liveLoad(link.href);
+});
+
+// back/forward through live states: the filter forms outside the table must match the URL too
+window.addEventListener('popstate', (event) => {
+    if (event.state?.live || liveRegions().length) window.location.reload();
+});
+
+/**
  * Submitting a form disables its submit button and shows a spinner, so a slow request can't be
  * sent twice. GET filter forms and forms marked data-no-loading are left alone.
  */

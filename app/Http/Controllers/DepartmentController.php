@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -38,9 +39,15 @@ class DepartmentController extends Controller
                 ->where('department_name', 'like', "%{$search}%")
                 ->orWhere('code', 'like', "%{$search}%")
                 ->orWhereHas('head', fn ($h) => $h->where('name', 'like', "%{$search}%"))))
-            ->orderBy('department_name')
-            ->paginate(15)
-            ->withQueryString();
+            ->sortable([
+                'code' => 'code',
+                'name' => 'department_name',
+                'head' => fn ($q, $d) => $q->orderBy(User::select('name')->whereColumn('users.id', 'departments.head_user_id'), $d),
+                'teachers' => 'teachers_count',
+                'started' => 'department_start_date',
+                'students' => 'no_of_students',
+            ], 'name')
+            ->paginateFromRequest(15);
 
         return view('department.list-department', compact('departments', 'search'));
     }

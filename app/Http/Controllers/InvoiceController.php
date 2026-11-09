@@ -187,9 +187,16 @@ class InvoiceController extends Controller
             ->when($filters['categories'] ?? null, fn ($q, $cats) => $q->whereHas('items', fn ($i) => $i->whereIn('category', $cats)))
             ->when($filters['from'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '>=', $d))
             ->when($filters['to'] ?? null, fn ($q, $d) => $q->whereDate('invoice_date', '<=', $d))
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+            ->sortable([
+                'invoice' => 'invoice_number',
+                'created' => 'invoice_date',
+                'customer' => fn ($q, $d) => $q->orderBy(User::select('name')->whereColumn('users.id', 'invoices.customer_id'), $d),
+                'amount' => 'total_amount',
+                'due_date' => 'due_date',
+                'status' => 'status',
+                'newest' => 'created_at',
+            ], 'newest', 'desc')
+            ->paginateFromRequest(15);
 
         $summary = fn ($query) => ['count' => $query->count(), 'amount' => (float) $query->sum('total_amount')];
         $stats = [

@@ -8,9 +8,9 @@
 
     <x-search-bar :value="$search" placeholder="Search title, author, ISBN or category..." />
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Title</th><th>Category</th><th>ISBN</th><th>Shelf</th><th class="text-center">Copies</th><th class="text-center">Available</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="title">Title</x-th><x-th sort="category">Category</x-th><x-th sort="isbn">ISBN</x-th><x-th sort="shelf">Shelf</x-th><x-th sort="copies" align="center">Copies</x-th><th class="text-center">Available</th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($books as $book)
             <tr class="hover:bg-slate-50">

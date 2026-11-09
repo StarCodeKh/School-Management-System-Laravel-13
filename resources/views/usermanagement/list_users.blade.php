@@ -7,9 +7,9 @@
 
     <x-search-bar :value="$search" placeholder="Search name, email, ID or phone..." />
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>User ID</th><th>Name</th><th>Role</th><th>Position</th><th>Phone</th><th>Joined</th><th>Status</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="code">User ID</x-th><x-th sort="name">Name</x-th><x-th sort="role">Role</x-th><x-th sort="position">Position</x-th><th>Phone</th><x-th sort="join_date">Joined</x-th><x-th sort="status">Status</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($users as $user)
             <tr class="hover:bg-slate-50">

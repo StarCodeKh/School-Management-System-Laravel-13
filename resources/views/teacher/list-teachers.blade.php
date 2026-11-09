@@ -9,9 +9,9 @@
 
     @include('teacher._toolbar')
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>User ID</th><th>Name</th><th>Department</th><th>Qualification</th><th>Experience</th><th>Phone</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="code">User ID</x-th><x-th sort="name">Name</x-th><x-th sort="department">Department</x-th><x-th sort="qualification">Qualification</x-th><x-th sort="experience">Experience</x-th><th>Phone</th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($teachers as $teacher)
             <tr class="hover:bg-slate-50">

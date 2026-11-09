@@ -21,9 +21,13 @@ class SubjectController extends Controller
                 ->where('subject_name', 'like', "%{$search}%")
                 ->orWhere('code', 'like', "%{$search}%")))
             ->when($classId, fn ($q) => $q->where('school_class_id', $classId))
-            ->orderBy('subject_name')
-            ->paginate(15)
-            ->withQueryString();
+            ->sortable([
+                'code' => 'code',
+                'name' => 'subject_name',
+                'class' => fn ($q, $d) => $q->orderBy(SchoolClass::select('sort_order')->whereColumn('school_classes.id', 'subjects.school_class_id'), $d)
+                    ->orderBy(SchoolClass::select('name')->whereColumn('school_classes.id', 'subjects.school_class_id'), $d),
+            ], 'name')
+            ->paginateFromRequest(15);
 
         $classes = $this->classes();
 

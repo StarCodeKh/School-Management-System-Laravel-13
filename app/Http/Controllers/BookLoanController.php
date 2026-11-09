@@ -19,9 +19,15 @@ class BookLoanController extends Controller
             ->when($tab === 'active', fn ($q) => $q->active())
             ->when($tab === 'overdue', fn ($q) => $q->overdue())
             ->when($tab === 'returned', fn ($q) => $q->whereNotNull('returned_on'))
-            ->orderBy($tab === 'returned' ? 'returned_on' : 'due_on', $tab === 'returned' ? 'desc' : 'asc')
-            ->paginate(20)
-            ->withQueryString();
+            ->sortable([
+                'book' => fn ($q, $d) => $q->orderBy(Book::select('title')->whereColumn('books.id', 'book_loans.book_id'), $d),
+                'student' => fn ($q, $d) => $q->orderBy(Student::select('first_name')->whereColumn('students.id', 'book_loans.student_id'), $d),
+                'issued' => 'issued_on',
+                'due' => 'due_on',
+                'returned' => 'returned_on',
+                'fine' => 'fine',
+            ], $tab === 'returned' ? 'returned' : 'due', $tab === 'returned' ? 'desc' : 'asc')
+            ->paginateFromRequest(20);
 
         $counts = ['active' => BookLoan::active()->count(), 'overdue' => BookLoan::overdue()->count()];
 

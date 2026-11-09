@@ -5,9 +5,9 @@
         </x-slot:actions>
     </x-page-header>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Admission ID</th><th>Student</th><th>Fee type</th><th>Amount</th><th>Paid date</th><th class="text-right">Status</th></tr>
+            <tr><x-th sort="admission_id">Admission ID</x-th><x-th sort="student">Student</x-th><x-th sort="fee_type">Fee type</x-th><x-th sort="amount">Amount</x-th><x-th sort="paid_date">Paid date</x-th><th class="text-right">Status</th></tr>
         </x-slot:head>
         @forelse ($feeCollections as $payment)
             <tr class="hover:bg-slate-50">

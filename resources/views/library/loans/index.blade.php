@@ -15,9 +15,9 @@
         @endforeach
     </nav>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Book</th><th>Student</th><th>Issued</th><th>Due</th><th>{{ $tab === 'returned' ? 'Returned' : 'Status' }}</th><th class="text-right">Fine</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="book">Book</x-th><x-th sort="student">Student</x-th><x-th sort="issued">Issued</x-th><x-th sort="due">Due</x-th>@if ($tab === 'returned')<x-th sort="returned">Returned</x-th>@else<th>Status</th>@endif<x-th sort="fine" align="right">Fine</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($loans as $loan)
             <tr class="hover:bg-slate-50">

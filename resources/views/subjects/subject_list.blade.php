@@ -12,9 +12,9 @@
                        placeholder="All classes" icon="academic-cap" wrapper="sm:w-48" />
     </x-search-bar>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>ID</th><th>Name</th><th>Class</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="code">ID</x-th><x-th sort="name">Name</x-th><x-th sort="class">Class</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($subjectList as $subject)
             <tr class="hover:bg-slate-50">

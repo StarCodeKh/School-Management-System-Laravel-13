@@ -9,9 +9,9 @@
 
     @include('student._toolbar')
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Admission ID</th><th>Name</th><th>Class</th><th>Date of birth</th><th>Phone</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="admission_id">Admission ID</x-th><x-th sort="name">Name</x-th><x-th sort="class">Class</x-th><x-th sort="date_of_birth">Date of birth</x-th><th>Phone</th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($studentList as $student)
             <tr class="hover:bg-slate-50">

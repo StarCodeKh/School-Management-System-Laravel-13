@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Enums\Role;
 use App\Models\Menu;
 use App\Models\User;
+use App\Support\TableQuery;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -42,5 +44,9 @@ class AppServiceProvider extends ServiceProvider
 
         // only the sidebar needs the menu tree
         View::composer('components.sidebar', fn ($view) => $view->with('menus', Menu::sidebar()));
+
+        // ->sortable() and ->paginateFromRequest() for list pages, and the shared pagination design
+        TableQuery::register();
+        Paginator::defaultView('pagination.table');
     }
 }

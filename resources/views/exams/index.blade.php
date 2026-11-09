@@ -7,14 +7,14 @@
         </x-slot:actions>
     </x-page-header>
 
-    <form method="GET" class="mb-4 flex gap-2">
+    <form method="GET" data-live class="mb-4 flex gap-2">
         <x-form.select name="class" :options="$classes->mapWithKeys(fn ($class) => [$class->id => 'Class '.$class->name])" :value="$classId"
-                       placeholder="All classes" icon="academic-cap" wrapper="w-full sm:w-56" onchange="this.form.submit()" />
+                       placeholder="All classes" icon="academic-cap" wrapper="w-full sm:w-56" />
     </form>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Exam</th><th>Class</th><th>Term</th><th>Dates</th><th>Max marks</th><th>Marks entered</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="name">Exam</x-th><x-th sort="class">Class</x-th><x-th sort="term">Term</x-th><x-th sort="dates">Dates</x-th><x-th sort="max_marks">Max marks</x-th><x-th sort="marks">Marks entered</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($exams as $exam)
             <tr class="hover:bg-slate-50">

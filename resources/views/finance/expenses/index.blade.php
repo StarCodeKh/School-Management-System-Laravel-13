@@ -5,17 +5,17 @@
         </x-slot:actions>
     </x-page-header>
 
-    <form method="GET" class="mb-4 flex flex-wrap items-center gap-2">
+    <form method="GET" data-live class="mb-4 flex flex-wrap items-center gap-2">
         <x-form.input name="month" type="month" :value="$month" wrapper="w-56" />
         <x-form.select name="category" :options="\App\Enums\ExpenseCategory::options()" :value="$filters['category'] ?? null"
                        placeholder="All categories" icon="tag" wrapper="sm:w-52" />
         <x-button variant="secondary">Filter</x-button>
-        <span class="ml-auto text-sm text-slate-600">Total: <span class="font-semibold text-slate-900">{{ money($total) }}</span></span>
+        <span class="ml-auto text-sm text-slate-600">Total: <span class="font-semibold text-slate-900" data-live-region="expenses-total">{{ money($total) }}</span></span>
     </form>
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>Date</th><th>Title</th><th>Category</th><th>Paid to</th><th>Method</th><th class="text-right">Amount</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="date">Date</x-th><x-th sort="title">Title</x-th><x-th sort="category">Category</x-th><x-th sort="paid_to">Paid to</x-th><x-th sort="method">Method</x-th><x-th sort="amount" align="right">Amount</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($expenses as $expense)
             <tr class="hover:bg-slate-50">

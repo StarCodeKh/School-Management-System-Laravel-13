@@ -19,9 +19,10 @@ class BookController extends Controller
                 ->orWhere('author', 'like', "%{$search}%")
                 ->orWhere('isbn', 'like', "%{$search}%")
                 ->orWhere('category', 'like', "%{$search}%")))
-            ->orderBy('title')
-            ->paginate(20)
-            ->withQueryString();
+            ->sortable([
+                'title' => 'title', 'category' => 'category', 'isbn' => 'isbn', 'shelf' => 'shelf', 'copies' => 'quantity',
+            ], 'title')
+            ->paginateFromRequest(20);
 
         return view('library.books.index', compact('books', 'search'));
     }

@@ -22,9 +22,12 @@ class FeeBalanceController extends Controller
                 ->orWhere('last_name', 'like', "%{$search}%")
                 ->orWhere('admission_id', 'like', "%{$search}%")))
             ->when($classId, fn ($q) => $q->where('school_class_id', $classId))
-            ->orderBy('first_name')
-            ->paginate(20)
-            ->withQueryString();
+            ->sortable([
+                'student' => ['first_name', 'last_name'],
+                'class' => fn ($q, $d) => $q->orderBy(SchoolClass::select('sort_order')->whereColumn('school_classes.id', 'students.school_class_id'), $d)
+                    ->orderBy(SchoolClass::select('name')->whereColumn('school_classes.id', 'students.school_class_id'), $d),
+            ], 'student')
+            ->paginateFromRequest(20);
 
         // two grouped queries for the whole page instead of one per student
         $dueByClass = FeeStructure::selectRaw('school_class_id, SUM(amount) as total')->groupBy('school_class_id')->pluck('total', 'school_class_id');

@@ -47,9 +47,15 @@ class TeacherController extends Controller
                 ->whereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
                 ->orWhere('qualification', 'like', "%{$search}%")
                 ->orWhere('phone_number', 'like', "%{$search}%")))
-            ->latest()
-            ->paginate($perPage)
-            ->withQueryString();
+            ->sortable([
+                'code' => fn ($q, $d) => $q->orderBy(User::select('code')->whereColumn('users.id', 'teachers.user_id'), $d),
+                'name' => fn ($q, $d) => $q->orderBy(User::select('name')->whereColumn('users.id', 'teachers.user_id'), $d),
+                'department' => fn ($q, $d) => $q->orderBy(Department::select('department_name')->whereColumn('departments.id', 'teachers.department_id'), $d),
+                'qualification' => 'qualification',
+                'experience' => 'experience',
+                'newest' => 'created_at',
+            ], 'newest', 'desc')
+            ->paginateFromRequest($perPage);
 
         return compact('teachers', 'search');
     }

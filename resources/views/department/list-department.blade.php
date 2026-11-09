@@ -9,9 +9,9 @@
 
     <x-search-bar :value="$search" placeholder="Search name, ID or head..." />
 
-    <x-table>
+    <x-table live>
         <x-slot:head>
-            <tr><th>ID</th><th>Name</th><th>Head of department</th><th>Teachers</th><th>Started</th><th>Students</th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="code">ID</x-th><x-th sort="name">Name</x-th><x-th sort="head">Head of department</x-th><x-th sort="teachers">Teachers</x-th><x-th sort="started">Started</x-th><x-th sort="students">Students</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($departments as $department)
             <tr class="hover:bg-slate-50">

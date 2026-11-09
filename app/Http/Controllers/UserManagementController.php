@@ -25,9 +25,11 @@ class UserManagementController extends Controller
                 ->orWhere('email', 'like', "%{$search}%")
                 ->orWhere('code', 'like', "%{$search}%")
                 ->orWhere('phone_number', 'like', "%{$search}%")))
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString();
+            ->sortable([
+                'code' => 'code', 'name' => 'name', 'role' => 'role', 'position' => 'position',
+                'join_date' => 'join_date', 'status' => 'status',
+            ], 'name')
+            ->paginateFromRequest(15);
 
         return view('usermanagement.list_users', compact('users', 'search'));
     }

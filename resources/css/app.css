@@ -56,3 +56,29 @@ button[aria-busy='true']::before {
     border-radius: 9999px;
     animation: spin 0.6s linear infinite;
 }
+
+/* live tables while the next page loads (see "Live tables" in resources/js/app.js) */
+[data-live-region][aria-busy='true'] {
+    transition: opacity 150ms;
+    opacity: 0.6;
+    pointer-events: none;
+}
+div[data-live-region][aria-busy='true']::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 20;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-primary-500), transparent);
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+    animation: live-progress 0.9s ease-in-out infinite;
+}
+@keyframes live-progress {
+    from {
+        background-position: -50% 0;
+    }
+    to {
+        background-position: 150% 0;
+    }
+}
