@@ -22,7 +22,7 @@
             <x-form.select name="customer_id" label="Customer" :options="$users->pluck('name', 'id')" :value="$invoice?->customer_id" placeholder="Select customer" required wrapper="lg:col-span-2" />
             <x-form.input name="po_number" label="PO number" :value="$invoice?->po_number" required />
             <x-form.input name="invoice_date" type="date" label="Invoice date" :value="$invoice?->invoice_date ?? now()" />
-            <x-form.input name="due_date" type="date" label="Due date" :value="$invoice?->due_date ?? now()->addDays((int) setting('invoice_due_days', 14))" required />
+            <x-form.input name="due_date" type="date" after="invoice_date" label="Due date" :value="$invoice?->due_date ?? now()->addDays((int) setting('invoice_due_days', 14))" required />
             <x-form.textarea name="invoice_from" label="Invoice from" :value="$invoice?->invoice_from ?? trim($from)" rows="3" wrapper="lg:col-span-2" />
             <x-form.textarea name="invoice_to" label="Invoice to" :value="$invoice?->invoice_to" rows="3" wrapper="lg:col-span-1" placeholder="Customer address" />
         </div>

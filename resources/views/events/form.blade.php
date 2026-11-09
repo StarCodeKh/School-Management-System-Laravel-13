@@ -8,7 +8,7 @@
             <div class="grid gap-5 sm:grid-cols-2">
                 <x-form.input name="title" label="Title" :value="$event?->title" required wrapper="sm:col-span-2" placeholder="e.g. Sports Day" />
                 <x-form.input name="starts_on" type="date" label="Starts" :value="$event?->starts_on" required />
-                <x-form.input name="ends_on" type="date" label="Ends" :value="$event?->ends_on" hint="Leave empty for a one-day event." />
+                <x-form.input name="ends_on" type="date" after="starts_on" label="Ends" :value="$event?->ends_on" hint="Leave empty for a one-day event." />
                 <x-form.input name="location" label="Location" :value="$event?->location" />
                 <x-form.select name="audience" label="Audience" :options="\App\Enums\Audience::options()" :value="$event?->audience ?? 'everyone'" :placeholder="false" required />
                 <x-form.textarea name="description" label="Description" :value="$event?->description" rows="4" wrapper="sm:col-span-2" />

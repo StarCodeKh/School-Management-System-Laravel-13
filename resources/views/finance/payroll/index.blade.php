@@ -2,7 +2,7 @@
 <x-layouts.app title="Payroll">
     <x-page-header :title="'Payroll: '.$monthLabel" :breadcrumbs="['Finance' => route('finance.index'), 'Payroll' => null]">
         <x-slot:actions>
-            <form method="GET"><x-form.input name="month" type="month" :value="$month" onchange="this.form.submit()" /></form>
+            <form method="GET"><x-form.input name="month" type="month" :value="$month" wrapper="w-56" onchange="this.form.submit()" /></form>
             <x-button :href="route('payroll.create', ['month' => $month])" icon="plus">Add salary</x-button>
         </x-slot:actions>
     </x-page-header>

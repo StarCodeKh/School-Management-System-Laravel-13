@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form method="GET" class="mb-4 flex flex-wrap items-center gap-2">
-        <x-form.input name="month" type="month" :value="$month" />
+        <x-form.input name="month" type="month" :value="$month" wrapper="w-56" />
         <x-form.select name="category" :options="\App\Enums\ExpenseCategory::options()" :value="$filters['category'] ?? null"
                        placeholder="All categories" icon="tag" wrapper="sm:w-52" />
         <x-button variant="secondary">Filter</x-button>

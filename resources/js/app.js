@@ -284,6 +284,201 @@ Alpine.data('selectMenu', (config = {}) => ({
 }));
 
 /**
+ * Calendar for <x-form.input type="date|month">. Like selectMenu, a real <input type="date|month">
+ * stays underneath and holds the value, so min/max/required, onchange and posts work unchanged.
+ * config.after names another field in the same form whose value is the earliest allowed date
+ * (e.g. an end date that can't be before the start date).
+ */
+const pad = (n) => String(n).padStart(2, '0');
+const isoDate = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+Alpine.data('datePicker', (config = {}) => ({
+    mode: config.mode === 'month' ? 'month' : 'date',
+    open: false,
+    view: 'days', // days | months | years
+    year: 0,
+    month: 0,
+    active: '',
+    value: '',
+    min: '',
+    max: '',
+    isDisabled: false,
+    isRequired: false,
+    panelStyle: '',
+
+    init() {
+        const native = this.$refs.native;
+        const syncState = () => {
+            this.isDisabled = native.disabled;
+            this.isRequired = native.required;
+        };
+        syncState();
+        new MutationObserver(syncState).observe(native, { attributes: true, attributeFilter: ['disabled', 'required'] });
+        this.$nextTick(() => (this.value = native.value));
+        native.addEventListener('change', () => (this.value = native.value));
+        native.form?.addEventListener('reset', () => setTimeout(() => (this.value = native.value)));
+        const reposition = () => this.open && this.place();
+        window.addEventListener('scroll', reposition, true);
+        window.addEventListener('resize', reposition);
+    },
+
+    // ----- display -------------------------------------------------------------------------
+    get label() {
+        if (!this.value) return '';
+        const [y, m, d] = this.value.split('-').map(Number);
+        return this.mode === 'month' ? `${MONTHS_LONG[m - 1]} ${y}` : `${pad(d)} ${MONTHS_SHORT[m - 1]} ${y}`;
+    },
+    get today() {
+        const now = new Date();
+        return isoDate(now.getFullYear(), now.getMonth(), now.getDate());
+    },
+    get heading() {
+        if (this.view === 'days') return `${MONTHS_LONG[this.month]} ${this.year}`;
+        if (this.view === 'months') return String(this.year);
+        return `${this.yearStart} – ${this.yearStart + 11}`;
+    },
+    get yearStart() {
+        return this.year - (((this.year % 12) + 12) % 12);
+    },
+    get days() {
+        const first = new Date(this.year, this.month, 1);
+        const offset = (first.getDay() + 6) % 7; // weeks start on Monday
+        return Array.from({ length: 42 }, (_, i) => {
+            const date = new Date(this.year, this.month, 1 - offset + i);
+            const iso = isoDate(date.getFullYear(), date.getMonth(), date.getDate());
+            return { iso, day: date.getDate(), outside: date.getMonth() !== this.month, disabled: this.outOfRange(iso) };
+        });
+    },
+    get months() {
+        return MONTHS_SHORT.map((name, index) => {
+            const iso = `${this.year}-${pad(index + 1)}`;
+            return { index, name, iso, disabled: this.monthOutOfRange(iso) };
+        });
+    },
+    get years() {
+        return Array.from({ length: 12 }, (_, i) => this.yearStart + i);
+    },
+    outOfRange(iso) {
+        return Boolean((this.min && iso < this.min) || (this.max && iso > this.max));
+    },
+    monthOutOfRange(ym) {
+        // a month is selectable when any part of it is inside min/max
+        return Boolean((this.min && ym < this.min.slice(0, 7)) || (this.max && ym > this.max.slice(0, 7)));
+    },
+    isSelectedMonth(index) {
+        return this.value.slice(0, 7) === `${this.year}-${pad(index + 1)}`;
+    },
+
+    // ----- open / close --------------------------------------------------------------------
+    toggle() {
+        this.open ? this.close() : this.show();
+    },
+    show() {
+        if (this.isDisabled) return;
+        const native = this.$refs.native;
+        this.value = native.value;
+        this.min = native.min || '';
+        this.max = native.max || '';
+        const after = config.after && native.form?.querySelector(`[name="${config.after}"]`)?.value;
+        if (after && (!this.min || after > this.min)) this.min = after;
+
+        const start = this.value || (this.min && this.today < this.min ? this.min : this.max && this.today > this.max ? this.max : this.today);
+        const [y, m] = start.split('-').map(Number);
+        this.year = y;
+        this.month = m - 1;
+        this.active = this.mode === 'month' ? start.slice(0, 7) : start.length === 7 ? `${start}-01` : start;
+        this.view = this.mode === 'month' ? 'months' : 'days';
+        this.open = true;
+        this.place();
+        this.$nextTick(() => this.$refs.panel?.focus({ preventScroll: true }));
+    },
+    close(refocus = false) {
+        this.open = false;
+        if (refocus) this.$refs.button.focus();
+    },
+    place() {
+        const rect = this.$refs.button.getBoundingClientRect();
+        const width = 288;
+        const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
+        const below = window.innerHeight - rect.bottom;
+        const vertical = below < 370 && rect.top > below ? `bottom:${window.innerHeight - rect.top + 6}px` : `top:${rect.bottom + 6}px`;
+        this.panelStyle = `position:fixed;left:${left}px;width:${width}px;${vertical}`;
+    },
+
+    // ----- navigation ----------------------------------------------------------------------
+    step(direction) {
+        if (this.view === 'days') {
+            const date = new Date(this.year, this.month + direction, 1);
+            this.year = date.getFullYear();
+            this.month = date.getMonth();
+        } else {
+            this.year += direction * (this.view === 'months' ? 1 : 12);
+        }
+    },
+    zoomOut() {
+        this.view = this.view === 'days' ? 'months' : 'years';
+    },
+    chooseYear(year) {
+        this.year = year;
+        this.view = 'months';
+    },
+    chooseMonth(month) {
+        if (month.disabled) return;
+        if (this.mode === 'month') return this.pick(month.iso);
+        this.month = month.index;
+        this.view = 'days';
+    },
+
+    // ----- picking -------------------------------------------------------------------------
+    pick(iso, refocus = true) {
+        if (iso && (this.mode === 'month' ? this.monthOutOfRange(iso) : this.outOfRange(iso))) return;
+        const native = this.$refs.native;
+        const changed = native.value !== iso;
+        native.value = iso;
+        this.value = iso;
+        if (changed) {
+            native.dispatchEvent(new Event('input', { bubbles: true }));
+            native.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        this.close(refocus);
+    },
+    pickToday() {
+        this.pick(this.mode === 'month' ? this.today.slice(0, 7) : this.today);
+    },
+    get todayAllowed() {
+        return this.mode === 'month' ? !this.monthOutOfRange(this.today.slice(0, 7)) : !this.outOfRange(this.today);
+    },
+    clear() {
+        this.pick('');
+    },
+    onButtonKey(event) {
+        if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+            event.preventDefault();
+            this.show();
+        }
+    },
+    onPanelKey(event) {
+        if (event.key === 'Escape') return event.preventDefault(), this.close(true);
+        if (event.key === 'Tab') return this.close();
+        if (this.view !== 'days') return;
+        const moves = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+        if (moves[event.key] !== undefined || event.key === 'PageUp' || event.key === 'PageDown') {
+            event.preventDefault();
+            const [y, m, d] = this.active.split('-').map(Number);
+            const next = moves[event.key] !== undefined ? new Date(y, m - 1, d + moves[event.key]) : new Date(y, m - 1 + (event.key === 'PageUp' ? -1 : 1), d);
+            this.active = isoDate(next.getFullYear(), next.getMonth(), next.getDate());
+            this.year = next.getFullYear();
+            this.month = next.getMonth();
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            this.pick(this.active);
+        }
+    },
+}));
+
+/**
  * Submitting a form disables its submit button and shows a spinner, so a slow request can't be
  * sent twice. GET filter forms and forms marked data-no-loading are left alone.
  */

@@ -11,7 +11,7 @@
                 <x-form.input name="term" label="Term" :value="$exam?->term" placeholder="e.g. Semester 1" />
                 <x-form.input name="max_marks" type="number" min="1" max="1000" label="Maximum marks per subject" :value="$exam?->max_marks ?? 100" required />
                 <x-form.input name="start_date" type="date" label="Start date" :value="$exam?->start_date" required />
-                <x-form.input name="end_date" type="date" label="End date" :value="$exam?->end_date" />
+                <x-form.input name="end_date" type="date" after="start_date" label="End date" :value="$exam?->end_date" />
             </div>
             <x-form.actions :submit="$exam ? 'Update exam' : 'Create exam'" :cancel="route('exams.index')" />
         </form>

@@ -54,7 +54,7 @@
             </x-form.field>
             <div class="space-y-3">
                 <x-form.input name="from" type="date" label="Invoice date from" :value="$filters['from'] ?? null" />
-                <x-form.input name="to" type="date" label="Invoice date to" :value="$filters['to'] ?? null" />
+                <x-form.input name="to" type="date" after="from" label="Invoice date to" :value="$filters['to'] ?? null" />
             </div>
             <div class="flex items-end"><x-button class="w-full">Apply filters</x-button></div>
         </div>

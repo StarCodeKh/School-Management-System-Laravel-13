@@ -5,7 +5,7 @@
         <form method="GET" class="grid gap-4 sm:grid-cols-[1fr_11rem_11rem_auto] sm:items-end">
             <x-form.select name="section_id" label="Section" :options="$sectionOptions" :value="$section?->id" placeholder="Select a section" required />
             <x-form.input name="from" type="date" label="From" :value="$from" />
-            <x-form.input name="to" type="date" label="To" :value="$to" />
+            <x-form.input name="to" type="date" after="from" label="To" :value="$to" />
             <x-button>Show</x-button>
         </form>
     </x-card>
