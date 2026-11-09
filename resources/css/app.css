@@ -39,22 +39,51 @@
     }
 }
 
-/* submit buttons while their form is being sent (see resources/js/app.js) */
-button[aria-busy='true'] {
+/* buttons while their form is being sent (see resources/js/app.js) or with <x-button loading> */
+:is(button, a)[aria-busy='true'] {
     cursor: progress;
 }
-button[aria-busy='true'] > svg {
+:is(button, a)[aria-busy='true'] > svg {
     display: none;
 }
-button[aria-busy='true']::before {
+:is(button, a)[aria-busy='true']::before {
     content: '';
-    width: 1rem;
-    height: 1rem;
+    width: 1.15em;
+    height: 1.15em;
     flex-shrink: 0;
     border: 2px solid currentColor;
     border-right-color: transparent;
     border-radius: 9999px;
     animation: spin 0.6s linear infinite;
+}
+
+/* the shared tooltip for [data-tooltip] (resources/js/app.js) */
+.app-tooltip {
+    position: fixed;
+    z-index: 90;
+    max-width: 16rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 0.375rem;
+    background: var(--color-slate-900);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(2px);
+    transition:
+        opacity 120ms,
+        transform 120ms;
+}
+.app-tooltip[data-side='bottom'] {
+    transform: translateY(-2px);
+}
+.app-tooltip[data-show] {
+    opacity: 1;
+    transform: none;
+    transition-delay: 150ms;
 }
 
 /* live tables while the next page loads (see "Live tables" in resources/js/app.js) */

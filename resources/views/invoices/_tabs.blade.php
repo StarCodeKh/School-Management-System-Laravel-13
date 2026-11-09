@@ -22,7 +22,7 @@
         @endforeach
     </nav>
     <div class="mb-2 flex rounded-lg border border-slate-300 bg-white p-0.5 shadow-sm">
-        <a href="{{ route('invoice/list/page') }}" @class(['rounded-md p-1.5', 'bg-primary-50 text-primary-700' => $currentTab, 'text-slate-500' => ! $currentTab]) title="List view"><x-icon name="list" /></a>
-        <a href="{{ route('invoice/grid/page') }}" @class(['rounded-md p-1.5', 'bg-primary-50 text-primary-700' => ! $currentTab, 'text-slate-500' => $currentTab]) title="Grid view"><x-icon name="squares" /></a>
+        <a href="{{ route('invoice/list/page') }}" @class(['rounded-md p-1.5', 'bg-primary-50 text-primary-700' => $currentTab, 'text-slate-500' => ! $currentTab]) data-tooltip="List view" aria-label="List view"><x-icon name="list" /></a>
+        <a href="{{ route('invoice/grid/page') }}" @class(['rounded-md p-1.5', 'bg-primary-50 text-primary-700' => ! $currentTab, 'text-slate-500' => $currentTab]) data-tooltip="Grid view" aria-label="Grid view"><x-icon name="squares" /></a>
     </div>
 </div>

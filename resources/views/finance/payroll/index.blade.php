@@ -19,7 +19,8 @@
             <form method="POST" action="{{ route('payroll.generate') }}">
                 @csrf
                 <input type="hidden" name="month" value="{{ $month }}">
-                <x-button size="sm" variant="secondary" icon="copy">Copy from previous months</x-button>
+                <x-button size="sm" variant="secondary" icon="copy" confirm-tone="primary" confirm-title="Copy salaries" confirm-label="Create records"
+                          :confirm="'Create '.$missingStaff.' pending salary '.\Illuminate\Support\Str::plural('record', $missingStaff).' for '.$monthLabel.' from each person\'s most recent month?'">Copy from previous months</x-button>
             </form>
         </div>
     @endif
@@ -51,7 +52,8 @@
                             @csrf
                             <x-form.select name="payment_method" :options="\App\Enums\PaymentMethod::options()" :placeholder="false" :icon="false" size="sm" wrapper="w-32 text-left"
                                            :id="'payment_method_'.$payroll->id" />
-                            <x-button size="sm">Pay</x-button>
+                            <x-button size="sm" variant="success" icon="check" confirm-tone="primary" confirm-title="Mark salary as paid" confirm-label="Mark as paid"
+                                      :confirm="'Pay '.money($payroll->net_salary).' to '.$payroll->user?->name.' for '.$monthLabel.'?'">Pay</x-button>
                         </form>
                     @endif
                     <x-icon-link :href="route('payroll.edit', $payroll)" icon="pencil" label="Edit" tone="primary" />

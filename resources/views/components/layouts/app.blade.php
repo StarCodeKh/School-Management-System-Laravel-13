@@ -42,28 +42,29 @@
 
                 <div class="flex-1"></div>
 
-                <div x-data="{ open: false }" class="relative">
-                    <button type="button" @click="open = !open" @click.outside="open = false" class="flex items-center gap-3 rounded-full py-1 pr-2 pl-1 hover:bg-slate-100">
+                <x-dropdown width="208">
+                    <x-slot:trigger>
+                    <button type="button" class="flex items-center gap-3 rounded-full py-1 pr-2 pl-1 transition hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-primary-500">
                         <img class="size-8 rounded-full object-cover" src="{{ auth()->user()->avatar_url }}" alt="">
                         <span class="hidden text-left sm:block">
                             <span class="block text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</span>
                             <span class="block text-xs text-slate-500">{{ auth()->user()->role?->label() }}</span>
                         </span>
-                        <x-icon name="chevron-down" class="size-4 text-slate-400" />
+                        <x-icon name="chevron-down" class="size-4 text-slate-400 transition" ::class="open && 'rotate-180'" />
                     </button>
-                    <div x-cloak x-show="open" x-transition.origin.top.right
-                         class="absolute right-0 mt-2 w-48 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
-                        <a href="{{ route('user/profile/page') }}" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50">
-                            <x-icon name="user" class="size-4" /> My Profile
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
-                                <x-icon name="logout" class="size-4" /> Logout
-                            </button>
-                        </form>
+                    </x-slot:trigger>
+
+                    <div class="border-b border-slate-100 px-3 pt-1.5 pb-2.5 sm:hidden">
+                        <p class="truncate text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</p>
+                        <p class="truncate text-xs text-slate-500">{{ auth()->user()->role?->label() }}</p>
                     </div>
-                </div>
+                    <x-dropdown.item :href="route('user/profile/page')" icon="user">My profile</x-dropdown.item>
+                    <div class="my-1 border-t border-slate-100"></div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-dropdown.item type="submit" icon="logout" tone="danger">Log out</x-dropdown.item>
+                    </form>
+                </x-dropdown>
             </header>
 
             <main class="px-4 py-6 sm:px-6 lg:px-8">
@@ -73,5 +74,6 @@
     </div>
 
     <x-flash />
+    <x-confirm-dialog />
 </body>
 </html>

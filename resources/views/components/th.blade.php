@@ -14,7 +14,7 @@
 <th {{ $attributes->class(['text-right' => $align === 'right', 'text-center' => $align === 'center']) }}
     @if ($active) aria-sort="{{ $direction === 'asc' ? 'ascending' : 'descending' }}" @endif>
     @if ($sort)
-        <a href="{{ $url }}" data-live-link title="Sort by {{ strtolower(trim(strip_tags($slot))) }}"
+        <a href="{{ $url }}" data-live-link data-tooltip="Sort by {{ strtolower(trim(strip_tags($slot))) }}"
            @class([
                'group -mx-1 inline-flex items-center gap-1 rounded px-1 py-0.5 transition hover:bg-slate-200/60 hover:text-slate-800',
                'flex-row-reverse' => $align === 'right',

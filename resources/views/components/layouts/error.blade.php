@@ -13,7 +13,10 @@
         <p class="text-6xl font-bold text-primary-600">{{ $code }}</p>
         <h1 class="mt-4 text-2xl font-bold tracking-tight text-slate-900">{{ $title }}</h1>
         <p class="mt-2 text-slate-500">{{ $message }}</p>
-        <a href="{{ url('/home') }}" class="mt-8 inline-flex rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Back to Home</a>
+        <div class="mt-8 flex justify-center gap-2">
+            <x-button variant="secondary" icon="arrow-left" type="button" onclick="history.length > 1 ? history.back() : location.assign('{{ url('/home') }}')">Go back</x-button>
+            <x-button :href="url('/home')" icon="home">Back to home</x-button>
+        </div>
     </div>
 </body>
 </html>

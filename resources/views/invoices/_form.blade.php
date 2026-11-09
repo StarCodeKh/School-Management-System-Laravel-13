@@ -125,7 +125,7 @@
                             <x-icon-link icon="trash" label="Remove charge" tone="danger" @click="charges.splice(index, 1)" />
                         </div>
                     </template>
-                    <button type="button" class="text-sm font-semibold text-primary-600 hover:text-primary-700" @click="charges.push(0)">+ Add charge</button>
+                    <x-button type="button" variant="soft" size="sm" icon="plus" @click="charges.push(0)">Add charge</x-button>
                 </div>
 
                 <div class="border-t border-slate-200 pt-3">
@@ -136,7 +136,7 @@
                             <x-icon-link icon="trash" label="Remove discount" tone="danger" @click="discounts.splice(index, 1)" />
                         </div>
                     </template>
-                    <button type="button" class="text-sm font-semibold text-primary-600 hover:text-primary-700" @click="discounts.push(0)">+ Add discount</button>
+                    <x-button type="button" variant="soft" size="sm" icon="plus" @click="discounts.push(0)">Add discount</x-button>
                 </div>
 
                 <div class="flex items-center justify-between gap-4 border-t border-slate-200 pt-3">

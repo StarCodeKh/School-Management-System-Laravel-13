@@ -564,6 +564,150 @@ window.addEventListener('popstate', (event) => {
 });
 
 /**
+ * Confirmation dialog (<x-confirm-dialog> in the app layout). Any button or link with
+ * data-confirm="message" asks first (optional data-confirm-title, -label and -tone = danger|primary),
+ * then carries on: a submit button submits its form, a link is followed.
+ * From JavaScript: if (await window.confirmAction({ title, message, confirmLabel, tone })) { ... }
+ */
+Alpine.store('confirm', {
+    open: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Confirm',
+    tone: 'danger',
+    resolve: null,
+
+    ask({ title = 'Are you sure?', message = '', confirmLabel = 'Confirm', tone = 'danger' } = {}) {
+        this.resolve?.(false);
+        Object.assign(this, { title, message, confirmLabel, tone: tone === 'primary' ? 'primary' : 'danger', open: true });
+        return new Promise((resolve) => (this.resolve = resolve));
+    },
+    answer(value) {
+        this.open = false;
+        this.resolve?.(value);
+        this.resolve = null;
+    },
+});
+window.confirmAction = (options) => Alpine.store('confirm').ask(options);
+
+document.addEventListener(
+    'click',
+    async (event) => {
+        const trigger = event.target.closest('[data-confirm]');
+        if (!trigger || trigger.dataset.confirmed === 'true' || trigger.disabled) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const ok = await window.confirmAction({
+            title: trigger.dataset.confirmTitle || 'Are you sure?',
+            message: trigger.dataset.confirm,
+            confirmLabel: trigger.dataset.confirmLabel || 'Confirm',
+            tone: trigger.dataset.confirmTone || 'danger',
+        });
+        if (!ok) return trigger.focus?.();
+        if (trigger.form && trigger.type === 'submit') {
+            trigger.form.requestSubmit(trigger);
+        } else if (trigger.href) {
+            window.location.href = trigger.href;
+        } else {
+            trigger.dataset.confirmed = 'true';
+            trigger.click();
+            delete trigger.dataset.confirmed;
+        }
+    },
+    true,
+);
+
+/**
+ * Floating dropdown menu (<x-dropdown>): the panel is teleported to <body> and positioned next to
+ * its trigger, so it is never clipped by a scrolling table or card.
+ */
+Alpine.data('dropdown', (config = {}) => ({
+    open: false,
+    panelStyle: '',
+    align: config.align === 'left' ? 'left' : 'right',
+    width: config.width ?? 192,
+
+    init() {
+        const reposition = () => this.open && this.place();
+        window.addEventListener('scroll', reposition, true);
+        window.addEventListener('resize', reposition);
+    },
+    toggle() {
+        this.open ? this.close() : this.show();
+    },
+    show() {
+        this.open = true;
+        this.place();
+        this.$nextTick(() => this.items()[0]?.focus({ preventScroll: true }));
+    },
+    close(refocus = false) {
+        this.open = false;
+        if (refocus) this.$refs.trigger.querySelector('button, a')?.focus();
+    },
+    place() {
+        const rect = this.$refs.trigger.getBoundingClientRect();
+        const left = this.align === 'right' ? rect.right - this.width : rect.left;
+        const clamped = Math.max(8, Math.min(left, window.innerWidth - this.width - 8));
+        const below = window.innerHeight - rect.bottom;
+        const vertical = below < 260 && rect.top > below ? `bottom:${window.innerHeight - rect.top + 6}px` : `top:${rect.bottom + 6}px`;
+        this.panelStyle = `position:fixed;left:${clamped}px;width:${this.width}px;${vertical}`;
+    },
+    items() {
+        return [...(this.$refs.panel?.querySelectorAll('[role=menuitem]:not([disabled])') ?? [])];
+    },
+    onKey(event) {
+        const items = this.items();
+        const index = items.indexOf(document.activeElement);
+        if (event.key === 'ArrowDown') items[(index + 1) % items.length]?.focus();
+        else if (event.key === 'ArrowUp') items[(index - 1 + items.length) % items.length]?.focus();
+        else if (event.key === 'Escape') this.close(true);
+        else if (event.key === 'Tab') this.close();
+        else return;
+        if (event.key !== 'Tab') event.preventDefault();
+    },
+}));
+
+/**
+ * Tooltips: any element with data-tooltip="text" shows a small dark label on hover or keyboard
+ * focus. One shared, fixed-position element is used, so tooltips are never clipped by tables.
+ */
+const tooltip = document.createElement('div');
+tooltip.setAttribute('role', 'tooltip');
+tooltip.className = 'app-tooltip';
+let tooltipTarget = null;
+
+function showTooltip(target) {
+    const text = target.dataset.tooltip;
+    if (!text) return;
+    tooltipTarget = target;
+    if (!tooltip.isConnected) document.body.append(tooltip);
+    tooltip.textContent = text;
+    tooltip.dataset.show = 'true';
+    const rect = target.getBoundingClientRect();
+    const box = tooltip.getBoundingClientRect();
+    const above = rect.top - box.height - 8 > 0;
+    tooltip.dataset.side = above ? 'top' : 'bottom';
+    tooltip.style.left = `${Math.max(6, Math.min(rect.left + rect.width / 2 - box.width / 2, window.innerWidth - box.width - 6))}px`;
+    tooltip.style.top = `${above ? rect.top - box.height - 8 : rect.bottom + 8}px`;
+}
+function hideTooltip() {
+    tooltipTarget = null;
+    delete tooltip.dataset.show;
+}
+document.addEventListener('pointerover', (event) => {
+    const target = event.target.closest?.('[data-tooltip]');
+    if (target && target !== tooltipTarget) showTooltip(target);
+    else if (!target && tooltipTarget) hideTooltip();
+});
+document.addEventListener('focusin', (event) => {
+    const target = event.target.closest?.('[data-tooltip]');
+    target?.matches(':focus-visible') ? showTooltip(target) : hideTooltip();
+});
+document.addEventListener('focusout', hideTooltip);
+document.addEventListener('pointerdown', hideTooltip);
+window.addEventListener('scroll', hideTooltip, true);
+
+/**
  * Submitting a form disables its submit button and shows a spinner, so a slow request can't be
  * sent twice. GET filter forms and forms marked data-no-loading are left alone.
  */
