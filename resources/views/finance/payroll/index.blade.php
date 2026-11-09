@@ -2,7 +2,7 @@
 <x-layouts.app title="Payroll">
     <x-page-header :title="'Payroll: '.$monthLabel" :breadcrumbs="['Finance' => route('finance.index'), 'Payroll' => null]">
         <x-slot:actions>
-            <form method="GET"><input type="month" name="month" value="{{ $month }}" onchange="this.form.submit()" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></form>
+            <form method="GET"><x-form.input name="month" type="month" :value="$month" onchange="this.form.submit()" /></form>
             <x-button :href="route('payroll.create', ['month' => $month])" icon="plus">Add salary</x-button>
         </x-slot:actions>
     </x-page-header>
@@ -49,9 +49,8 @@
                     @if ($payroll->status === \App\Enums\PayrollStatus::Pending)
                         <form method="POST" action="{{ route('payroll.pay', $payroll) }}" class="inline-flex items-center gap-1">
                             @csrf
-                            <select name="payment_method" class="rounded-md border-slate-300 py-1 text-xs shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                                @foreach (\App\Enums\PaymentMethod::options() as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
-                            </select>
+                            <x-form.select name="payment_method" :options="\App\Enums\PaymentMethod::options()" :placeholder="false" :icon="false" size="sm" wrapper="w-32 text-left"
+                                           :id="'payment_method_'.$payroll->id" />
                             <x-button size="sm">Pay</x-button>
                         </form>
                     @endif

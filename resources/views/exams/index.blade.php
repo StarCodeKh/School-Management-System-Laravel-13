@@ -8,12 +8,8 @@
     </x-page-header>
 
     <form method="GET" class="mb-4 flex gap-2">
-        <select name="class" onchange="this.form.submit()" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
-            <option value="">All classes</option>
-            @foreach ($classes as $class)
-                <option value="{{ $class->id }}" @selected($classId === $class->id)>Class {{ $class->name }}</option>
-            @endforeach
-        </select>
+        <x-form.select name="class" :options="$classes->mapWithKeys(fn ($class) => [$class->id => 'Class '.$class->name])" :value="$classId"
+                       placeholder="All classes" icon="academic-cap" wrapper="w-full sm:w-56" onchange="this.form.submit()" />
     </form>
 
     <x-table>

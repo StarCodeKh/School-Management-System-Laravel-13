@@ -23,12 +23,12 @@ class LoginController extends Controller
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withInput($request->only('email'))->with('error', 'WRONG USERNAME OR PASSWORD :(');
+            return back()->withInput($request->only('email'))->with('error', 'Incorrect email or password.');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'))->with('success', 'LOGIN SUCCESSFULLY :)');
+        return redirect()->intended(route('home'))->with('success', 'Welcome back!');
     }
 
     /** sign the user out and drop the whole session */
@@ -39,6 +39,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'LOGOUT SUCCESSFULLY :)');
+        return redirect()->route('login')->with('success', "You've been logged out.");
     }
 }

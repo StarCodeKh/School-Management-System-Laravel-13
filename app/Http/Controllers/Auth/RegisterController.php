@@ -39,11 +39,11 @@ class RegisterController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            return redirect()->route('login')->with('success', 'Create new account successfully :)');
+            return redirect()->route('login')->with('success', 'Account created. You can now log in.');
         } catch (QueryException $e) {
             Log::error('Creating user: '.$e->getMessage());
 
-            return back()->with('error', 'Create new account failed :(');
+            return back()->with('error', "Couldn't create your account. Please try again.");
         }
     }
 }

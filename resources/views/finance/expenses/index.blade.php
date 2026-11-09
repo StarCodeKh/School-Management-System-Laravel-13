@@ -6,13 +6,9 @@
     </x-page-header>
 
     <form method="GET" class="mb-4 flex flex-wrap items-center gap-2">
-        <input type="month" name="month" value="{{ $month }}" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
-        <select name="category" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
-            <option value="">All categories</option>
-            @foreach (\App\Enums\ExpenseCategory::options() as $value => $label)
-                <option value="{{ $value }}" @selected(($filters['category'] ?? null) === $value)>{{ $label }}</option>
-            @endforeach
-        </select>
+        <x-form.input name="month" type="month" :value="$month" />
+        <x-form.select name="category" :options="\App\Enums\ExpenseCategory::options()" :value="$filters['category'] ?? null"
+                       placeholder="All categories" icon="tag" wrapper="sm:w-52" />
         <x-button variant="secondary">Filter</x-button>
         <span class="ml-auto text-sm text-slate-600">Total: <span class="font-semibold text-slate-900">{{ money($total) }}</span></span>
     </form>

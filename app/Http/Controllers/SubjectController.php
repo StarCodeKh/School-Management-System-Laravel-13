@@ -47,11 +47,11 @@ class SubjectController extends Controller
             $subject = Subject::create($validated);
             Log::info('Subject record saved successfully', ['subject' => $subject->code]);
 
-            return redirect()->back()->with('success', 'Subject record saved successfully!');
+            return redirect()->back()->with('success', 'Subject added.');
         } catch (\Exception $e) {
             Log::error('Failed to save Subject record', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->withInput()->with('error', 'Failed to save Subject record. Please try again.');
+            return redirect()->back()->withInput()->with('error', "Couldn't add the subject. Please try again.");
         }
     }
 
@@ -74,11 +74,11 @@ class SubjectController extends Controller
             $subject->update($validated);
             Log::info('Subject record updated successfully', ['subject' => $subject->code]);
 
-            return redirect()->back()->with('success', 'Subject record updated successfully!');
+            return redirect()->back()->with('success', 'Subject updated.');
         } catch (\Exception $e) {
             Log::error('Failed to update Subject record', ['error' => $e->getMessage(), 'subject' => $subject->code]);
 
-            return redirect()->back()->with('error', 'Failed to update Subject record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't update the subject. Please try again.");
         }
     }
 
@@ -88,13 +88,13 @@ class SubjectController extends Controller
         $subject = Subject::where('code', $request->input('code'))->first();
 
         if (! $subject) {
-            return redirect()->back()->with('error', 'Subject record not found!');
+            return redirect()->back()->with('error', 'Subject not found.');
         }
 
         $subject->delete();
         Log::info('Subject record deleted', ['subject' => $subject->code]);
 
-        return redirect()->back()->with('success', 'Subject record deleted successfully!');
+        return redirect()->back()->with('success', 'Subject deleted.');
     }
 
     private function classes()

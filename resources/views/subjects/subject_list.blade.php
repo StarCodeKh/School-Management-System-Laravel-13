@@ -8,12 +8,8 @@
     </x-page-header>
 
     <x-search-bar :value="$search" placeholder="Search name or ID...">
-        <select name="class" class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
-            <option value="">All classes</option>
-            @foreach ($classes as $class)
-                <option value="{{ $class->id }}" @selected($classId === $class->id)>Class {{ $class->name }}</option>
-            @endforeach
-        </select>
+        <x-form.select name="class" :options="$classes->mapWithKeys(fn ($class) => [$class->id => 'Class '.$class->name])" :value="$classId"
+                       placeholder="All classes" icon="academic-cap" wrapper="sm:w-48" />
     </x-search-bar>
 
     <x-table>

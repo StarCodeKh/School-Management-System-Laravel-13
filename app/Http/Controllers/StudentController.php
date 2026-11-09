@@ -72,11 +72,11 @@ class StudentController extends Controller
             $validated['photo'] = $this->storePhoto($request->file('photo'));
             Student::create($validated);
 
-            return redirect()->back()->with('success', 'Student has been added successfully!');
+            return redirect()->back()->with('success', 'Student added.');
         } catch (\Exception $e) {
             Log::error('Student Save Failed', ['error' => $e->getMessage(), 'email' => $validated['email']]);
 
-            return redirect()->back()->withInput()->with('error', 'Failed to add new student. Please try again.');
+            return redirect()->back()->withInput()->with('error', "Couldn't add the student. Please try again.");
         }
     }
 
@@ -108,11 +108,11 @@ class StudentController extends Controller
 
             $student->update($validated);
 
-            return redirect()->back()->with('success', 'Updated successfully!');
+            return redirect()->back()->with('success', 'Student updated.');
         } catch (\Exception $e) {
             Log::error('Student Update Failed', ['error' => $e->getMessage(), 'id' => $student->id]);
 
-            return redirect()->back()->with('error', 'Failed to update record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't update the student. Please try again.");
         }
     }
 
@@ -134,11 +134,11 @@ class StudentController extends Controller
             $student->delete();
             $this->deletePhoto($photo);
 
-            return redirect()->back()->with('success', 'Student deleted successfully :)');
+            return redirect()->back()->with('success', 'Student deleted.');
         } catch (\Exception $e) {
             Log::error('Student Deletion Failed', ['error' => $e->getMessage(), 'id' => $student->id]);
 
-            return redirect()->back()->with('error', 'Failed to delete record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't delete the student. Please try again.");
         }
     }
 

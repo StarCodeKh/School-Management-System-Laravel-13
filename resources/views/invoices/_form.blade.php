@@ -72,7 +72,7 @@
             </table>
         </div>
         @if ($errors->has('items') || $errors->has('items.*'))
-            <p class="px-4 pt-3 text-sm text-red-600">Every item needs a name, category, quantity and price.</p>
+            <x-alert type="error" class="mx-4 mt-3">Every item needs a name, category, quantity and price.</x-alert>
         @endif
         <div class="p-4">
             <x-button type="button" variant="secondary" size="sm" icon="plus" @click="addItem()">Add item</x-button>

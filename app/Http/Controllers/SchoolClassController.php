@@ -33,7 +33,7 @@ class SchoolClassController extends Controller
             );
         });
 
-        return redirect()->back()->with('success', 'Class has been added successfully!');
+        return redirect()->back()->with('success', 'Class added.');
     }
 
     /** Update Record: renames the class and syncs its sections */
@@ -55,7 +55,7 @@ class SchoolClassController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'Class updated successfully!');
+        return redirect()->back()->with('success', 'Class updated.');
     }
 
     /** Delete Record (blocked while students or subjects still use the class) */
@@ -69,7 +69,7 @@ class SchoolClassController extends Controller
 
         $class->delete(); // sections are removed by the foreign key cascade
 
-        return redirect()->back()->with('success', 'Class deleted successfully!');
+        return redirect()->back()->with('success', 'Class deleted.');
     }
 
     private function rules(?SchoolClass $ignore = null): array

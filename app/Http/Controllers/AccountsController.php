@@ -43,11 +43,11 @@ class AccountsController extends Controller
 
             Log::info('New fees record saved successfully', ['fee_collection_id' => $feeCollection->id]);
 
-            return redirect()->back()->with('success', 'Fees record saved successfully!');
+            return redirect()->back()->with('success', 'Fee payment recorded.');
         } catch (\Exception $e) {
             Log::error('Failed to save fees record', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->with('error', 'Failed to save fees record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't record the fee payment. Please try again.");
         }
     }
 }

@@ -24,3 +24,31 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* toast countdown bar (resources/views/components/flash.blade.php) */
+@keyframes toast-countdown {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* submit buttons while their form is being sent (see resources/js/app.js) */
+button[aria-busy='true'] {
+    cursor: progress;
+}
+button[aria-busy='true'] > svg {
+    display: none;
+}
+button[aria-busy='true']::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 9999px;
+    animation: spin 0.6s linear infinite;
+}

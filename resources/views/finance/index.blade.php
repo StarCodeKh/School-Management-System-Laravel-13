@@ -2,8 +2,7 @@
     <x-page-header title="Finance overview" :breadcrumbs="['Dashboard' => route('home'), 'Finance' => null]">
         <x-slot:actions>
             <form method="GET" class="flex items-center gap-2">
-                <input type="month" name="month" value="{{ $month }}" onchange="this.form.submit()"
-                       class="rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <x-form.input name="month" type="month" :value="$month" onchange="this.form.submit()" />
             </form>
         </x-slot:actions>
     </x-page-header>

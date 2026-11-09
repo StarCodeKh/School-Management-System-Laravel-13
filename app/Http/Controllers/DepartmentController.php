@@ -53,11 +53,11 @@ class DepartmentController extends Controller
         try {
             Department::create($validated);
 
-            return redirect()->back()->with('success', 'Department has been added successfully!');
+            return redirect()->back()->with('success', 'Department added.');
         } catch (\Exception $e) {
             Log::error('Failed to add new Department record', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->withInput()->with('error', 'Failed to add new record. Please try again later.');
+            return redirect()->back()->withInput()->with('error', "Couldn't add the department. Please try again.");
         }
     }
 
@@ -70,11 +70,11 @@ class DepartmentController extends Controller
         try {
             $department->update($validated);
 
-            return redirect()->back()->with('success', 'Department record updated successfully!');
+            return redirect()->back()->with('success', 'Department updated.');
         } catch (\Exception $e) {
             Log::error('Failed to update Department record', ['error' => $e->getMessage(), 'department' => $department->code]);
 
-            return redirect()->back()->with('error', 'Failed to update the department record. Please try again later.');
+            return redirect()->back()->with('error', "Couldn't update the department. Please try again.");
         }
     }
 
@@ -90,7 +90,7 @@ class DepartmentController extends Controller
         $department->delete();
         Log::info('Department record deleted successfully', ['department' => $department->code]);
 
-        return redirect()->back()->with('success', 'Department record deleted successfully!');
+        return redirect()->back()->with('success', 'Department deleted.');
     }
 
     private function teachers()

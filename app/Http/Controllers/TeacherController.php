@@ -64,11 +64,11 @@ class TeacherController extends Controller
         try {
             Teacher::create($validated);
 
-            return redirect()->back()->with('success', 'Teacher record saved successfully!');
+            return redirect()->back()->with('success', 'Teacher added.');
         } catch (\Exception $e) {
             Log::error('Failed to save Teacher record', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->with('error', 'Failed to save Teacher record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't add the teacher. Please try again.");
         }
     }
 
@@ -96,11 +96,11 @@ class TeacherController extends Controller
             $teacher->user->update(['name' => $validated['full_name']]);
             $teacher->update(collect($validated)->except(['id', 'full_name'])->all());
 
-            return redirect()->back()->with('success', 'Teacher record updated successfully!');
+            return redirect()->back()->with('success', 'Teacher updated.');
         } catch (\Exception $e) {
             Log::error('Failed to update Teacher record', ['error' => $e->getMessage(), 'teacher_id' => $validated['id']]);
 
-            return redirect()->back()->with('error', 'Failed to update Teacher record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't update the teacher. Please try again.");
         }
     }
 
@@ -114,11 +114,11 @@ class TeacherController extends Controller
         try {
             Teacher::findOrFail($validated['id'])->delete();
 
-            return redirect()->back()->with('success', 'Teacher record deleted successfully!');
+            return redirect()->back()->with('success', 'Teacher deleted.');
         } catch (\Exception $e) {
             Log::error('Failed to delete Teacher record', ['error' => $e->getMessage(), 'teacher_id' => $validated['id']]);
 
-            return redirect()->back()->with('error', 'Failed to delete Teacher record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't delete the teacher. Please try again.");
         }
     }
 

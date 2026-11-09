@@ -93,12 +93,12 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Invoice created successfully!');
+            return redirect()->back()->with('success', 'Invoice created.');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Invoice creation failed', ['error' => $e->getMessage()]);
 
-            return redirect()->back()->with('error', 'Failed to create invoice. Please try again.');
+            return redirect()->back()->with('error', "Couldn't create the invoice. Please try again.");
         }
     }
 
@@ -134,12 +134,12 @@ class InvoiceController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Invoice updated successfully!');
+            return redirect()->back()->with('success', 'Invoice updated.');
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Invoice update failed', ['error' => $e->getMessage(), 'invoice' => $invoice->invoice_number]);
 
-            return redirect()->back()->with('error', 'Failed to update invoice. Please try again.');
+            return redirect()->back()->with('error', "Couldn't update the invoice. Please try again.");
         }
     }
 
@@ -153,11 +153,11 @@ class InvoiceController extends Controller
             $invoice->delete(); // items are removed by the foreign key cascade
             $this->deleteSignature($signaturePath);
 
-            return redirect()->route('invoice/list/page')->with('success', 'Record deleted successfully!');
+            return redirect()->route('invoice/list/page')->with('success', 'Invoice deleted.');
         } catch (\Exception $e) {
             Log::error('Invoice delete failed', ['error' => $e->getMessage(), 'invoice' => $invoice->invoice_number]);
 
-            return redirect()->back()->with('error', 'Failed to delete record. Please try again.');
+            return redirect()->back()->with('error', "Couldn't delete the invoice. Please try again.");
         }
     }
 

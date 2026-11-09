@@ -71,7 +71,7 @@ class SettingController extends Controller
 
         Setting::store($request->validate(self::GROUPS[$group]));
 
-        return redirect()->back()->with('success', 'Settings saved successfully!');
+        return redirect()->back()->with('success', 'Settings saved.');
     }
 
     private function show(string $group)

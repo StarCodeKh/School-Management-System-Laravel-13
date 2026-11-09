@@ -51,7 +51,7 @@ class UserManagementController extends Controller
                 'role' => $request->user()->role?->value,
             ]);
 
-            return redirect()->back()->with('error', 'User update failed: Unauthorized access.');
+            return redirect()->back()->with('error', "You don't have permission to update users.");
         }
 
         $user = User::where('code', $request->input('code'))->firstOrFail();
@@ -79,11 +79,11 @@ class UserManagementController extends Controller
 
             $user->update($validated);
 
-            return redirect()->back()->with('success', 'User updated successfully :)');
+            return redirect()->back()->with('success', 'User updated.');
         } catch (\Exception $e) {
             Log::error('User update failed', ['error' => $e->getMessage(), 'code' => $user->code]);
 
-            return redirect()->back()->with('error', 'User update failed. Please try again.');
+            return redirect()->back()->with('error', "Couldn't update the user. Please try again.");
         }
     }
 
@@ -91,7 +91,7 @@ class UserManagementController extends Controller
     public function userDelete(Request $request)
     {
         if (Gate::denies('manage-users')) {
-            return redirect()->back()->with('error', 'User deleted fail :(');
+            return redirect()->back()->with('error', "You don't have permission to delete users.");
         }
 
         $user = User::where('code', $request->input('code'))->firstOrFail();
@@ -101,11 +101,11 @@ class UserManagementController extends Controller
             // the avatar path comes from the database, never from the request
             $this->deleteAvatar($user->avatar);
 
-            return redirect()->back()->with('success', 'User deleted successfully :)');
+            return redirect()->back()->with('success', 'User deleted.');
         } catch (\Exception $e) {
             Log::error('User delete failed', ['error' => $e->getMessage(), 'code' => $user->code]);
 
-            return redirect()->back()->with('error', 'User deleted fail :(');
+            return redirect()->back()->with('error', "Couldn't delete the user. Please try again.");
         }
     }
 
@@ -129,6 +129,6 @@ class UserManagementController extends Controller
         // the User model's "hashed" cast hashes the new password on save
         $request->user()->update(['password' => $request->new_password]);
 
-        return redirect()->intended('home')->with('success', 'User change successfully :)');
+        return redirect()->intended('home')->with('success', 'Password changed.');
     }
 }
