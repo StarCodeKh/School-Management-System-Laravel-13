@@ -1,10 +1,13 @@
 {{-- $menus is provided by the view composer in AppServiceProvider --}}
 <div class="flex h-full flex-col">
-    <a href="{{ route('home') }}" class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-6">
-        <span class="grid size-9 place-items-center rounded-lg bg-primary-600 text-white">
+    <a href="{{ route('home') }}" class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-5" title="{{ setting('school_name') }}">
+        <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-linear-to-br from-primary-500 to-primary-700 text-white shadow-sm">
             <x-icon name="academic-cap" />
         </span>
-        <span class="truncate text-sm font-bold text-slate-900">{{ setting('school_name') }}</span>
+        <span class="min-w-0">
+            <span class="line-clamp-2 text-sm leading-tight font-bold text-slate-900">{{ setting('school_name') }}</span>
+            <span class="block text-xs text-slate-500">School management</span>
+        </span>
     </a>
 
     <nav class="flex-1 overflow-y-auto px-3 py-4">

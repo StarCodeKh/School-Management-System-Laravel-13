@@ -20,6 +20,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\SchoolClassController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
@@ -61,6 +62,9 @@ Route::middleware('auth')->group(function () {
 
     // Permissions (gates in AppServiceProvider):
     //   manage-school = admins change school records; teach = admins + teachers view them
+
+    // top bar search (results are filtered by permission inside the controller)
+    Route::get('search', SearchController::class)->middleware('throttle:60,1')->name('search');
 
     // 1. HOME & SETTING
     Route::controller(HomeController::class)->group(function () {

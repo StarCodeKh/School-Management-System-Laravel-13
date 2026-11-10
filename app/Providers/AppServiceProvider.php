@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\Role;
 use App\Models\Menu;
+use App\Models\Notice;
 use App\Models\User;
 use App\Support\TableQuery;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,15 @@ class AppServiceProvider extends ServiceProvider
 
         // only the sidebar needs the menu tree
         View::composer('components.sidebar', fn ($view) => $view->with('menus', Menu::sidebar()));
+        View::composer('components.topbar', fn ($view) => $view->with([
+            // every page the user can open, for the search box
+            'pages' => Menu::sidebar()->flatMap(fn (Menu $menu) => $menu->children->isEmpty()
+                ? [['title' => $menu->title, 'section' => null, 'icon' => $menu->icon, 'url' => $menu->url()]]
+                : $menu->children->map(fn (Menu $child) => ['title' => $child->title, 'section' => $menu->title, 'icon' => $menu->icon, 'url' => $child->url()]))->values(),
+            'notices' => auth()->check()
+                ? Notice::visibleTo(auth()->user())->orderByDesc('is_pinned')->latest('published_at')->limit(5)->get(['id', 'title', 'body', 'published_at', 'is_pinned'])
+                : collect(),
+        ]));
 
         // ->sortable() and ->paginateFromRequest() for list pages, and the shared pagination design
         TableQuery::register();

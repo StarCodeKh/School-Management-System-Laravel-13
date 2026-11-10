@@ -782,5 +782,108 @@ window.addEventListener('pageshow', (event) => {
     });
 });
 
+/*
+ * Top bar search (resources/views/components/topbar.blade.php): pages the user can open are matched
+ * here, records (students, teachers, users) come from the search route, both listed in one keyboard list.
+ */
+Alpine.data('commandPalette', (config) => ({
+    open: false,
+    query: '',
+    records: [],
+    loading: false,
+    active: 0,
+    icons: {},
+    shortcut: /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K',
+    request: null,
+
+    init() {
+        this.$refs.icons.querySelectorAll('[data-icon]').forEach((el) => (this.icons[el.dataset.icon] = el.innerHTML));
+        this.$watch('query', () => (this.active = 0));
+    },
+    openPalette() {
+        this.open = true;
+        this.$nextTick(() => this.$refs.input.select());
+    },
+    closePalette() {
+        this.open = false;
+    },
+    get pageResults() {
+        const words = this.query.toLowerCase().split(/\s+/).filter(Boolean);
+        const pages = config.pages.filter((page) => {
+            const text = `${page.section ?? ''} ${page.title}`.toLowerCase();
+            return words.every((word) => text.includes(word));
+        });
+        return (words.length ? pages.slice(0, 6) : pages.slice(0, 8)).map((page) => ({ ...page, meta: page.section }));
+    },
+    // one flat, numbered list across groups so arrow keys move straight through
+    get groups() {
+        let index = 0;
+        const number = (items) => items.map((item) => ({ ...item, index: index++ }));
+        const groups = [];
+        if (this.pageResults.length) groups.push({ label: this.query.trim() ? 'Pages' : 'Go to', items: number(this.pageResults) });
+        this.records.forEach((group) => groups.push({ label: group.label, items: number(group.items) }));
+        return groups;
+    },
+    get count() {
+        return this.groups.reduce((total, group) => total + group.items.length, 0);
+    },
+    async fetchRecords() {
+        const q = this.query.trim();
+        this.request?.abort();
+        if (q.length < 2) {
+            this.records = [];
+            this.loading = false;
+            return;
+        }
+        this.request = new AbortController();
+        this.loading = true;
+        try {
+            const response = await fetch(`${config.endpoint}?q=${encodeURIComponent(q)}`, {
+                headers: { Accept: 'application/json' },
+                signal: this.request.signal,
+            });
+            if (response.ok) this.records = (await response.json()).groups;
+            this.loading = false;
+        } catch (error) {
+            if (error.name !== 'AbortError') this.loading = false;
+        }
+    },
+    onKey(event) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            this.closePalette();
+        } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            if (!this.count) return;
+            this.active = (this.active + (event.key === 'ArrowDown' ? 1 : -1) + this.count) % this.count;
+            this.$nextTick(() => this.$refs.list.querySelector(`[data-index="${this.active}"]`)?.scrollIntoView({ block: 'nearest' }));
+        } else if (event.key === 'Enter') {
+            const link = this.$refs.list.querySelector(`[data-index="${this.active}"]`);
+            if (link) {
+                event.preventDefault();
+                window.location.href = link.href;
+            }
+        }
+    },
+}));
+
+/* Red dot on the notices bell until the newest notice has been seen in this browser. */
+Alpine.data('noticeBell', (latest) => ({
+    unread: false,
+    init() {
+        let seen = null;
+        try {
+            seen = localStorage.getItem('notices-seen');
+        } catch {}
+        this.unread = Boolean(latest) && (!seen || new Date(latest) > new Date(seen));
+    },
+    markSeen() {
+        this.unread = false;
+        try {
+            if (latest) localStorage.setItem('notices-seen', latest);
+        } catch {}
+    },
+}));
+
 window.Alpine = Alpine;
 Alpine.start();

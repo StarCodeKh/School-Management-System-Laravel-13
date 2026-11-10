@@ -33,39 +33,7 @@
         </aside>
 
         <div class="lg:pl-72">
-            {{-- top bar --}}
-            <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-6 lg:px-8">
-                <button type="button" class="-m-2 p-2 text-slate-500 lg:hidden" @click="sidebarOpen = true">
-                    <span class="sr-only">Open menu</span>
-                    <x-icon name="bars" class="size-6" />
-                </button>
-
-                <div class="flex-1"></div>
-
-                <x-dropdown width="208">
-                    <x-slot:trigger>
-                    <button type="button" class="flex items-center gap-3 rounded-full py-1 pr-2 pl-1 transition hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-primary-500">
-                        <img class="size-8 rounded-full object-cover" src="{{ auth()->user()->avatar_url }}" alt="">
-                        <span class="hidden text-left sm:block">
-                            <span class="block text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</span>
-                            <span class="block text-xs text-slate-500">{{ auth()->user()->role?->label() }}</span>
-                        </span>
-                        <x-icon name="chevron-down" class="size-4 text-slate-400 transition" ::class="open && 'rotate-180'" />
-                    </button>
-                    </x-slot:trigger>
-
-                    <div class="border-b border-slate-100 px-3 pt-1.5 pb-2.5 sm:hidden">
-                        <p class="truncate text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</p>
-                        <p class="truncate text-xs text-slate-500">{{ auth()->user()->role?->label() }}</p>
-                    </div>
-                    <x-dropdown.item :href="route('user/profile/page')" icon="user">My profile</x-dropdown.item>
-                    <div class="my-1 border-t border-slate-100"></div>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <x-dropdown.item type="submit" icon="logout" tone="danger">Log out</x-dropdown.item>
-                    </form>
-                </x-dropdown>
-            </header>
+            <x-topbar />
 
             <main class="px-4 py-6 sm:px-6 lg:px-8">
                 {{ $slot }}

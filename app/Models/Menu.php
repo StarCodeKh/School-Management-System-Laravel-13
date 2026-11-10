@@ -34,10 +34,16 @@ class Menu extends Model
         ];
     }
 
-    /** Top-level items with their children, filtered to what the current user may see. */
+    /** Top-level items with their children, filtered to what the current user may see (built once per request). */
     public static function sidebar(): Collection
     {
-        return static::whereNull('parent_id')
+        // kept on the request, not in once(): a menu must never outlive the user it was built for
+        $attributes = request()->attributes;
+        if ($attributes->has('sidebar-menu')) {
+            return $attributes->get('sidebar-menu');
+        }
+
+        $menus = static::whereNull('parent_id')
             ->where('is_active', true)
             ->with(['children' => fn ($q) => $q->where('is_active', true)])
             ->orderBy('sort_order')
@@ -50,6 +56,9 @@ class Menu extends Model
             // hide a group the user may not see, or one whose links are all hidden
             ->filter(fn (Menu $menu) => $menu->isVisible() && ($menu->route || $menu->children->isNotEmpty()))
             ->values();
+        $attributes->set('sidebar-menu', $menus);
+
+        return $menus;
     }
 
     public function children(): HasMany
