@@ -1,5 +1,5 @@
 <x-layouts.app title="Book Loans">
-    <x-page-header title="Book loans" :breadcrumbs="['Library' => route('books.index'), 'Loans' => null]">
+    <x-page-header title="Book Loans" :breadcrumbs="['Library' => route('books.index'), 'Book Loans' => null]">
         <x-slot:actions>
             <x-button :href="route('loans.create')" icon="plus">Issue book</x-button>
         </x-slot:actions>

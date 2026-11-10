@@ -1,5 +1,5 @@
 <x-layouts.app title="Fee Structures">
-    <x-page-header title="Fee structures" :breadcrumbs="['Finance' => route('finance.index'), 'Fee structures' => null]" />
+    <x-page-header title="Fee Structures" :breadcrumbs="['Finance' => route('finance.index'), 'Fee Structures' => null]" />
 
     <x-card title="Set a fee for a class" class="mb-6">
         <form method="POST" action="{{ route('fee-structures.store') }}" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_10rem_11rem_auto] lg:items-start">

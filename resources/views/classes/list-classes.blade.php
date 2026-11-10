@@ -20,15 +20,15 @@
             <tr class="align-top">
                 <td class="w-32">
                     <input form="class-{{ $class->id }}" name="name" value="{{ $class->name }}" required
-                           class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                           class="form-control">
                 </td>
                 <td class="min-w-64">
                     <input form="class-{{ $class->id }}" name="sections" value="{{ $class->sections->pluck('name')->implode(', ') }}" required
-                           class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                           class="form-control">
                 </td>
                 <td class="w-28">
                     <input form="class-{{ $class->id }}" name="sort_order" type="number" min="0" value="{{ $class->sort_order }}"
-                           class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                           class="form-control">
                 </td>
                 <td class="pt-5!">{{ $class->students_count }}</td>
                 <td class="pt-5!">{{ $class->subjects_count }}</td>

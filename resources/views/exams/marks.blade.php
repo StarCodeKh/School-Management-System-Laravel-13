@@ -2,7 +2,7 @@
     <x-page-header :title="'Enter marks: '.$exam->name" :breadcrumbs="['Exams' => route('exams.index'), $exam->name => route('exams.show', $exam), 'Marks' => null]" />
 
     @if ($subjects->isEmpty())
-        <p class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">This class has no subjects yet.</p>
+        <x-empty-state icon="book">This class has no subjects yet.</x-empty-state>
     @else
         <nav class="mb-6 flex gap-1 overflow-x-auto border-b border-slate-200">
             @foreach ($subjects as $item)
@@ -34,7 +34,7 @@
                         </td>
                         <td class="min-w-48">
                             <input type="text" name="remarks[{{ $student->id }}]" value="{{ old("remarks.{$student->id}", $results[$student->id]->remark ?? '') }}" placeholder="Optional"
-                                   class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                   class="form-control">
                         </td>
                     </tr>
                 @empty

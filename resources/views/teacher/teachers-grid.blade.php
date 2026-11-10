@@ -20,7 +20,7 @@
                 @endif
             </a>
         @empty
-            <p class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No teachers found.</p>
+            <x-empty-state icon="users" class="col-span-full">No teachers found.</x-empty-state>
         @endforelse
     </div>
 

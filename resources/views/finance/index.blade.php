@@ -1,5 +1,5 @@
 <x-layouts.app title="Finance">
-    <x-page-header title="Finance overview" :breadcrumbs="['Dashboard' => route('home'), 'Finance' => null]">
+    <x-page-header title="Finance Overview" :breadcrumbs="['Dashboard' => route('home'), 'Finance' => null]">
         <x-slot:actions>
             <form method="GET" class="flex items-center gap-2">
                 <x-form.input name="month" type="month" :value="$month" wrapper="w-56" onchange="this.form.submit()" />

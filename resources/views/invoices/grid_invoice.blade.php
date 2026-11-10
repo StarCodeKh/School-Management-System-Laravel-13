@@ -25,7 +25,7 @@
                 <div class="border-t border-slate-100 px-3 py-2 text-right">@include('invoices._actions')</div>
             </div>
         @empty
-            <p class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No invoices yet.</p>
+            <x-empty-state icon="document" class="col-span-full">No invoices yet.</x-empty-state>
         @endforelse
     </div>
 

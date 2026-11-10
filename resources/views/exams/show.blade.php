@@ -14,9 +14,9 @@
     </div>
 
     @if ($subjects->isEmpty())
-        <p class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
+        <x-empty-state icon="clipboard">
             Class {{ $exam->schoolClass?->name }} has no subjects yet. <a href="{{ route('subject/add/page') }}" class="text-primary-600 hover:underline">Add subjects</a> first.
-        </p>
+        </x-empty-state>
     @else
         <x-table>
             <x-slot:head>

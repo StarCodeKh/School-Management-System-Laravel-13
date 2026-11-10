@@ -24,6 +24,11 @@
     --color-primary-900: var(--color-indigo-900);
 }
 
+/* inputs inside table rows (marks, attendance, invoice items, classes); full fields use <x-form.input> */
+@utility form-control {
+    @apply block w-full rounded-lg border-slate-300 text-sm shadow-sm placeholder:text-slate-400 focus:border-primary-500 focus:ring-primary-500;
+}
+
 /* hide Alpine elements until Alpine has initialised */
 [x-cloak] {
     display: none !important;

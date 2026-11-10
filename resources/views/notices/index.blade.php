@@ -1,5 +1,5 @@
 <x-layouts.app title="Notice Board">
-    <x-page-header title="Notice board" :breadcrumbs="['Dashboard' => route('home'), 'Notices' => null]">
+    <x-page-header title="Notice Board" :breadcrumbs="['Dashboard' => route('home'), 'Notice Board' => null]">
         <x-slot:actions>
             @can('manage-communication')
                 <x-button :href="route('notices.create')" icon="plus">New notice</x-button>
@@ -29,7 +29,7 @@
                 @if ($notice->expires_on)<p x-show="open" x-cloak class="mt-3 text-xs text-slate-400">Until {{ $notice->expires_on->format('d M Y') }}</p>@endif
             </article>
         @empty
-            <p class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No notices right now.</p>
+            <x-empty-state icon="megaphone">No notices right now.</x-empty-state>
         @endforelse
         {{ $notices->links() }}
     </div>

@@ -45,6 +45,6 @@
             @endforelse
         </x-table>
     @else
-        <p class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">Choose a section to see its attendance report.</p>
+        <x-empty-state icon="calendar">Choose a section to see its attendance report.</x-empty-state>
     @endif
 </x-layouts.app>

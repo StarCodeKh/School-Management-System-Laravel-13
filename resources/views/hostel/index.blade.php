@@ -63,6 +63,6 @@
             @endforeach
         </div>
     @empty
-        <p class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No hostel rooms yet.</p>
+        <x-empty-state icon="home-modern">No hostel rooms yet.</x-empty-state>
     @endforelse
 </x-layouts.app>

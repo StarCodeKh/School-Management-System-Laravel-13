@@ -1,5 +1,5 @@
 <x-layouts.app title="Fee Balances">
-    <x-page-header title="Fee balances" :breadcrumbs="['Finance' => route('finance.index'), 'Fee balances' => null]">
+    <x-page-header title="Fee Balances" :breadcrumbs="['Finance' => route('finance.index'), 'Fee Balances' => null]">
         <x-slot:actions>
             <x-button variant="secondary" :href="route('fee-structures.index')" icon="cog">Fee structures</x-button>
             <x-button :href="route('add/fees/collection/page')" icon="plus">Record payment</x-button>

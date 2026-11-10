@@ -64,7 +64,7 @@
                         </td>
                         <td class="min-w-48">
                             <input type="text" name="attendance[{{ $student->id }}][remark]" value="{{ old("attendance.{$student->id}.remark", $records[$student->id]->remark ?? '') }}"
-                                   placeholder="Optional" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                   placeholder="Optional" class="form-control">
                         </td>
                     </tr>
                 @empty
@@ -77,6 +77,6 @@
             @endif
         </form>
     @else
-        <p class="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">Choose a section and date to take attendance.</p>
+        <x-empty-state icon="calendar">Choose a section and date to take attendance.</x-empty-state>
     @endif
 </x-layouts.app>

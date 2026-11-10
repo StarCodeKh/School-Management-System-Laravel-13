@@ -22,7 +22,8 @@ class DepartmentController extends Controller
     /** edit record (URL uses the display code, e.g. /department/edit/DEP-00001) */
     public function editDepartment(string $code)
     {
-        $department = Department::where('code', $code)->firstOrFail();
+        $department = Department::where('code', $code)
+            ->with(['head', 'teachers.user'])->withCount('teachers')->firstOrFail();
         $teachers = $this->teachers();
 
         return view('department.edit-department', compact('department', 'teachers'));

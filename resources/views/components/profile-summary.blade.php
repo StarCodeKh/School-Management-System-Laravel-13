@@ -1,18 +1,25 @@
 {{--
     Summary card shown beside an edit form: photo, name, badges, key facts and linked records.
     The *-bind props are Alpine expressions from the page's x-data, so the card follows the form as it is typed.
+    Without an image it shows :icon in a tile (for records such as departments).
     Give it class="xl:sticky xl:top-24" to keep it in view beside a long form.
       details   [term => value] rows
       badges    slot: <x-badge>s under the name
       links     slot: <x-profile-summary.link>s, listed under "Linked records"
 --}}
-@props(['image', 'name', 'subtitle' => null, 'details' => [], 'imageBind' => null, 'nameBind' => null, 'subtitleBind' => null, 'linksTitle' => 'Linked records'])
+@props(['image' => null, 'icon' => 'user', 'name', 'subtitle' => null, 'details' => [], 'imageBind' => null, 'nameBind' => null, 'subtitleBind' => null, 'linksTitle' => 'Linked records'])
 
 <aside {{ $attributes }}>
     <x-card :padding="false" class="overflow-hidden">
         <div class="h-20 bg-linear-to-br from-primary-500 to-primary-700"></div>
         <div class="-mt-10 flex flex-col items-center px-5 pb-5 text-center">
-            <img src="{{ $image }}" @if ($imageBind) :src="{{ $imageBind }}" @endif alt="" class="size-20 rounded-full bg-white object-cover ring-4 ring-white">
+            @if ($image)
+                <img src="{{ $image }}" @if ($imageBind) :src="{{ $imageBind }}" @endif alt="" class="size-20 rounded-full bg-white object-cover ring-4 ring-white">
+            @else
+                <span class="grid size-20 place-items-center rounded-2xl bg-white text-primary-600 shadow-sm ring-4 ring-white">
+                    <x-icon :name="$icon" class="size-9" />
+                </span>
+            @endif
             <h2 class="mt-3 text-lg font-semibold text-slate-900" @if ($nameBind) x-text="{{ $nameBind }} || 'No name'" @endif>{{ $name }}</h2>
             @if ($subtitle || $subtitleBind)
                 <p class="text-sm break-all text-slate-500" @if ($subtitleBind) x-text="{{ $subtitleBind }}" @endif>{{ $subtitle }}</p>

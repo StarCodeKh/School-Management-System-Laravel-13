@@ -53,11 +53,11 @@
                 <tbody class="divide-y divide-slate-100">
                     <template x-for="(row, index) in items" :key="index">
                         <tr>
-                            <td class="px-4 py-2"><input type="text" :name="`items[${index}][item]`" x-model="row.item" required class="block w-full min-w-40 rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></td>
-                            <td class="px-4 py-2"><input type="text" :name="`items[${index}][category]`" x-model="row.category" required class="block w-full min-w-32 rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></td>
-                            <td class="px-4 py-2"><input type="number" step="0.01" min="0" :name="`items[${index}][quantity]`" x-model="row.quantity" required class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></td>
-                            <td class="px-4 py-2"><input type="number" step="0.01" min="0" :name="`items[${index}][price]`" x-model="row.price" required class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></td>
-                            <td class="px-4 py-2"><input type="number" step="0.01" min="0" max="100" :name="`items[${index}][discount]`" x-model="row.discount" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></td>
+                            <td class="px-4 py-2"><input type="text" :name="`items[${index}][item]`" x-model="row.item" required class="form-control min-w-40"></td>
+                            <td class="px-4 py-2"><input type="text" :name="`items[${index}][category]`" x-model="row.category" required class="form-control min-w-32"></td>
+                            <td class="px-4 py-2"><input type="number" step="0.01" min="0" :name="`items[${index}][quantity]`" x-model="row.quantity" required class="form-control"></td>
+                            <td class="px-4 py-2"><input type="number" step="0.01" min="0" :name="`items[${index}][price]`" x-model="row.price" required class="form-control"></td>
+                            <td class="px-4 py-2"><input type="number" step="0.01" min="0" max="100" :name="`items[${index}][discount]`" x-model="row.discount" class="form-control"></td>
                             <td class="px-4 py-2 text-right font-medium text-slate-900" x-text="money(lineAmount(row))"></td>
                             <td class="px-4 py-2 text-right whitespace-nowrap">
                                 <x-icon-link icon="copy" label="Duplicate row" @click="copyItem(index)" />
@@ -115,7 +115,7 @@
                     <dt class="mb-2 text-slate-500">Additional charges</dt>
                     <template x-for="(charge, index) in charges" :key="index">
                         <div class="mb-2 flex items-center gap-2">
-                            <input type="number" step="0.01" min="0" name="charges[]" x-model="charges[index]" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="Amount">
+                            <input type="number" step="0.01" min="0" name="charges[]" x-model="charges[index]" class="form-control" placeholder="Amount">
                             <x-icon-link icon="trash" label="Remove charge" tone="danger" @click="charges.splice(index, 1)" />
                         </div>
                     </template>
@@ -126,7 +126,7 @@
                     <dt class="mb-2 text-slate-500">Discounts (% of subtotal)</dt>
                     <template x-for="(discount, index) in discounts" :key="index">
                         <div class="mb-2 flex items-center gap-2">
-                            <input type="number" step="0.01" min="0" max="100" name="discounts[]" x-model="discounts[index]" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="%">
+                            <input type="number" step="0.01" min="0" max="100" name="discounts[]" x-model="discounts[index]" class="form-control" placeholder="%">
                             <x-icon-link icon="trash" label="Remove discount" tone="danger" @click="discounts.splice(index, 1)" />
                         </div>
                     </template>
@@ -135,7 +135,7 @@
 
                 <div class="flex items-center justify-between gap-4 border-t border-slate-200 pt-3">
                     <dt class="text-slate-500">Round off</dt>
-                    <dd class="w-28"><input type="number" step="0.01" name="round_off" x-model="roundOff" class="block w-full rounded-lg border-slate-300 text-right text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></dd>
+                    <dd class="w-28"><input type="number" step="0.01" name="round_off" x-model="roundOff" class="form-control text-right"></dd>
                 </div>
 
                 <div class="flex justify-between border-t border-slate-200 pt-3 text-base">

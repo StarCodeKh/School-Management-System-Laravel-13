@@ -9,7 +9,7 @@
                     <x-form.select name="user_id" label="Teacher account" :options="$users->pluck('name', 'id')" placeholder="Select account" required x-model="userId" icon="user"
                                    :hint="$users->isEmpty() ? 'Every Teacher account already has a profile. Register a new Teacher account first.' : null" />
                     <x-form.field label="User ID">
-                        <input type="text" readonly :value="codes[userId] ?? ''" class="block w-full rounded-lg border-slate-300 bg-slate-50 text-sm text-slate-500 shadow-sm">
+                        <input type="text" readonly :value="codes[userId] ?? ''" class="form-control bg-slate-50 text-slate-500">
                     </x-form.field>
             </x-form.section>
 

@@ -10,6 +10,6 @@
         @csrf
         <input type="hidden" name="invoice_number" value="{{ $invoice->invoice_number }}">
         @include('invoices._form')
-        <div class="mt-6"><x-form.actions submit="Update invoice" :cancel="route('invoice/view/page', $invoice)" /></div>
+        <div class="mt-6"><x-form.actions submit="Save changes" :cancel="route('invoice/view/page', $invoice)" /></div>
     </form>
 </x-layouts.app>
