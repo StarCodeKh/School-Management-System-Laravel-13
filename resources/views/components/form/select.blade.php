@@ -69,13 +69,13 @@
         <button type="button" id="{{ $id }}" x-ref="button" @click="toggle()" @keydown="onButtonKey($event)" :disabled="disabled"
                 aria-haspopup="listbox" :aria-expanded="open.toString()"
                 @class([
-                    'relative flex w-full items-center gap-2 rounded-lg border bg-white text-left shadow-sm transition focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500',
+                    'relative flex w-full items-center gap-2 rounded-lg border bg-white text-left shadow-sm transition focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500',
                     'py-2 pr-2 pl-3 text-sm' => ! $small,
                     'py-1 pr-1.5 pl-2.5 text-xs' => $small,
-                    'border-slate-300 focus:border-primary-500 focus:ring-primary-500' => ! $hasError,
-                    'border-red-400 focus:border-red-500 focus:ring-red-500' => $hasError,
+                    'border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100' => ! $hasError,
+                    'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-100' => $hasError,
                 ])
-                :class="open && '{{ $hasError ? 'border-red-500 ring-1 ring-red-500' : 'border-primary-500 ring-1 ring-primary-500' }}'">
+                :class="open && '{{ $hasError ? 'border-red-500 ring-4 ring-red-100' : 'border-primary-500 ring-4 ring-primary-100' }}'">
             @if ($icon)
                 <x-icon :name="$icon" @class(['text-slate-400', 'size-4' => ! $small, 'size-3.5' => $small]) />
             @endif

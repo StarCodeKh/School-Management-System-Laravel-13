@@ -13,8 +13,8 @@
                   {{ $attributes->class([
                       'block w-full rounded-lg text-sm shadow-sm placeholder:text-slate-400',
                       'pb-6' => $max,
-                      'border-slate-300 focus:border-primary-500 focus:ring-primary-500' => ! $errors->has($key),
-                      'border-red-400 focus:border-red-500 focus:ring-red-500' => $errors->has($key),
+                      'border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100' => ! $errors->has($key),
+                      'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-100' => $errors->has($key),
                   ]) }}>{{ old($key, $value) }}</textarea>
         @if ($max)
             <span class="pointer-events-none absolute right-3 bottom-1.5 text-xs text-slate-400" :class="count >= {{ (int) $max }} && 'text-red-500'">

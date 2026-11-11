@@ -25,7 +25,7 @@
                         <td class="w-44">
                             <input type="number" step="0.01" min="0" max="{{ $exam->max_marks }}" name="marks[{{ $student->id }}]"
                                    value="{{ old($key, isset($results[$student->id]) ? (float) $results[$student->id]->marks : '') }}"
-                                   @class(['block w-full rounded-lg text-sm shadow-sm', 'border-slate-300 focus:border-primary-500 focus:ring-primary-500' => ! $errors->has($key), 'border-red-400' => $errors->has($key)])>
+                                   @class(['block w-full rounded-lg text-sm shadow-sm', 'border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100' => ! $errors->has($key), 'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-100' => $errors->has($key)])>
                             @error($key)<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                         </td>
                         <td class="min-w-48">
