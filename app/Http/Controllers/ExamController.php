@@ -88,7 +88,11 @@ class ExamController extends Controller
             ? $exam->results()->where('subject_id', $subject->id)->get()->keyBy('student_id')
             : collect();
 
-        return view('exams.marks', compact('exam', 'subjects', 'subject', 'students', 'results'));
+        // marks entered per subject, for the progress shown on each subject tab
+        $entered = $exam->results()->whereNotNull('marks')->whereIn('student_id', $students->pluck('id'))
+            ->selectRaw('subject_id, count(*) as total')->groupBy('subject_id')->pluck('total', 'subject_id');
+
+        return view('exams.marks', compact('exam', 'subjects', 'subject', 'students', 'results', 'entered'));
     }
 
     public function saveMarks(Request $request, Exam $exam)

@@ -1,7 +1,5 @@
 <div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
     <x-search-bar :value="$search" placeholder="Search name, user ID, qualification..." />
-    <div class="mb-4 flex w-fit self-start rounded-lg border border-slate-300 bg-white p-0.5 shadow-sm">
-        <a href="{{ route('teacher/list/page', request()->query()) }}" @class(['rounded-md p-1.5', 'bg-primary-50 text-primary-700' => request()->routeIs('teacher/list/page'), 'text-slate-500' => ! request()->routeIs('teacher/list/page')]) data-tooltip="List view" aria-label="List view"><x-icon name="list" /></a>
-        <a href="{{ route('teacher/grid/page', request()->query()) }}" @class(['rounded-md p-1.5', 'bg-primary-50 text-primary-700' => request()->routeIs('teacher/grid/page'), 'text-slate-500' => ! request()->routeIs('teacher/grid/page')]) data-tooltip="Grid view" aria-label="Grid view"><x-icon name="squares" /></a>
-    </div>
+    <x-view-switch :list="route('teacher/list/page', request()->query())" :grid="route('teacher/grid/page', request()->query())"
+                   :current="request()->routeIs('teacher/grid/page') ? 'grid' : 'list'" class="mb-4 self-start" />
 </div>

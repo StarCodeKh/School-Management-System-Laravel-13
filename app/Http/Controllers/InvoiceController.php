@@ -56,7 +56,9 @@ class InvoiceController extends Controller
     {
         $invoiceList = Invoice::with('customer')->latest()->paginate(12);
 
-        return view('invoices.grid_invoice', compact('invoiceList'));
+        $tabCounts = Invoice::tabCounts();
+
+        return view('invoices.grid_invoice', compact('invoiceList', 'tabCounts'));
     }
 
     /** change an invoice's status (mark as sent / paid / cancelled / draft) */
@@ -208,8 +210,9 @@ class InvoiceController extends Controller
 
         $customers = $this->customers();
         $categories = InvoiceItem::query()->distinct()->orderBy('category')->pluck('category');
+        $tabCounts = Invoice::tabCounts();
 
-        return view('invoices.list_invoices', compact('invoiceList', 'tab', 'stats', 'customers', 'categories', 'filters'));
+        return view('invoices.list_invoices', compact('invoiceList', 'tab', 'stats', 'customers', 'categories', 'filters', 'tabCounts'));
     }
 
     /** users who can be billed */

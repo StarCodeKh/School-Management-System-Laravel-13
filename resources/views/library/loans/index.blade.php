@@ -5,15 +5,11 @@
         </x-slot:actions>
     </x-page-header>
 
-    <nav class="mb-6 flex gap-1 border-b border-slate-200">
-        @foreach (['active' => 'On loan ('.$counts['active'].')', 'overdue' => 'Overdue ('.$counts['overdue'].')', 'returned' => 'Returned'] as $key => $label)
-            <a href="{{ route('loans.index', ['tab' => $key]) }}" @class([
-                '-mb-px border-b-2 px-4 py-2 text-sm font-medium whitespace-nowrap',
-                'border-primary-600 text-primary-700' => $tab === $key,
-                'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' => $tab !== $key,
-            ])>{{ $label }}</a>
-        @endforeach
-    </nav>
+    <x-tabs :active="$tab" :items="[
+        'active' => ['label' => 'On loan', 'icon' => 'book', 'href' => route('loans.index', ['tab' => 'active']), 'count' => $counts['active']],
+        'overdue' => ['label' => 'Overdue', 'icon' => 'clock', 'href' => route('loans.index', ['tab' => 'overdue']), 'count' => $counts['overdue'], 'tone' => 'red'],
+        'returned' => ['label' => 'Returned', 'icon' => 'check-circle', 'href' => route('loans.index', ['tab' => 'returned'])],
+    ]" />
 
     <x-table live>
         <x-slot:head>

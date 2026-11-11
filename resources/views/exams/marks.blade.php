@@ -4,15 +4,11 @@
     @if ($subjects->isEmpty())
         <x-empty-state icon="book">This class has no subjects yet.</x-empty-state>
     @else
-        <nav class="mb-6 flex gap-1 overflow-x-auto border-b border-slate-200">
-            @foreach ($subjects as $item)
-                <a href="{{ route('exams.marks', [$exam, 'subject_id' => $item->id]) }}" @class([
-                    '-mb-px border-b-2 px-4 py-2 text-sm font-medium whitespace-nowrap',
-                    'border-primary-600 text-primary-700' => $subject->is($item),
-                    'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' => ! $subject->is($item),
-                ])>{{ $item->subject_name }}</a>
-            @endforeach
-        </nav>
+        <x-tabs :active="$subject->id" :items="$subjects->mapWithKeys(fn ($item) => [$item->id => [
+            'label' => $item->subject_name,
+            'href' => route('exams.marks', [$exam, 'subject_id' => $item->id]),
+            'progress' => [(int) ($entered[$item->id] ?? 0), $students->count()],
+        ]])->all()" />
 
         <form method="POST" action="{{ route('exams.marks.save', $exam) }}">
             @csrf

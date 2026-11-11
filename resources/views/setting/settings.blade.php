@@ -1,25 +1,17 @@
 @php
     $tabs = [
-        'general' => ['label' => 'General', 'route' => 'setting/page'],
-        'invoice' => ['label' => 'Invoice', 'route' => 'invoice/settings/page'],
-        'tax' => ['label' => 'Tax', 'route' => 'invoice/settings/tax/page'],
-        'bank' => ['label' => 'Bank', 'route' => 'invoice/settings/bank/page'],
-        'library' => ['label' => 'Library', 'route' => 'setting/library'],
+        'general' => ['label' => 'General', 'icon' => 'cog', 'route' => 'setting/page'],
+        'invoice' => ['label' => 'Invoice', 'icon' => 'document', 'route' => 'invoice/settings/page'],
+        'tax' => ['label' => 'Tax', 'icon' => 'currency', 'route' => 'invoice/settings/tax/page'],
+        'bank' => ['label' => 'Bank', 'icon' => 'banknotes', 'route' => 'invoice/settings/bank/page'],
+        'library' => ['label' => 'Library', 'icon' => 'library', 'route' => 'setting/library'],
     ];
 @endphp
 
 <x-layouts.app :title="$tabs[$group]['label'].' Settings'">
     <x-page-header title="Settings" :breadcrumbs="['Dashboard' => route('home'), 'Settings' => route('setting/page'), $tabs[$group]['label'] => null]" />
 
-    <nav class="mb-6 flex gap-1 overflow-x-auto border-b border-slate-200">
-        @foreach ($tabs as $key => $tab)
-            <a href="{{ route($tab['route']) }}" @class([
-                '-mb-px border-b-2 px-4 py-2 text-sm font-medium whitespace-nowrap',
-                'border-primary-600 text-primary-700' => $group === $key,
-                'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' => $group !== $key,
-            ])>{{ $tab['label'] }}</a>
-        @endforeach
-    </nav>
+    <x-tabs :active="$group" :items="collect($tabs)->map(fn ($tab) => $tab + ['href' => route($tab['route'])])->all()" />
 
     <x-card class="max-w-3xl">
         <form method="POST" action="{{ route('setting/update', $group) }}" class="space-y-6">

@@ -95,6 +95,15 @@ class Invoice extends Model
      * Narrow the list to one tab of the invoices page.
      * Tabs: all, paid, overdue, draft, recurring, cancelled.
      */
+    /** The list tabs, in order. */
+    public const TABS = ['all', 'paid', 'overdue', 'draft', 'recurring', 'cancelled'];
+
+    /** @return array<string, int> invoices on each list tab */
+    public static function tabCounts(): array
+    {
+        return collect(self::TABS)->mapWithKeys(fn (string $tab) => [$tab => static::query()->forTab($tab)->count()])->all();
+    }
+
     public function scopeForTab(Builder $query, string $tab): void
     {
         match ($tab) {
