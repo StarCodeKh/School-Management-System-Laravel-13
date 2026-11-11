@@ -36,7 +36,7 @@
 
 <x-form.field :name="$name" :label="$label" :required="$required" :hint="$hint" :for="$id" :class="$wrapper">
     @if ($isPicker)
-        <div x-data="datePicker({ mode: @js($type), after: @js($after) })" class="relative" @keydown.escape.prevent.stop="open && close(true)">
+        <div x-data="datePicker({ mode: @js($type), after: @js($after) })" class="relative" @keydown.escape="open && ($event.preventDefault(), $event.stopPropagation(), close(true))">
             {{-- the real control: submitted with the form, invisible, sits under the button so browser validation points here --}}
             <input type="{{ $type }}" x-ref="native" name="{{ $name }}" id="{{ $id }}-native" tabindex="-1" aria-hidden="true"
                    @if ($current !== null) value="{{ $current }}" @endif @required($required)

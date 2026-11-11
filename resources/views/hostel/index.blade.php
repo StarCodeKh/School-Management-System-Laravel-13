@@ -1,33 +1,15 @@
 <x-layouts.app title="Hostel">
-    <x-page-header title="Hostel" :breadcrumbs="['Dashboard' => route('home'), 'Hostel' => null]" />
+    <x-page-header title="Hostel" :breadcrumbs="['Dashboard' => route('home'), 'Hostel' => null]">
+        <x-slot:actions>
+            <x-button type="button" variant="secondary" icon="home-modern" x-data @click="$dispatch('open-modal', 'add-room')">Add room</x-button>
+            <x-button type="button" icon="plus" x-data @click="$dispatch('open-modal', 'allocate')">Allocate a student</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
     <div class="mb-6 grid gap-4 sm:grid-cols-3">
         <x-stat-card label="Beds" :value="$totals['beds']" icon="home-modern" />
         <x-stat-card label="Occupied" :value="$totals['used']" icon="users" color="amber" />
         <x-stat-card label="Free" :value="$totals['beds'] - $totals['used']" icon="check-circle" color="green" />
-    </div>
-
-    <div class="mb-6 grid gap-6 xl:grid-cols-2">
-        <x-card title="Allocate a student">
-            <form method="POST" action="{{ route('hostel.allocations.store') }}" class="grid gap-5 sm:grid-cols-2">
-                @csrf
-                <x-form.select name="student_id" label="Student" :options="$students" placeholder="Select student" required />
-                <x-form.select name="hostel_room_id" label="Room" :options="$roomOptions" placeholder="Select room" required
-                               :hint="$roomOptions->isEmpty() ? 'No free beds. Add a room first.' : null" />
-                <div class="sm:col-span-2 flex justify-end"><x-button icon="plus">Allocate</x-button></div>
-            </form>
-        </x-card>
-
-        <x-card title="Add room">
-            <form method="POST" action="{{ route('hostel.rooms.store') }}" class="grid gap-5 sm:grid-cols-2">
-                @csrf
-                <x-form.input name="hostel" label="Hostel" placeholder="e.g. Boys Hostel" required />
-                <x-form.input name="room_number" label="Room number" required />
-                <x-form.input name="capacity" type="number" min="1" max="50" label="Beds" required />
-                <x-form.input name="fee" type="number" step="0.01" min="0" :label="'Fee per term ('.setting('currency_symbol').')'" />
-                <div class="sm:col-span-2 flex justify-end"><x-button icon="plus">Add room</x-button></div>
-            </form>
-        </x-card>
     </div>
 
     @forelse ($rooms as $hostel => $hostelRooms)
@@ -43,6 +25,10 @@
                         </div>
                         <div class="flex items-center gap-1">
                             <x-badge :color="$used >= $room->capacity ? 'red' : 'green'">{{ $used }} / {{ $room->capacity }}</x-badge>
+                            @if ($used < $room->capacity)
+                                <x-icon-link icon="plus" label="Allocate a student here" tone="primary" x-data
+                                             @click="$dispatch('open-modal', { name: 'allocate', fill: { hostel_room_id: {{ $room->id }} } })" />
+                            @endif
                             @if ($used === 0)
                                 <x-delete-button :action="route('hostel.rooms.destroy', $room)" :fields="['_method' => 'DELETE']" title="Delete room" :message="'Delete '.$room->label().'?'" />
                             @endif
@@ -63,6 +49,30 @@
             @endforeach
         </div>
     @empty
-        <x-empty-state icon="home-modern">No hostel rooms yet.</x-empty-state>
+        <x-empty-state icon="home-modern">No hostel rooms yet. Use Add room to create one.</x-empty-state>
     @endforelse
+
+    <x-modal name="allocate" title="Allocate a student" description="Give a student a bed in a room with space." icon="users">
+        <form method="POST" action="{{ route('hostel.allocations.store') }}" id="allocate-form" class="grid gap-5">
+            @csrf
+            <x-modal.form-name name="allocate" />
+            <x-form.select name="student_id" label="Student" :options="$students" placeholder="Select student" required icon="user" />
+            <x-form.select name="hostel_room_id" label="Room" :options="$roomOptions" placeholder="Select room" required icon="home-modern"
+                           :hint="$roomOptions->isEmpty() ? 'No free beds. Add a room first.' : 'Only rooms with a free bed are listed.'" />
+        </form>
+        <x-slot:footer><x-button form="allocate-form" icon="plus">Allocate</x-button></x-slot:footer>
+    </x-modal>
+
+    <x-modal name="add-room" title="Add room" description="A room, its number of beds and the termly fee." icon="home-modern">
+        <form method="POST" action="{{ route('hostel.rooms.store') }}" id="add-room-form" class="grid gap-5 sm:grid-cols-2">
+            @csrf
+            <x-modal.form-name name="add-room" />
+            <x-form.input name="hostel" label="Hostel" placeholder="e.g. Boys Hostel" required list="hostel-names" hint="Rooms are grouped by hostel." />
+            <x-form.input name="room_number" label="Room number" required placeholder="e.g. B-12" />
+            <x-form.input name="capacity" type="number" min="1" max="50" label="Beds" required />
+            <x-form.input name="fee" type="number" step="0.01" min="0" :label="'Fee per term ('.setting('currency_symbol').')'" />
+            <datalist id="hostel-names">@foreach ($rooms->keys() as $hostel)<option value="{{ $hostel }}">@endforeach</datalist>
+        </form>
+        <x-slot:footer><x-button form="add-room-form" icon="plus">Add room</x-button></x-slot:footer>
+    </x-modal>
 </x-layouts.app>

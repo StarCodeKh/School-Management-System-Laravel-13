@@ -1,23 +1,17 @@
 <x-layouts.app title="Fee Structures">
-    <x-page-header title="Fee Structures" :breadcrumbs="['Finance' => route('finance.index'), 'Fee Structures' => null]" />
-
-    <x-card title="Set a fee for a class" class="mb-6">
-        <form method="POST" action="{{ route('fee-structures.store') }}" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_10rem_11rem_auto] lg:items-start">
-            @csrf
-            <x-form.select name="school_class_id" label="Class" :options="$classes->pluck('name', 'id')->map(fn ($n) => 'Class '.$n)" placeholder="Select class" required />
-            <x-form.select name="fee_type_id" label="Fee type" :options="$feeTypes" placeholder="Select fee type" required />
-            <x-form.input name="amount" type="number" step="0.01" min="0" :label="'Amount ('.setting('currency_symbol').')'" required />
-            <x-form.input name="due_date" type="date" label="Due date" />
-            <x-button icon="check" class="lg:mt-7">Save</x-button>
-        </form>
-        <p class="mt-3 text-xs text-slate-500">Saving a class and fee type that already exist updates the amount.</p>
-    </x-card>
+    <x-page-header title="Fee Structures" :breadcrumbs="['Finance' => route('finance.index'), 'Fee Structures' => null]">
+        <x-slot:actions>
+            <x-button type="button" icon="plus" x-data @click="$dispatch('open-modal', 'set-fee')">Set a fee</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
     <div class="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         @forelse ($classes as $class)
             <x-card :title="'Class '.$class->name" :padding="false">
                 <x-slot:actions>
                     <span class="text-sm font-semibold text-slate-900">{{ money($class->feeStructures->sum('amount')) }}</span>
+                    <x-icon-link icon="plus" :label="'Set a fee for class '.$class->name" tone="primary" x-data
+                                 @click="$dispatch('open-modal', { name: 'set-fee', fill: { school_class_id: {{ $class->id }} } })" />
                 </x-slot:actions>
                 <ul class="divide-y divide-slate-100">
                     @forelse ($class->feeStructures->sortBy('feeType.name') as $structure)
@@ -34,7 +28,19 @@
                 </ul>
             </x-card>
         @empty
-            <p class="col-span-full text-sm text-slate-500">No classes yet.</p>
+            <x-empty-state icon="squares" class="col-span-full">No classes yet. Add classes on the Classes page first.</x-empty-state>
         @endforelse
     </div>
+
+    <x-modal name="set-fee" title="Set a fee" description="Saving a class and fee type that already exist updates the amount." icon="banknotes">
+        <form method="POST" action="{{ route('fee-structures.store') }}" id="set-fee-form" class="grid gap-5 sm:grid-cols-2">
+            @csrf
+            <x-modal.form-name name="set-fee" />
+            <x-form.select name="school_class_id" label="Class" :options="$classes->pluck('name', 'id')->map(fn ($n) => 'Class '.$n)" placeholder="Select class" required icon="academic-cap" />
+            <x-form.select name="fee_type_id" label="Fee type" :options="$feeTypes" placeholder="Select fee type" required icon="tag" />
+            <x-form.input name="amount" type="number" step="0.01" min="0" :label="'Amount ('.setting('currency_symbol').')'" required />
+            <x-form.input name="due_date" type="date" label="Due date" />
+        </form>
+        <x-slot:footer><x-button form="set-fee-form" icon="check">Save fee</x-button></x-slot:footer>
+    </x-modal>
 </x-layouts.app>

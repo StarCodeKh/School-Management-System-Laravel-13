@@ -620,6 +620,114 @@ Alpine.data('imageUpload', (config = {}) => ({
  * then carries on: a submit button submits its form, a link is followed.
  * From JavaScript: if (await window.confirmAction({ title, message, confirmLabel, tone })) { ... }
  */
+/* <x-form-progress>: how many required fields of a form are filled in (radios count once per group). */
+Alpine.data('formProgress', (formId) => ({
+    done: 0,
+    total: 0,
+    get complete() {
+        return this.total > 0 && this.done === this.total;
+    },
+    init() {
+        const form = document.getElementById(formId);
+        if (!form) return;
+        const update = () => {
+            const groups = new Map();
+            form.querySelectorAll('[required]').forEach((field) => {
+                // disabled fields still count: a section waiting for its class is still to be filled in
+                if (field.type === 'hidden' || !field.name) return;
+                const filled = field.type === 'radio' || field.type === 'checkbox' ? field.checked : String(field.value).trim() !== '';
+                groups.set(field.name, (groups.get(field.name) ?? false) || filled);
+            });
+            this.total = groups.size;
+            this.done = [...groups.values()].filter(Boolean).length;
+        };
+        ['input', 'change'].forEach((type) => form.addEventListener(type, () => setTimeout(update)));
+        // custom selects and pickers set their values after start-up; disabled fields change too
+        new MutationObserver(() => setTimeout(update)).observe(form, { subtree: true, attributes: true, attributeFilter: ['disabled', 'required'] });
+        setTimeout(update, 50);
+    },
+}));
+
+/* Keep Tab and Shift+Tab inside an open dialog. */
+const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+window.trapFocus = (container, event) => {
+    const items = [...container.querySelectorAll(focusableSelector)].filter((el) => el.offsetParent !== null && !el.closest('.sr-only, [inert]'));
+    if (!items.length) return;
+    const [first, last] = [items[0], items.at(-1)];
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+};
+
+/* Page scroll is locked while any dialog is open (counted, so stacked dialogs unlock in order). */
+let openDialogs = 0;
+window.lockScroll = (lock) => {
+    openDialogs = Math.max(0, openDialogs + (lock ? 1 : -1));
+    document.documentElement.style.overflow = openDialogs ? 'hidden' : '';
+};
+
+/**
+ * <x-modal>: opened with $dispatch('open-modal', name) or ('open-modal', { name, fill: { field: value } }),
+ * closed with Esc, the backdrop, the X, Cancel or $dispatch('close-modal', name).
+ */
+Alpine.data('modal', (config) => ({
+    open: false,
+    returnTo: null,
+
+    init() {
+        window.addEventListener('open-modal', (event) => {
+            const detail = typeof event.detail === 'string' ? { name: event.detail } : (event.detail ?? {});
+            if (detail.name === config.name) this.show(detail.fill);
+        });
+        window.addEventListener('close-modal', (event) => (!event.detail || event.detail === config.name) && this.hide());
+        if (config.open) this.$nextTick(() => this.show()); // reopened after a failed save
+    },
+    show(fill) {
+        if (this.open) return;
+        this.returnTo = document.activeElement;
+        this.open = true;
+        window.lockScroll(true);
+        this.$nextTick(() => {
+            if (fill) this.fill(fill);
+            // once the panel is showing: the first field with an error, then [autofocus], then the first field
+            setTimeout(() => {
+                const body = this.$refs.body;
+                const visible = (el) => el && el.offsetParent !== null;
+                const errorField = body.querySelector('[data-field-error]')?.parentElement;
+                const candidates = [
+                    ...(errorField ? errorField.querySelectorAll(focusableSelector) : []),
+                    body.querySelector('[autofocus]'),
+                    ...body.querySelectorAll(focusableSelector),
+                ];
+                candidates.find(visible)?.focus({ preventScroll: true });
+            }, 60);
+        });
+    },
+    hide() {
+        if (!this.open) return;
+        this.open = false;
+        window.lockScroll(false);
+        this.returnTo?.focus?.({ preventScroll: true });
+    },
+    // set fields by name; change events let custom selects and pickers update themselves
+    fill(values) {
+        Object.entries(values).forEach(([name, value]) => {
+            this.$refs.panel.querySelectorAll(`[name="${name}"]`).forEach((field) => {
+                field.value = value ?? '';
+                field.dispatchEvent(new Event('input', { bubbles: true }));
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
+    },
+    trap(event) {
+        window.trapFocus(this.$refs.panel, event);
+    },
+}));
+
 Alpine.store('confirm', {
     open: false,
     title: '',
@@ -630,10 +738,12 @@ Alpine.store('confirm', {
 
     ask({ title = 'Are you sure?', message = '', confirmLabel = 'Confirm', tone = 'danger' } = {}) {
         this.resolve?.(false);
+        if (!this.open) window.lockScroll(true);
         Object.assign(this, { title, message, confirmLabel, tone: tone === 'primary' ? 'primary' : 'danger', open: true });
         return new Promise((resolve) => (this.resolve = resolve));
     },
     answer(value) {
+        if (this.open) window.lockScroll(false);
         this.open = false;
         this.resolve?.(value);
         this.resolve = null;
@@ -801,10 +911,12 @@ Alpine.data('commandPalette', (config) => ({
         this.$watch('query', () => (this.active = 0));
     },
     openPalette() {
+        if (!this.open) window.lockScroll(true);
         this.open = true;
         this.$nextTick(() => this.$refs.input.select());
     },
     closePalette() {
+        if (this.open) window.lockScroll(false);
         this.open = false;
     },
     get pageResults() {
@@ -849,7 +961,9 @@ Alpine.data('commandPalette', (config) => ({
         }
     },
     onKey(event) {
-        if (event.key === 'Escape') {
+        if (event.key === 'Tab') {
+            window.trapFocus(event.currentTarget, event);
+        } else if (event.key === 'Escape') {
             event.preventDefault();
             this.closePalette();
         } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {

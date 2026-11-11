@@ -1,5 +1,9 @@
 <x-layouts.app :title="$route->name">
-    <x-page-header :title="$route->name" :breadcrumbs="['Transport' => route('transport.index'), $route->name => null]" />
+    <x-page-header :title="$route->name" :breadcrumbs="['Transport' => route('transport.index'), $route->name => null]">
+        <x-slot:actions>
+            <x-button type="button" icon="plus" x-data @click="$dispatch('open-modal', 'add-rider')">Add a student</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
     <div class="grid gap-6 xl:grid-cols-3">
         <x-card title="Route details">
@@ -40,15 +44,17 @@
                 @endforelse
             </x-table>
 
-            <x-card title="Add a student">
-                <form method="POST" action="{{ route('transport.routes.assign', $route) }}" class="grid gap-5 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
-                    @csrf
-                    <x-form.select name="student_id" label="Student" :options="$students" placeholder="Select student" required
-                                   :hint="$students->isEmpty() ? 'Every student already has a route.' : null" />
-                    <x-form.select name="pickup_stop" label="Pickup stop" :options="array_combine($route->stopList(), $route->stopList())" placeholder="-- Not set --" />
-                    <x-button icon="plus" class="sm:mt-7">Add</x-button>
-                </form>
-            </x-card>
         </div>
     </div>
+
+    <x-modal name="add-rider" title="Add a student" :description="'Put a student on '.$route->name.'.'" icon="users" size="sm">
+        <form method="POST" action="{{ route('transport.routes.assign', $route) }}" id="add-rider-form" class="grid gap-5">
+            @csrf
+            <x-modal.form-name name="add-rider" />
+            <x-form.select name="student_id" label="Student" :options="$students" placeholder="Select student" required icon="user"
+                           :hint="$students->isEmpty() ? 'Every student already has a route.' : 'Students already on a route are not listed.'" />
+            <x-form.select name="pickup_stop" label="Pickup stop" :options="array_combine($route->stopList(), $route->stopList())" placeholder="-- Not set --" icon="map" />
+        </form>
+        <x-slot:footer><x-button form="add-rider-form" icon="plus">Add</x-button></x-slot:footer>
+    </x-modal>
 </x-layouts.app>

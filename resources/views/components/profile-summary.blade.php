@@ -3,11 +3,11 @@
     The *-bind props are Alpine expressions from the page's x-data, so the card follows the form as it is typed.
     Without an image it shows :icon in a tile (for records such as departments).
     Give it class="xl:sticky xl:top-24" to keep it in view beside a long form.
-      details   [term => value] rows
+      details   [term => value] rows; a value may be ['value' => ..., 'bind' => 'alpine expression'] to follow the form
       badges    slot: <x-badge>s under the name
       links     slot: <x-profile-summary.link>s, listed under "Linked records"
 --}}
-@props(['image' => null, 'icon' => 'user', 'name', 'subtitle' => null, 'details' => [], 'imageBind' => null, 'nameBind' => null, 'subtitleBind' => null, 'linksTitle' => 'Linked records'])
+@props(['image' => null, 'icon' => 'user', 'name', 'subtitle' => null, 'details' => [], 'imageBind' => null, 'nameBind' => null, 'subtitleBind' => null, 'linksTitle' => 'Linked records', 'nameFallback' => 'No name'])
 
 <aside {{ $attributes }}>
     <x-card :padding="false" class="overflow-hidden">
@@ -20,7 +20,7 @@
                     <x-icon :name="$icon" class="size-9" />
                 </span>
             @endif
-            <h2 class="mt-3 text-lg font-semibold text-slate-900" @if ($nameBind) x-text="{{ $nameBind }} || 'No name'" @endif>{{ $name }}</h2>
+            <h2 class="mt-3 text-lg font-semibold text-slate-900" @if ($nameBind) x-text="{{ $nameBind }} || @js($nameFallback)" @endif>{{ $name }}</h2>
             @if ($subtitle || $subtitleBind)
                 <p class="text-sm break-all text-slate-500" @if ($subtitleBind) x-text="{{ $subtitleBind }}" @endif>{{ $subtitle }}</p>
             @endif
@@ -34,7 +34,11 @@
                 @foreach ($details as $term => $detail)
                     <div class="flex justify-between gap-4 px-5 py-2.5">
                         <dt class="shrink-0 text-slate-500">{{ $term }}</dt>
-                        <dd class="truncate font-medium text-slate-900">{{ filled($detail) ? $detail : '-' }}</dd>
+                        @if (is_array($detail))
+                            <dd class="truncate font-medium text-slate-900" x-text="({{ $detail['bind'] }}) || '-'">{{ filled($detail['value'] ?? null) ? $detail['value'] : '-' }}</dd>
+                        @else
+                            <dd class="truncate font-medium text-slate-900">{{ filled($detail) ? $detail : '-' }}</dd>
+                        @endif
                     </div>
                 @endforeach
             </dl>

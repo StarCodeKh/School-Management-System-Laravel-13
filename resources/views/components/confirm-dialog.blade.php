@@ -1,13 +1,13 @@
 {{-- The one confirmation dialog for the whole app, driven by the Alpine "confirm" store (resources/js/app.js). --}}
 <div x-data x-cloak x-show="$store.confirm.open" class="fixed inset-0 z-[80] flex items-end justify-center p-4 sm:items-center"
      role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message"
-     @keydown.escape.window="$store.confirm.open && $store.confirm.answer(false)">
+     @keydown.escape.window="$store.confirm.open && $store.confirm.answer(false)" @keydown.tab="trapFocus($refs.box, $event)">
     <div x-show="$store.confirm.open" x-transition.opacity class="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]" @click="$store.confirm.answer(false)"></div>
 
     <div x-show="$store.confirm.open"
          x-transition:enter="transition duration-200 ease-out" x-transition:enter-start="translate-y-4 scale-95 opacity-0" x-transition:enter-end="translate-y-0 scale-100 opacity-100"
          x-transition:leave="transition duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="scale-95 opacity-0"
-         class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-900/5">
+         x-ref="box" class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-900/5">
         <div class="flex gap-4 p-6">
             <span class="grid size-11 shrink-0 place-items-center rounded-full"
                   :class="$store.confirm.tone === 'danger' ? 'bg-red-100 text-red-600' : 'bg-primary-100 text-primary-600'">

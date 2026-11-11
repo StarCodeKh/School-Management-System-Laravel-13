@@ -11,7 +11,7 @@
     @endif
     {{ $slot }}
     @if ($key && $errors->has($key))
-        <p class="mt-1.5 text-sm text-red-600">{{ $errors->first($key) }}</p>
+        <p class="mt-1.5 text-sm text-red-600" data-field-error>{{ $errors->first($key) }}</p>
     @elseif ($hint)
         <p class="mt-1.5 text-xs text-slate-500">{{ $hint }}</p>
     @endif

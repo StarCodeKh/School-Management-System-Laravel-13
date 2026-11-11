@@ -41,7 +41,7 @@
 @endphp
 
 <x-form.field :name="$name" :label="$label" :required="$required" :hint="$hint" :for="$id" :class="$wrapper">
-    <div x-data="selectMenu({ searchable: @js($searchable){!! $groupFilter ? ', groupFilter: () => ('.e($groupFilter).')' : '' !!} })" class="relative" @keydown.escape.prevent.stop="open && close(true)">
+    <div x-data="selectMenu({ searchable: @js($searchable){!! $groupFilter ? ', groupFilter: () => ('.e($groupFilter).')' : '' !!} })" class="relative" @keydown.escape="open && ($event.preventDefault(), $event.stopPropagation(), close(true))">
         {{-- the real control: submitted with the form, invisible, sits under the button so browser validation points here --}}
         <select x-ref="native" name="{{ $name }}" id="{{ $id }}-native" tabindex="-1" aria-hidden="true" @required($required)
                 {{ $attributes->except(['class', 'id', 'x-bind:disabled', ':disabled']) }}

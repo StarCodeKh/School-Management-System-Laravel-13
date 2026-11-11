@@ -1,15 +1,9 @@
 <x-layouts.app title="Classes">
-    <x-page-header title="Classes" :breadcrumbs="['Dashboard' => route('home'), 'Classes' => null]" />
-
-    <x-card title="Add class" class="mb-6">
-        <form method="POST" action="{{ route('class/save') }}" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-[1fr_2fr_8rem_auto] lg:items-start">
-            @csrf
-            <x-form.input name="name" label="Class name" placeholder="e.g. 10" required />
-            <x-form.input name="sections" label="Sections" placeholder="Comma separated, e.g. A, B, C" required />
-            <x-form.input name="sort_order" type="number" min="0" label="Sort order" :value="0" />
-            <x-button icon="plus" class="lg:mt-7">Add class</x-button>
-        </form>
-    </x-card>
+    <x-page-header title="Classes" :breadcrumbs="['Dashboard' => route('home'), 'Classes' => null]">
+        <x-slot:actions>
+            <x-button type="button" icon="plus" x-data @click="$dispatch('open-modal', 'add-class')">Add class</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
     <x-table>
         <x-slot:head>
@@ -42,7 +36,18 @@
                 </td>
             </tr>
         @empty
-            <x-empty-row colspan="6" message="No classes yet. Add one above." />
+            <x-empty-row colspan="6" message="No classes yet. Use Add class to create one." />
         @endforelse
     </x-table>
+
+    <x-modal name="add-class" title="Add class" description="A grade and its sections, e.g. class 10 with sections A, B and C." icon="squares" size="sm">
+        <form method="POST" action="{{ route('class/save') }}" id="add-class-form" class="grid gap-5 sm:grid-cols-2">
+            @csrf
+            <x-modal.form-name name="add-class" />
+            <x-form.input name="name" label="Class name" placeholder="e.g. 10" required />
+            <x-form.input name="sort_order" type="number" min="0" label="Sort order" :value="($classes->max('sort_order') ?? 0) + 1" hint="Lower comes first." />
+            <x-form.input name="sections" label="Sections" placeholder="e.g. A, B, C" required hint="Separate sections with commas." wrapper="sm:col-span-2" />
+        </form>
+        <x-slot:footer><x-button form="add-class-form" icon="plus">Add class</x-button></x-slot:footer>
+    </x-modal>
 </x-layouts.app>

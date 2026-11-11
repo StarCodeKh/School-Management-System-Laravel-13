@@ -33,7 +33,7 @@
 
 <div x-data x-init="@js($flashes).forEach((flash) => $store.toasts.push(flash))"
      aria-live="polite" aria-atomic="false"
-     class="pointer-events-none fixed inset-x-0 top-3 z-[60] flex flex-col items-center gap-2 px-4 sm:items-end sm:pr-5">
+     class="pointer-events-none fixed inset-x-0 top-3 z-[90] flex flex-col items-center gap-2 px-4 sm:items-end sm:pr-5">
     <template x-for="toast in $store.toasts.items" :key="toast.id">
         <div x-show="toast.visible"
              x-transition:enter="transition duration-200 ease-out"
