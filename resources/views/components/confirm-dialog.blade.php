@@ -7,7 +7,9 @@
     <div x-show="$store.confirm.open"
          x-transition:enter="transition duration-200 ease-out" x-transition:enter-start="translate-y-4 scale-95 opacity-0" x-transition:enter-end="translate-y-0 scale-100 opacity-100"
          x-transition:leave="transition duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="scale-95 opacity-0"
-         x-ref="box" class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-900/5">
+         x-ref="box" tabindex="-1" class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-900/5 focus:outline-none"
+         {{-- opened by a click: focus the dialog itself (no outline). By keyboard: Cancel for dangerous actions, so Enter never deletes by habit; the confirm button otherwise --}}
+         x-init="$watch('$store.confirm.open', (open) => open && $nextTick(() => (window.usedPointer() ? $el : ($store.confirm.tone === 'danger' ? $refs.cancel : $refs.ok)).focus()))">
         <div class="flex gap-4 p-6">
             <span class="grid size-11 shrink-0 place-items-center rounded-full"
                   :class="$store.confirm.tone === 'danger' ? 'bg-red-100 text-red-600' : 'bg-primary-100 text-primary-600'">
@@ -20,8 +22,8 @@
             </div>
         </div>
         <div class="flex flex-col-reverse gap-2 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
-            <x-button type="button" variant="secondary" @click="$store.confirm.answer(false)">Cancel</x-button>
-            <button type="button" x-ref="ok" x-init="$watch('$store.confirm.open', (open) => open && $nextTick(() => $el.focus()))"
+            <x-button type="button" variant="secondary" x-ref="cancel" @click="$store.confirm.answer(false)">Cancel</x-button>
+            <button type="button" x-ref="ok"
                     @click="$store.confirm.answer(true)" x-text="$store.confirm.confirmLabel"
                     class="inline-flex h-9.5 items-center justify-center rounded-lg px-4 text-sm font-semibold text-white shadow-sm ring-1 ring-inset transition active:scale-[.97] focus-visible:outline-2 focus-visible:outline-offset-2"
                     :class="$store.confirm.tone === 'danger'

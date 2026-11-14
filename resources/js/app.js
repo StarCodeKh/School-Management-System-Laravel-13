@@ -654,7 +654,11 @@ window.trapFocus = (container, event) => {
     const items = [...container.querySelectorAll(focusableSelector)].filter((el) => el.offsetParent !== null && !el.closest('.sr-only, [inert]'));
     if (!items.length) return;
     const [first, last] = [items[0], items.at(-1)];
-    if (event.shiftKey && document.activeElement === first) {
+    if (document.activeElement === container) {
+        // the dialog itself has focus (opened with the mouse): Tab enters at the start, Shift+Tab at the end
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+    } else if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
     } else if (!event.shiftKey && document.activeElement === last) {
@@ -662,6 +666,13 @@ window.trapFocus = (container, event) => {
         first.focus();
     }
 };
+
+/* Whether the last input was a mouse/touch press rather than a key, so dialogs opened by a click
+   don't light up a keyboard focus outline (see the confirm dialog). */
+let pointerInput = false;
+document.addEventListener('pointerdown', () => (pointerInput = true), true);
+document.addEventListener('keydown', () => (pointerInput = false), true);
+window.usedPointer = () => pointerInput;
 
 /* Page scroll is locked while any dialog is open (counted, so stacked dialogs unlock in order). */
 let openDialogs = 0;
