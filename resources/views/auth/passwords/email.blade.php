@@ -9,6 +9,6 @@
     </form>
 
     <p class="mt-6 text-center text-sm">
-        <a href="{{ route('login') }}" class="font-semibold text-primary-600 hover:text-primary-700">Back to login</a>
+        <a href="{{ route('login') }}" class="font-semibold text-primary-600 hover:text-primary-700">Back to sign in</a>
     </p>
 </x-layouts.guest>

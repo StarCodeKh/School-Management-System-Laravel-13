@@ -1,4 +1,4 @@
-<x-layouts.guest title="Login">
+<x-layouts.guest title="Sign in">
     <h1 class="text-xl font-bold text-slate-900">Welcome back</h1>
     <p class="mt-1 text-sm text-slate-500">
         Need an account? <a href="{{ route('register') }}" class="font-semibold text-primary-600 hover:text-primary-700">Sign up</a>
@@ -14,6 +14,6 @@
             <a href="{{ route('password.request') }}" class="text-sm font-semibold text-primary-600 hover:text-primary-700">Forgot password?</a>
         </div>
 
-        <x-button class="w-full">Login</x-button>
+        <x-button class="w-full">Sign in</x-button>
     </form>
 </x-layouts.guest>
