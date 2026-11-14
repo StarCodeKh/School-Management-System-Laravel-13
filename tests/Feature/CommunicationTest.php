@@ -41,6 +41,19 @@ class CommunicationTest extends TestCase
         $this->actingAs($teacher)->get('/notices/create')->assertForbidden();
     }
 
+    public function test_notice_publish_date_and_time_are_combined(): void
+    {
+        $this->actingAs($this->admin)->post('/notices', [
+            'title' => 'Sports day', 'body' => 'Details', 'audience' => 'everyone',
+            'published_on' => '2026-12-01', 'published_time' => '07:30',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('2026-12-01 07:30', Notice::where('title', 'Sports day')->first()->published_at->format('Y-m-d H:i'));
+
+        $this->actingAs($this->admin)->get('/notices/create')->assertOk()
+            ->assertSee('name="published_on"', false)->assertSee('name="published_time"', false);
+    }
+
     public function test_events_show_on_the_calendar_and_dashboard(): void
     {
         $this->actingAs($this->admin)->post('/events', [

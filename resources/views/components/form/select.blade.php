@@ -85,7 +85,7 @@
                   class="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
                 <x-icon name="x-mark" class="size-3.5" />
             </span>
-            <x-icon name="chevron-up-down" @class(['text-slate-400 transition', 'size-4' => ! $small, 'size-3.5' => $small]) />
+            <x-icon name="chevron-down" @class(['text-slate-400 transition', 'size-4' => ! $small, 'size-3.5' => $small]) ::class="open && 'rotate-180'" />
         </button>
 
         <template x-teleport="body">
