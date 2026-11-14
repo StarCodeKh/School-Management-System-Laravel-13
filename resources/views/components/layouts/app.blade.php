@@ -16,8 +16,8 @@
         {{-- mobile sidebar --}}
         <div x-cloak x-show="sidebarOpen" class="relative z-40 lg:hidden">
             <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/50" @click="sidebarOpen = false"></div>
-            <div x-show="sidebarOpen" x-transition:enter="transition duration-200" x-transition:enter-start="-translate-x-full"
-                 x-transition:leave="transition duration-200" x-transition:leave-end="-translate-x-full"
+            <div x-show="sidebarOpen" x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="-translate-x-full"
+                 x-transition:leave="transition duration-200 ease-in" x-transition:leave-end="-translate-x-full"
                  class="fixed inset-y-0 left-0 flex w-72 max-w-[calc(100%-4rem)] flex-col bg-white shadow-xl">
                 {{-- sits on the dimmed backdrop beside the panel, so it never covers the school name --}}
                 <button type="button" class="absolute top-3.5 left-full ml-3 grid size-9 place-items-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-white" @click="sidebarOpen = false">
@@ -37,7 +37,10 @@
             <x-topbar />
 
             <main class="px-4 py-6 sm:px-6 lg:px-8">
-                {{ $slot }}
+                {{-- capped and centred so tables and cards don't stretch across very wide monitors --}}
+                <div class="mx-auto max-w-[100rem]">
+                    {{ $slot }}
+                </div>
             </main>
         </div>
     </div>

@@ -29,6 +29,18 @@
     @apply block w-full rounded-lg border-slate-300 text-sm placeholder:text-slate-400 focus:border-primary-500 focus:ring-0;
 }
 
+/* "Reduce motion" turned on in the OS: dialogs, menus and the drawer appear without sliding or scaling.
+   Spinners, the loading bar and the toast countdown keep running; they show progress rather than decorate. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* hide Alpine elements until Alpine has initialised */
 [x-cloak] {
     display: none !important;
