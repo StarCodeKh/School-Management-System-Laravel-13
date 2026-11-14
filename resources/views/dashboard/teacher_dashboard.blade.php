@@ -6,8 +6,8 @@
     @endunless
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-stat-card label="Students" :value="number_format($stats['students'])" icon="academic-cap" />
-        <x-stat-card label="Classes" :value="number_format($stats['classes'])" icon="squares" color="sky" />
+        <x-stat-card label="Classes today" :value="$todayClasses->count()" icon="calendar" :href="route('timetable.index')" />
+        <x-stat-card label="Students" :value="number_format($stats['students'])" icon="academic-cap" color="sky" />
         <x-stat-card label="Subjects" :value="number_format($stats['subjects'])" icon="book" color="amber" />
         <x-stat-card label="Department colleagues" :value="number_format($stats['colleagues'])" icon="users" color="green" />
     </div>
@@ -34,33 +34,20 @@
     @endif
 
     <div class="mt-6 grid gap-6 xl:grid-cols-3">
-        <x-card title="My profile">
-            @if ($teacher)
-                <div class="flex items-center gap-3">
-                    <x-avatar :src="auth()->user()->avatar_url" :alt="$teacher->full_name" size="size-14" />
-                    <div>
-                        <p class="font-semibold text-slate-900">{{ $teacher->full_name }}</p>
-                        <p class="text-sm text-slate-500">{{ $teacher->qualification }}</p>
-                    </div>
-                </div>
-                <dl class="mt-5 space-y-3 text-sm">
-                    @foreach ([
-                        'Department' => $teacher->department?->department_name,
-                        'Head of department' => $teacher->department?->head?->name,
-                        'Experience' => $teacher->experience.' years',
-                        'Phone' => $teacher->phone_number,
-                        'City' => $teacher->city,
-                    ] as $label => $value)
-                        <div class="flex justify-between gap-4">
-                            <dt class="text-slate-500">{{ $label }}</dt>
-                            <dd class="text-right font-medium text-slate-900">{{ $value ?: '-' }}</dd>
-                        </div>
-                    @endforeach
-                </dl>
-            @else
-                <p class="text-sm text-slate-500">No teacher profile linked to this account.</p>
-            @endif
-        </x-card>
+        @if ($teacher)
+            <x-profile-summary :image="auth()->user()->avatar_url" :name="$teacher->full_name" :subtitle="$teacher->qualification"
+                               :details="[
+                                   'Department' => $teacher->department?->department_name,
+                                   'Head of department' => $teacher->department?->head?->name,
+                                   'Experience' => $teacher->experience.' years',
+                                   'Phone' => $teacher->phone_number,
+                                   'City' => $teacher->city,
+                               ]">
+                <x-slot:badges><x-badge color="indigo">Teacher</x-badge></x-slot:badges>
+            </x-profile-summary>
+        @else
+            <x-card title="My profile"><p class="text-sm text-slate-500">No teacher profile linked to this account.</p></x-card>
+        @endif
 
         <x-card title="Classes" :padding="false" class="xl:col-span-2">
             <x-table class="rounded-none border-0 shadow-none">
@@ -93,7 +80,7 @@
                                 <span class="text-slate-500">{{ $colleague->qualification }}</span>
                             </li>
                         @empty
-                            <li class="px-5 py-6 text-center text-sm text-slate-500">You are the only teacher in this department.</li>
+                            <li class="px-5 py-8 text-center text-sm text-slate-500">You are the only teacher in this department.</li>
                         @endforelse
                     </ul>
                 </x-card>

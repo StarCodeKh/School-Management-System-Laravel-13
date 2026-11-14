@@ -1,6 +1,16 @@
 <x-layouts.app title="Parent Dashboard">
     <x-page-header :title="'Welcome, '.auth()->user()->name.'!'" :breadcrumbs="['Home' => route('home'), 'Parent Dashboard' => null]" />
 
+    @if ($children->isNotEmpty())
+        <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <x-stat-card label="Children" :value="$stats['children']" icon="users" />
+            <x-stat-card label="Attendance" :value="$stats['attendance'] !== null ? $stats['attendance'].'%' : 'Not recorded'" icon="check-circle"
+                         :color="$stats['attendance'] === null ? 'amber' : ($stats['attendance'] >= 90 ? 'green' : ($stats['attendance'] >= 75 ? 'amber' : 'red'))" />
+            <x-stat-card label="Fee balance" :value="money($stats['balance'])" icon="banknotes" :color="$stats['balance'] > 0 ? 'red' : 'green'" />
+            <x-stat-card label="Upcoming events" :value="$stats['events']" icon="calendar" color="sky" :href="route('events.index')" />
+        </div>
+    @endif
+
     @forelse ($children as $child)
         @php($student = $child['student'])
         <section class="mb-8">

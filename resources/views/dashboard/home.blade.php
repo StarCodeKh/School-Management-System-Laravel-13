@@ -4,7 +4,8 @@
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <x-stat-card label="Students" :value="number_format($stats['students'])" icon="academic-cap" :href="route('student/list')" />
         <x-stat-card label="Teachers" :value="number_format($stats['teachers'])" icon="users" color="sky" :href="route('teacher/list/page')" />
-        <x-stat-card label="Departments" :value="number_format($stats['departments'])" icon="building" color="amber" :href="route('department/list/page')" />
+        <x-stat-card label="Attendance today" :value="$stats['attendance'] !== null ? $stats['attendance'].'%' : 'Not taken'" icon="check-circle"
+                     :color="$stats['attendance'] === null ? 'amber' : ($stats['attendance'] >= 90 ? 'green' : ($stats['attendance'] >= 75 ? 'amber' : 'red'))" :href="route('attendance.index')" />
         <x-stat-card label="Fees collected" :value="money($stats['revenue'])" icon="banknotes" color="green" :href="route('account/fees/collections/page')" />
     </div>
 
@@ -25,7 +26,7 @@
                         <span class="hidden text-xs text-slate-400 sm:block">{{ $student->created_at->format('d M Y') }}</span>
                     </li>
                 @empty
-                    <li class="px-5 py-10 text-center text-sm text-slate-500">No students yet.</li>
+                    <li class="px-5 py-8 text-center text-sm text-slate-500">No students yet.</li>
                 @endforelse
             </ul>
         </x-card>
@@ -65,18 +66,31 @@
                         <span class="font-semibold text-emerald-600">{{ money($payment->amount) }}</span>
                     </li>
                 @empty
-                    <li class="px-5 py-10 text-center text-sm text-slate-500">No payments recorded yet.</li>
+                    <li class="px-5 py-8 text-center text-sm text-slate-500">No payments recorded yet.</li>
                 @endforelse
             </ul>
         </x-card>
 
-        <x-card title="Invoices">
-            <p class="text-sm text-slate-500">Unpaid invoices</p>
-            <p class="mt-1 text-3xl font-bold text-slate-900">{{ $unpaidInvoices }}</p>
-            <div class="mt-4 flex gap-2">
-                <x-button size="sm" :href="route('invoice/list/page')">Open invoices</x-button>
-                <x-button size="sm" variant="secondary" :href="route('invoice/add/page')" icon="plus">New</x-button>
+        <x-card title="Quick actions">
+            <div class="grid grid-cols-2 gap-2">
+                @foreach ([
+                    ['Add student', 'academic-cap', route('student/add/page')],
+                    ['Add teacher', 'users', route('teacher/add/page')],
+                    ['Take attendance', 'check-circle', route('attendance.index')],
+                    ['New invoice', 'document', route('invoice/add/page')],
+                    ['Post notice', 'megaphone', route('notices.create')],
+                    ['Timetable', 'calendar', route('timetable.index')],
+                ] as [$label, $icon, $href])
+                    <a href="{{ $href }}" class="flex flex-col items-center gap-2 rounded-lg border border-slate-200 px-2 py-3 text-center text-xs font-medium text-slate-700 transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700">
+                        <x-icon :name="$icon" class="size-5 text-primary-600" />
+                        {{ $label }}
+                    </a>
+                @endforeach
             </div>
+            <a href="{{ route('invoice/list/page') }}" class="mt-4 flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-800 hover:bg-amber-100">
+                <span>Unpaid invoices</span>
+                <span class="font-semibold tabular-nums">{{ $unpaidInvoices }}</span>
+            </a>
         </x-card>
     </div>
     <div class="mt-6"><x-noticeboard /></div>

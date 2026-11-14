@@ -69,7 +69,7 @@
                     @endif
                 </li>
             @empty
-                <li class="px-5 py-6 text-center text-sm text-slate-500">No books on loan.</li>
+                <li class="px-5 py-8 text-center text-sm text-slate-500">No books on loan.</li>
             @endforelse
         </ul>
     </x-card>

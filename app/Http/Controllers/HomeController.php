@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\InvoiceStatus;
 use App\Enums\Role;
 use App\Enums\Weekday;
-use App\Models\Department;
+use App\Models\Attendance;
+use App\Models\Event;
 use App\Models\FeeCollection;
 use App\Models\Invoice;
 use App\Models\SchoolClass;
@@ -33,7 +34,7 @@ class HomeController extends Controller
         $stats = [
             'students' => Student::count(),
             'teachers' => Teacher::count(),
-            'departments' => Department::count(),
+            'attendance' => self::rate(Attendance::whereDate('date', today())->pluck('status')),
             'revenue' => FeeCollection::sum('amount'),
         ];
 
@@ -93,7 +94,21 @@ class HomeController extends Controller
         $children = $request->user()->children()->with(['schoolClass', 'section'])->orderBy('first_name')->get()
             ->map(fn (Student $student) => ['student' => $student] + StudentController::overview($student));
 
-        return view('dashboard.parent_dashboard', compact('children'));
+        $rates = $children->pluck('attendanceRate')->filter(fn ($rate) => $rate !== null);
+        $stats = [
+            'children' => $children->count(),
+            'attendance' => $rates->isEmpty() ? null : round($rates->avg(), 1),
+            'balance' => $children->sum(fn (array $child) => $child['fees']['balance']),
+            'events' => Event::visibleTo($request->user())->upcoming()->count(),
+        ];
+
+        return view('dashboard.parent_dashboard', compact('children', 'stats'));
+    }
+
+    /** share of present/late among attendance statuses, as a whole percent; null when nothing is recorded */
+    private static function rate($statuses): ?float
+    {
+        return $statuses->isEmpty() ? null : round($statuses->filter(fn ($status) => $status->isAttending())->count() / $statuses->count() * 100);
     }
 
     /** overview data shared with the student profile, plus today's timetable */

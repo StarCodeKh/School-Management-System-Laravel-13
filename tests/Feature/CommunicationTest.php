@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
+use App\Models\Attendance;
 use App\Models\Event;
 use App\Models\Exam;
 use App\Models\Notice;
@@ -87,6 +88,21 @@ class CommunicationTest extends TestCase
 
         $this->actingAs($this->admin)->delete("/students/{$child->id}/guardians/{$parent->id}");
         $this->assertFalse($parent->fresh()->canViewStudent($child));
+    }
+
+    public function test_dashboards_show_attendance_summaries(): void
+    {
+        [$first, $second] = Student::factory()->count(2)->create();
+        Attendance::create(['student_id' => $first->id, 'date' => today(), 'status' => 'present']);
+        Attendance::create(['student_id' => $second->id, 'date' => today(), 'status' => 'absent']);
+
+        $this->actingAs($this->admin)->get('/home')->assertOk()
+            ->assertSeeInOrder(['Attendance today', '50%'])->assertSee('Quick actions');
+
+        $parent = User::factory()->create(['role' => Role::Parent]);
+        $parent->children()->attach($first->id, ['relationship' => 'father']);
+        $this->actingAs($parent)->get('/parent/dashboard')->assertOk()
+            ->assertSeeInOrder(['Children', '1', 'Attendance', '100%', 'Fee balance', 'Upcoming events']);
     }
 
     public function test_parent_dashboard_is_only_for_parents(): void
