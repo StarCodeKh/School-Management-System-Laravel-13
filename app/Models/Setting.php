@@ -20,6 +20,7 @@ class Setting extends Model
         'school_phone' => null,
         'school_address' => null,
         'currency_symbol' => '$',
+        'allow_registration' => '0', // public sign-up page off unless an admin turns it on
         // invoice
         'invoice_due_days' => '14',
         'invoice_terms' => null,

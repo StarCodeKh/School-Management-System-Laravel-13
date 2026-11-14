@@ -15,6 +15,8 @@ class RegisterController extends Controller
 {
     public function register()
     {
+        $this->ensureOpen();
+
         $roles = Role::registrable();
 
         return view('auth.register', compact('roles'));
@@ -22,6 +24,8 @@ class RegisterController extends Controller
 
     public function storeUser(Request $request)
     {
+        $this->ensureOpen();
+
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -45,5 +49,11 @@ class RegisterController extends Controller
 
             return back()->with('error', "Couldn't create your account. Please try again.");
         }
+    }
+
+    /** Sign-up is only available when an admin has turned it on in Settings > General. */
+    private function ensureOpen(): void
+    {
+        abort_unless(setting('allow_registration'), 404);
     }
 }

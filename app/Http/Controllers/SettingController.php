@@ -16,6 +16,7 @@ class SettingController extends Controller
             'school_phone' => 'nullable|string|max:50',
             'school_address' => 'nullable|string|max:500',
             'currency_symbol' => 'required|string|max:5',
+            'allow_registration' => 'sometimes|boolean',
         ],
         'invoice' => [
             'invoice_due_days' => 'required|integer|min:0|max:365',

@@ -65,7 +65,7 @@
             <form method="POST" action="{{ route('guardians.store', $student) }}" class="grid gap-4 border-t border-slate-200 p-5 sm:grid-cols-[1fr_12rem_auto] sm:items-start">
                 @csrf
                 <x-form.select name="user_id" label="Parent account" :options="$parentAccounts" placeholder="Select a Parent account"
-                               :hint="$parentAccounts->isEmpty() ? 'No other Parent accounts. Parents can sign up on the register page as Parent.' : null" />
+                               :hint="$parentAccounts->isEmpty() ? (setting('allow_registration') ? 'No other Parent accounts. Parents can sign up on the register page as Parent.' : 'No other Parent accounts. Create one under Users.') : null" />
                 <x-form.select name="relationship" label="Relationship" :options="\App\Enums\GuardianRelationship::options()" :placeholder="false" />
                 <x-button icon="plus" class="sm:mt-7">Link</x-button>
             </form>

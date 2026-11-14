@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\Role;
 use App\Enums\UserStatus;
+use App\Models\Setting;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -71,8 +72,39 @@ class AccessTest extends TestCase
         $this->assertTrue(Hash::check('password', $user->fresh()->password));
     }
 
+    public function test_sign_up_is_closed_by_default(): void
+    {
+        $this->get('/login')->assertOk()->assertDontSee('Sign up');
+        $this->get('/register')->assertNotFound();
+        $this->post('/register', [
+            'name' => 'Visitor',
+            'email' => 'visitor@example.com',
+            'role' => Role::registrable()[0]->value,
+            'password' => 'Password@123',
+            'password_confirmation' => 'Password@123',
+        ])->assertNotFound();
+
+        $this->assertDatabaseMissing('users', ['email' => 'visitor@example.com']);
+    }
+
+    public function test_admin_can_open_sign_up_from_settings(): void
+    {
+        $admin = User::factory()->create(['role' => Role::SuperAdmin]);
+        $this->actingAs($admin)->post('/setting/general', [
+            'school_name' => 'Test School',
+            'currency_symbol' => '$',
+            'allow_registration' => '1',
+        ])->assertSessionHasNoErrors();
+        auth()->logout();
+
+        $this->get('/login')->assertSee('Sign up');
+        $this->get('/register')->assertOk();
+    }
+
     public function test_visitor_cannot_register_as_admin(): void
     {
+        Setting::store(['allow_registration' => '1']);
+
         $this->post('/register', [
             'name' => 'Intruder',
             'email' => 'intruder@example.com',

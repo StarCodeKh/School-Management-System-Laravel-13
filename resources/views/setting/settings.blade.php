@@ -24,6 +24,11 @@
                         <x-form.input name="school_phone" label="Phone" :value="$settings['school_phone']" />
                         <x-form.textarea name="school_address" label="Address" :value="$settings['school_address']" wrapper="sm:col-span-2" />
                         <x-form.input name="currency_symbol" label="Currency symbol" :value="$settings['currency_symbol']" maxlength="5" required hint="Used for every amount, e.g. $ or ៛." />
+                        <div class="sm:col-span-2">
+                            <input type="hidden" name="allow_registration" value="0">
+                            <x-form.checkbox name="allow_registration" :switch="true" :checked="(bool) $settings['allow_registration']"
+                                             hint="Shows a Sign up link on the login page so parents, students and teachers can create their own account. Off: only admins create accounts.">Allow sign up</x-form.checkbox>
+                        </div>
                         @break
                     @case('invoice')
                         <x-form.input name="invoice_due_days" type="number" min="0" max="365" label="Default due in (days)" :value="$settings['invoice_due_days']" required hint="Pre-fills the due date on new invoices." />
