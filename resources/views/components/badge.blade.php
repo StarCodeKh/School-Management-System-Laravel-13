@@ -7,6 +7,7 @@
         'red' => 'bg-red-50 text-red-700 ring-red-600/20',
         'amber' => 'bg-amber-50 text-amber-800 ring-amber-600/20',
         'blue' => 'bg-sky-50 text-sky-700 ring-sky-600/20',
+        'sky' => 'bg-sky-50 text-sky-700 ring-sky-600/20', // same as blue, matching <x-stat-card color="sky">
         'indigo' => 'bg-primary-50 text-primary-700 ring-primary-600/20',
     ];
 @endphp

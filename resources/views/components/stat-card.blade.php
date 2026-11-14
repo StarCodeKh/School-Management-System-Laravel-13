@@ -6,6 +6,8 @@
         'green' => 'bg-emerald-50 text-emerald-600',
         'amber' => 'bg-amber-50 text-amber-600',
         'sky' => 'bg-sky-50 text-sky-600',
+        'blue' => 'bg-sky-50 text-sky-600', // same as sky, matching <x-badge color="blue">
+        'slate' => 'bg-slate-100 text-slate-600',
         'red' => 'bg-red-50 text-red-600',
     ];
 @endphp
