@@ -52,7 +52,7 @@
                                     <label class="cursor-pointer">
                                         <input type="radio" class="peer sr-only" name="attendance[{{ $student->id }}][status]" value="{{ $status->value }}" @checked($current === $status->value)>
                                         <span @class([
-                                            'inline-block rounded-md border px-2.5 py-1 text-xs font-medium text-slate-500 border-slate-200 peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500',
+                                            'inline-block rounded-md border px-2.5 py-1 text-xs font-medium text-slate-500 border-slate-200 peer-focus-visible:outline-2 peer-focus-visible:outline-primary-500',
                                             'peer-checked:border-emerald-300 peer-checked:bg-emerald-50 peer-checked:text-emerald-700' => $status->value === 'present',
                                             'peer-checked:border-red-300 peer-checked:bg-red-50 peer-checked:text-red-700' => $status->value === 'absent',
                                             'peer-checked:border-amber-300 peer-checked:bg-amber-50 peer-checked:text-amber-800' => $status->value === 'late',

@@ -24,7 +24,7 @@
         </span>
     @else
         <input type="checkbox" name="{{ $name }}" id="{{ $id }}" value="{{ $value }}" @checked($isChecked)
-               {{ $attributes->except('id')->class('mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-300 text-primary-600 transition focus:ring-primary-500') }}>
+               {{ $attributes->except('id')->class('mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-300 text-primary-600 transition focus:ring-0 focus:ring-offset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500') }}>
     @endif
     <span>
         <span class="font-medium">{{ $slot }}</span>

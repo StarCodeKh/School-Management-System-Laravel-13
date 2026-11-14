@@ -63,7 +63,7 @@
                     </ul>
                 </div>
 
-                <button type="button" class="shrink-0 self-start rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                <button type="button" class="shrink-0 self-start rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-2 focus-visible:outline-primary-500"
                         @click="$store.toasts.dismiss(toast.id)">
                     <span class="sr-only">Dismiss</span>
                     <x-icon name="x-mark" class="size-3.5" />

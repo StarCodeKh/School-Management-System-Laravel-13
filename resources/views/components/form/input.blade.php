@@ -47,10 +47,10 @@
                     aria-haspopup="dialog" :aria-expanded="open.toString()"
                     @class([
                         'relative flex w-full items-center gap-2 rounded-lg border bg-white py-2 pr-2 pl-3 text-left text-sm shadow-sm transition focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500',
-                        'border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100' => ! $hasError,
-                        'border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-100' => $hasError,
+                        'border-slate-300 focus:border-primary-500 focus:ring-0' => ! $hasError,
+                        'border-red-400 focus:border-red-500 focus:ring-0' => $hasError,
                     ])
-                    :class="open && '{{ $hasError ? 'border-red-500 ring-4 ring-red-100' : 'border-primary-500 ring-4 ring-primary-100' }}'">
+                    :class="open && '{{ $hasError ? 'border-red-500' : 'border-primary-500' }}'">
                 @if ($icon)
                     <x-icon :name="$icon" @class(['size-4', 'text-slate-400' => ! $hasError, 'text-red-400' => $hasError]) />
                 @endif
@@ -144,8 +144,8 @@
                        'block w-full rounded-lg text-sm shadow-sm placeholder:text-slate-400',
                        'pl-9' => $icon,
                        'pr-10' => $isPassword,
-                       'border-slate-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100' => ! $hasError,
-                       'border-red-400 text-red-900 focus:border-red-500 focus:ring-4 focus:ring-red-100' => $hasError,
+                       'border-slate-300 focus:border-primary-500 focus:ring-0' => ! $hasError,
+                       'border-red-400 text-red-900 focus:border-red-500 focus:ring-0' => $hasError,
                        'file:mr-3 file:rounded-md file:border-0 file:bg-primary-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100 border p-1.5' => $type === 'file',
                        'bg-slate-50 text-slate-500' => $attributes->has('readonly'),
                    ]) }}>
