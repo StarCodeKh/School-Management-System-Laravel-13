@@ -5,7 +5,7 @@
         <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <x-stat-card label="Children" :value="$stats['children']" icon="users" />
             <x-stat-card label="Attendance" :value="$stats['attendance'] !== null ? $stats['attendance'].'%' : 'Not recorded'" icon="check-circle"
-                         :color="$stats['attendance'] === null ? 'amber' : ($stats['attendance'] >= 90 ? 'green' : ($stats['attendance'] >= 75 ? 'amber' : 'red'))" />
+                         :color="attendance_color($stats['attendance'])" />
             <x-stat-card label="Fee balance" :value="money($stats['balance'])" icon="banknotes" :color="$stats['balance'] > 0 ? 'red' : 'green'" />
             <x-stat-card label="Upcoming events" :value="$stats['events']" icon="calendar" color="sky" :href="route('events.index')" />
         </div>

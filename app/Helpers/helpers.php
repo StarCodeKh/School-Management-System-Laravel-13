@@ -17,3 +17,16 @@ if (! function_exists('money')) {
         return setting('currency_symbol', '$').number_format((float) $amount, 2);
     }
 }
+
+if (! function_exists('attendance_color')) {
+    /** Badge colour for an attendance rate, using the cut-offs in Settings > Attendance; amber when nothing is recorded. */
+    function attendance_color(int|float|null $rate): string
+    {
+        return match (true) {
+            $rate === null => 'amber',
+            $rate >= (float) setting('attendance_good', 90) => 'green',
+            $rate >= (float) setting('attendance_warning', 75) => 'amber',
+            default => 'red',
+        };
+    }
+}

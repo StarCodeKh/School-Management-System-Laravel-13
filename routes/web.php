@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
         Route::get('invoice/settings/page', 'invoice')->name('invoice/settings/page');
         Route::get('invoice/settings/tax/page', 'tax')->name('invoice/settings/tax/page');
         Route::get('invoice/settings/bank/page', 'bank')->name('invoice/settings/bank/page');
+        Route::get('setting/attendance', 'attendance')->name('setting/attendance');
         Route::get('setting/library', 'library')->name('setting/library');
         Route::post('setting/{group}', 'update')->name('setting/update');
     });

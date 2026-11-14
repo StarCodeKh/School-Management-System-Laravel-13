@@ -24,7 +24,7 @@
         @if ($attendanceRate === null)
             <p class="text-sm text-slate-500">No attendance recorded yet.</p>
         @else
-            <p class="text-3xl font-bold {{ $attendanceRate >= 90 ? 'text-emerald-600' : ($attendanceRate >= 75 ? 'text-amber-600' : 'text-red-600') }}">{{ $attendanceRate }}%</p>
+            <p class="text-3xl font-bold {{ ['green' => 'text-emerald-600', 'amber' => 'text-amber-600', 'red' => 'text-red-600'][attendance_color($attendanceRate)] }}">{{ $attendanceRate }}%</p>
             <p class="text-sm text-slate-500">attendance rate</p>
             <ul class="mt-4 flex flex-wrap gap-1.5">
                 @foreach ($recentAttendance as $record)

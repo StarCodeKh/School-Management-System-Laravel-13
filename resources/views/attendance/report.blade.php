@@ -36,7 +36,7 @@
                         @if ($rate === null)
                             <span class="text-slate-400">-</span>
                         @else
-                            <x-badge :color="$rate >= 90 ? 'green' : ($rate >= 75 ? 'amber' : 'red')">{{ $rate }}%</x-badge>
+                            <x-badge :color="attendance_color($rate)">{{ $rate }}%</x-badge>
                         @endif
                     </td>
                 </tr>

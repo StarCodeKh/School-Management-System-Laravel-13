@@ -28,6 +28,22 @@ class RedesignTest extends TestCase
         $this->admin = User::factory()->create(['role' => Role::SuperAdmin]);
     }
 
+    public function test_attendance_cut_offs_come_from_settings(): void
+    {
+        $this->assertSame('amber', attendance_color(80));
+
+        $this->actingAs($this->admin)->get('/setting/attendance')->assertOk()->assertSee('Good from (%)');
+        $this->actingAs($this->admin)->post('/setting/attendance', ['attendance_good' => 70, 'attendance_warning' => 80])
+            ->assertSessionHasErrors('attendance_warning');
+        $this->actingAs($this->admin)->post('/setting/attendance', ['attendance_good' => 80, 'attendance_warning' => 60])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('green', attendance_color(80));
+        $this->assertSame('amber', attendance_color(60));
+        $this->assertSame('red', attendance_color(59.9));
+        $this->assertSame('amber', attendance_color(null));
+    }
+
     public function test_settings_are_saved_and_used_across_the_app(): void
     {
         $this->actingAs($this->admin)->post('/setting/general', [

@@ -5,7 +5,7 @@
         <x-stat-card label="Students" :value="number_format($stats['students'])" icon="academic-cap" :href="route('student/list')" />
         <x-stat-card label="Teachers" :value="number_format($stats['teachers'])" icon="users" color="sky" :href="route('teacher/list/page')" />
         <x-stat-card label="Attendance today" :value="$stats['attendance'] !== null ? $stats['attendance'].'%' : 'Not taken'" icon="check-circle"
-                     :color="$stats['attendance'] === null ? 'amber' : ($stats['attendance'] >= 90 ? 'green' : ($stats['attendance'] >= 75 ? 'amber' : 'red'))" :href="route('attendance.index')" />
+                     :color="attendance_color($stats['attendance'])" :href="route('attendance.index')" />
         <x-stat-card label="Fees collected" :value="money($stats['revenue'])" icon="banknotes" color="green" :href="route('account/fees/collections/page')" />
     </div>
 
@@ -74,13 +74,14 @@
         <x-card title="Quick actions">
             <div class="grid grid-cols-2 gap-2">
                 @foreach ([
-                    ['Add student', 'academic-cap', route('student/add/page')],
-                    ['Add teacher', 'users', route('teacher/add/page')],
-                    ['Take attendance', 'check-circle', route('attendance.index')],
-                    ['New invoice', 'document', route('invoice/add/page')],
-                    ['Post notice', 'megaphone', route('notices.create')],
-                    ['Timetable', 'calendar', route('timetable.index')],
-                ] as [$label, $icon, $href])
+                    ['Add student', 'academic-cap', route('student/add/page'), 'manage-school'],
+                    ['Add teacher', 'users', route('teacher/add/page'), 'manage-school'],
+                    ['Take attendance', 'check-circle', route('attendance.index'), 'teach'],
+                    ['New invoice', 'document', route('invoice/add/page'), 'manage-finance'],
+                    ['Post notice', 'megaphone', route('notices.create'), 'manage-communication'],
+                    ['Timetable', 'calendar', route('timetable.index'), 'teach'],
+                ] as [$label, $icon, $href, $ability])
+                    @continue(auth()->user()->cannot($ability))
                     <a href="{{ $href }}" class="flex flex-col items-center gap-2 rounded-lg border border-slate-200 px-2 py-3 text-center text-xs font-medium text-slate-700 transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700">
                         <x-icon :name="$icon" class="size-5 text-primary-600" />
                         {{ $label }}

@@ -4,6 +4,7 @@
         'invoice' => ['label' => 'Invoice', 'icon' => 'document', 'route' => 'invoice/settings/page'],
         'tax' => ['label' => 'Tax', 'icon' => 'currency', 'route' => 'invoice/settings/tax/page'],
         'bank' => ['label' => 'Bank', 'icon' => 'banknotes', 'route' => 'invoice/settings/bank/page'],
+        'attendance' => ['label' => 'Attendance', 'icon' => 'check-circle', 'route' => 'setting/attendance'],
         'library' => ['label' => 'Library', 'icon' => 'library', 'route' => 'setting/library'],
     ];
 @endphp
@@ -45,6 +46,11 @@
                         <x-form.input name="bank_name" label="Bank name" :value="$settings['bank_name']" />
                         <x-form.input name="bank_ifsc_code" label="IFSC / SWIFT code" :value="$settings['bank_ifsc_code']" />
                         <x-form.input name="bank_account_number" label="Account number" :value="$settings['bank_account_number']" />
+                        @break
+                    @case('attendance')
+                        <p class="text-sm text-slate-500 sm:col-span-2">Attendance rates are coloured on dashboards, profiles and the attendance report: green at or above Good, amber at or above Warning, red below.</p>
+                        <x-form.input name="attendance_good" type="number" min="1" max="100" label="Good from (%)" :value="$settings['attendance_good']" required />
+                        <x-form.input name="attendance_warning" type="number" min="0" max="99" label="Warning from (%)" :value="$settings['attendance_warning']" required hint="Must be lower than Good." />
                         @break
                     @case('library')
                         <x-form.input name="library_loan_days" type="number" min="1" max="365" label="Loan period (days)" :value="$settings['library_loan_days']" required hint="Default due date for new loans." />

@@ -33,6 +33,9 @@ class Setting extends Model
         'bank_name' => null,
         'bank_ifsc_code' => null,
         'bank_account_number' => null,
+        // attendance: rates at or above 'good' show green, at or above 'warning' amber, below that red
+        'attendance_good' => '90',
+        'attendance_warning' => '75',
         // library
         'library_loan_days' => '14',
         'library_fine_per_day' => '0',

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
-/** School-wide settings, grouped into tabs: general, invoice, tax and bank. */
+/** School-wide settings, grouped into tabs: general, invoice, tax, bank, attendance and library. */
 class SettingController extends Controller
 {
     /** validation rules per settings tab; the keys are also the saved setting keys */
@@ -26,6 +26,10 @@ class SettingController extends Controller
         'tax' => [
             'tax_name' => 'required|string|max:50',
             'tax_rate' => 'required|numeric|min:0|max:100',
+        ],
+        'attendance' => [
+            'attendance_good' => 'required|integer|min:1|max:100',
+            'attendance_warning' => 'required|integer|min:0|lt:attendance_good',
         ],
         'library' => [
             'library_loan_days' => 'required|integer|min:1|max:365',
@@ -58,6 +62,11 @@ class SettingController extends Controller
     public function bank()
     {
         return $this->show('bank');
+    }
+
+    public function attendance()
+    {
+        return $this->show('attendance');
     }
 
     public function library()
