@@ -7,7 +7,7 @@
 
     <x-table live>
         <x-slot:head>
-            <tr><x-th sort="admission_id">Admission ID</x-th><x-th sort="student">Student</x-th><x-th sort="fee_type">Fee type</x-th><x-th sort="amount">Amount</x-th><x-th sort="paid_date">Paid date</x-th><th class="text-right">Status</th></tr>
+            <tr><x-th sort="admission_id">Admission ID</x-th><x-th sort="student">Student</x-th><x-th sort="fee_type">Fee type</x-th><x-th sort="amount" align="right">Amount</x-th><x-th sort="paid_date">Paid date</x-th><th class="text-right">Status</th></tr>
         </x-slot:head>
         @forelse ($feeCollections as $payment)
             <tr class="hover:bg-slate-50">
@@ -19,7 +19,7 @@
                     </a>
                 </td>
                 <td>{{ $payment->feeType?->name }}</td>
-                <td class="font-semibold text-slate-900">{{ money($payment->amount) }}</td>
+                <td class="text-right font-semibold text-slate-900 tabular-nums">{{ money($payment->amount) }}</td>
                 <td>{{ $payment->paid_date->format('d M Y') }}</td>
                 <td class="text-right"><x-badge color="green">Paid</x-badge></td>
             </tr>

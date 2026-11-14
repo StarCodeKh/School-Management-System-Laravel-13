@@ -12,7 +12,7 @@
             <thead class="sticky top-0 z-10 bg-slate-50 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase shadow-[inset_0_-1px_0] shadow-slate-200 [&_th]:px-4 [&_th]:py-3 [&_th]:whitespace-nowrap">
                 {{ $head }}
             </thead>
-            <tbody class="divide-y divide-slate-100 [&_td]:px-4 [&_td]:py-3 [&_td]:whitespace-nowrap [&>tr]:transition-colors [&>tr:hover]:bg-slate-50/80">
+            <tbody class="divide-y divide-slate-100 tabular-nums [&_td]:px-4 [&_td]:py-3 [&_td]:whitespace-nowrap [&>tr]:transition-colors [&>tr:hover]:bg-slate-50/80">
                 {{ $slot }}
             </tbody>
         </table>

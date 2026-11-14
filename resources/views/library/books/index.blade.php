@@ -6,7 +6,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <x-search-bar :value="$search" placeholder="Search title, author, ISBN or category..." />
+    <x-search-bar :value="$search" placeholder="Search title, author or ISBN..." />
 
     <x-table live>
         <x-slot:head>

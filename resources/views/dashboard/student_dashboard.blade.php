@@ -83,13 +83,13 @@
     <x-card title="My invoices" :padding="false" class="mt-6">
         <x-table class="rounded-none border-0 shadow-none">
             <x-slot:head>
-                <tr><th>Invoice</th><th>Due date</th><th>Amount</th><th>Status</th></tr>
+                <tr><th>Invoice</th><th>Due date</th><th class="text-right">Amount</th><th>Status</th></tr>
             </x-slot:head>
             @forelse ($invoices as $invoice)
                 <tr>
                     <td class="font-medium text-slate-900">{{ $invoice->invoice_number }}</td>
                     <td>{{ $invoice->due_date->format('d M Y') }}</td>
-                    <td>{{ money($invoice->total_amount) }}</td>
+                    <td class="text-right tabular-nums">{{ money($invoice->total_amount) }}</td>
                     <td><x-invoice-status :invoice="$invoice" /></td>
                 </tr>
             @empty

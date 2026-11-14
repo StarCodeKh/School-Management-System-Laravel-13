@@ -54,7 +54,7 @@
 
     <x-table live>
         <x-slot:head>
-            <tr><x-th sort="invoice">Invoice</x-th><th>Category</th><x-th sort="created">Created</x-th><x-th sort="customer">Customer</x-th><x-th sort="amount">Amount</x-th><x-th sort="due_date">Due date</x-th><x-th sort="status">Status</x-th><th class="text-right">Actions</th></tr>
+            <tr><x-th sort="invoice">Invoice</x-th><th>Category</th><x-th sort="created">Created</x-th><x-th sort="customer">Customer</x-th><x-th sort="amount" align="right">Amount</x-th><x-th sort="due_date">Due date</x-th><x-th sort="status">Status</x-th><th class="text-right">Actions</th></tr>
         </x-slot:head>
         @forelse ($invoiceList as $invoice)
             <tr class="hover:bg-slate-50">
@@ -67,7 +67,7 @@
                         <span class="font-medium text-slate-900">{{ $invoice->customer_name }}</span>
                     </div>
                 </td>
-                <td class="font-semibold text-slate-900">{{ money($invoice->total_amount) }}</td>
+                <td class="text-right font-semibold text-slate-900 tabular-nums">{{ money($invoice->total_amount) }}</td>
                 <td>{{ $invoice->due_date->format('d M Y') }}</td>
                 <td><x-invoice-status :invoice="$invoice" /></td>
                 <td class="text-right">@include('invoices._actions')</td>

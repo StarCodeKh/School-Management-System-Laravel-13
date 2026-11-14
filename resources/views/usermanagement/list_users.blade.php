@@ -5,7 +5,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <x-search-bar :value="$search" placeholder="Search name, email, ID or phone..." />
+    <x-search-bar :value="$search" placeholder="Search name, email or phone..." />
 
     <x-table live>
         <x-slot:head>
