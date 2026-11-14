@@ -10,12 +10,14 @@
     </x-page-header>
 
     <div class="grid gap-6 lg:grid-cols-3">
-        <x-card class="text-center">
-            <x-avatar :src="$student->photo_url" :alt="$student->full_name" size="size-28" class="mx-auto" />
-            <h2 class="mt-4 text-lg font-bold text-slate-900">{{ $student->full_name }}</h2>
-            <p class="text-sm text-slate-500">{{ $student->admission_id }}</p>
-            <x-badge color="indigo" class="mt-3">Class {{ $student->schoolClass?->name }} - {{ $student->section?->name }}</x-badge>
-        </x-card>
+        <x-profile-summary :image="$student->photo_url" :name="$student->full_name" :subtitle="'Admission ID '.$student->admission_id">
+            <x-slot:badges>
+                <x-badge color="indigo">Class {{ $student->schoolClass?->name }} - {{ $student->section?->name }}</x-badge>
+                @if ($student->gender)
+                    <x-badge>{{ $student->gender->label() }}</x-badge>
+                @endif
+            </x-slot:badges>
+        </x-profile-summary>
 
         <x-card title="Personal details" class="lg:col-span-2">
             <dl class="grid gap-x-6 gap-y-5 sm:grid-cols-2">

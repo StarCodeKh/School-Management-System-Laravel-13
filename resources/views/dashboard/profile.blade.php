@@ -8,7 +8,7 @@
             <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
                 <x-avatar :src="$user->avatar_url" :alt="$user->name" size="size-20" />
                 <div class="flex-1">
-                    <h2 class="text-xl font-bold text-slate-900">{{ $user->name }}</h2>
+                    <h2 class="text-lg font-semibold text-slate-900">{{ $user->name }}</h2>
                     <p class="text-sm text-slate-500">{{ $user->position ?: $user->role?->label() }}</p>
                     <div class="mt-2 flex flex-wrap gap-2">
                         <x-badge color="indigo">{{ $user->role?->label() }}</x-badge>

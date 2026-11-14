@@ -84,7 +84,7 @@
     {{-- today --}}
     <div class="hidden items-center gap-2 text-sm text-slate-500 xl:flex">
         <x-icon name="calendar" class="size-4 text-slate-400" />
-        <span>{{ now()->format('l, j F Y') }}</span>
+        <span>{{ now()->format('l, d M Y') }}</span>
     </div>
 
     {{-- notices bell --}}

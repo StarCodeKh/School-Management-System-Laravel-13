@@ -7,7 +7,7 @@
             <div class="mb-4 flex items-center gap-3">
                 <x-avatar :src="$student->photo_url" :alt="$student->full_name" size="size-12" />
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">{{ $student->full_name }}</h2>
+                    <h2 class="text-lg font-semibold text-slate-900">{{ $student->full_name }}</h2>
                     <p class="text-sm text-slate-500">Class {{ $student->schoolClass?->name }} - {{ $student->section?->name }} &middot; {{ $student->admission_id }}</p>
                 </div>
             </div>
