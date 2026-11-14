@@ -13,7 +13,7 @@
 <x-form.field :name="$name" :label="$label" :required="$required" :hint="$hint" :class="$wrapper">
     <div role="radiogroup" @class(['grid gap-2', 'sm:grid-cols-2' => (int) $cols >= 2, 'lg:grid-cols-3' => (int) $cols === 3])>
         @foreach ($options as $optionValue => $option)
-            <label class="relative flex cursor-pointer gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 has-checked:border-primary-500 has-checked:bg-primary-50/50 has-checked:ring-1 has-checked:ring-primary-500 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary-500">
+            <label class="relative flex cursor-pointer gap-3 rounded-xl border border-slate-200 bg-white p-3 transition hover:border-slate-300 has-checked:border-primary-500 has-checked:bg-primary-50/50 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary-500">
                 <input type="radio" name="{{ $name }}" value="{{ $optionValue }}" @checked($selected === (string) $optionValue) @required($required)
                        {{ $attributes->class('peer sr-only') }}>
                 <span class="mt-1.5 size-2 shrink-0 rounded-full {{ $dots[$option['color'] ?? 'slate'] ?? $dots['slate'] }}"></span>
