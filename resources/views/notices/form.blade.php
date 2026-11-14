@@ -6,7 +6,7 @@
             @csrf
             @if ($notice) @method('PUT') @endif
             <x-form.section title="Message" description="What everyone will read on the notice board." icon="megaphone">
-                <x-form.input name="title" label="Title" :value="$notice?->title" required wrapper="sm:col-span-2" />
+                <x-form.input name="title" label="Title" :value="$notice?->title" required wrapper="sm:col-span-2" placeholder="e.g. Staff meeting on Friday" />
                 <x-form.textarea name="body" label="Message" :value="$notice?->body" rows="6" required wrapper="sm:col-span-2" />
             </x-form.section>
 
