@@ -20,10 +20,16 @@
             <div class="grid grid-cols-7">
                 @foreach ($days as $date => $dayEvents)
                     @php($day = \Illuminate\Support\Carbon::parse($date))
-                    <div @class(['min-h-24 border-r border-b border-slate-100 p-1.5 text-xs', 'bg-slate-50/60 text-slate-400' => ! $day->isSameMonth($month)])>
+                    <div @class(['min-h-14 border-r border-b border-slate-100 p-1 text-xs sm:min-h-24 sm:p-1.5', 'bg-slate-50/60 text-slate-400' => ! $day->isSameMonth($month)])>
                         <span @class(['inline-grid size-6 place-items-center rounded-full', 'bg-primary-600 font-semibold text-white' => $day->isToday()])>{{ $day->day }}</span>
+                        {{-- phones: a dot per event (titles are in the Upcoming list); wider screens: the titles --}}
+                        @if ($dayEvents->isNotEmpty())
+                            <span class="mt-1 flex flex-wrap gap-0.5 px-1 sm:hidden" title="{{ $dayEvents->pluck('title')->implode(', ') }}">
+                                @foreach ($dayEvents as $event)<span class="size-1.5 rounded-full bg-primary-500"></span>@endforeach
+                            </span>
+                        @endif
                         @foreach ($dayEvents as $event)
-                            <p class="mt-1 truncate rounded bg-primary-50 px-1.5 py-0.5 font-medium text-primary-700" title="{{ $event->title }}">{{ $event->title }}</p>
+                            <p class="mt-1 hidden truncate rounded bg-primary-50 px-1.5 py-0.5 font-medium text-primary-700 sm:block" title="{{ $event->title }}">{{ $event->title }}</p>
                         @endforeach
                     </div>
                 @endforeach

@@ -6,7 +6,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <x-stat-card label="Class" :value="$exam->schoolClass?->name" icon="squares" />
         <x-stat-card label="Subjects" :value="$subjects->count()" icon="book" color="sky" />
         <x-stat-card label="Students" :value="$sheet->count()" icon="academic-cap" color="amber" />

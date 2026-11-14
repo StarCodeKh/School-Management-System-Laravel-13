@@ -8,7 +8,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <x-stat-card :label="'All invoices ('.$stats['all']['count'].')'" :value="money($stats['all']['amount'])" icon="document" />
         <x-stat-card :label="'Paid ('.$stats['paid']['count'].')'" :value="money($stats['paid']['amount'])" icon="check-circle" color="green" />
         <x-stat-card :label="'Unpaid ('.$stats['unpaid']['count'].')'" :value="money($stats['unpaid']['amount'])" icon="clipboard" color="amber" />

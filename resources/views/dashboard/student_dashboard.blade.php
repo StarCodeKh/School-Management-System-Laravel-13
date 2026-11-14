@@ -5,7 +5,7 @@
         <x-alert type="warning" title="Account not linked yet" class="mb-6">Your account is not linked to a student record yet. An administrator can link it from the student's edit page (<strong>Login account</strong>).</x-alert>
     @endunless
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <x-stat-card label="Class" :value="$student ? $student->schoolClass?->name.' - '.$student->section?->name : '-'" icon="squares" />
         <x-stat-card label="Subjects" :value="$subjects->count()" icon="book" color="sky" />
         <x-stat-card label="Fee balance" :value="money($fees['balance'] ?? 0)" icon="banknotes" :color="($fees['balance'] ?? 0) > 0 ? 'red' : 'green'" />

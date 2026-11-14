@@ -1,7 +1,7 @@
 <x-layouts.app title="Dashboard">
     <x-page-header :title="'Welcome, '.auth()->user()->name.'!'" :breadcrumbs="['Home' => route('home'), 'Admin Dashboard' => null]" />
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <x-stat-card label="Students" :value="number_format($stats['students'])" icon="academic-cap" :href="route('student/list')" />
         <x-stat-card label="Teachers" :value="number_format($stats['teachers'])" icon="users" color="sky" :href="route('teacher/list/page')" />
         <x-stat-card label="Attendance today" :value="$stats['attendance'] !== null ? $stats['attendance'].'%' : 'Not taken'" icon="check-circle"

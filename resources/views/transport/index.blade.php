@@ -7,7 +7,7 @@
     </x-page-header>
 
     <div class="grid gap-6 xl:grid-cols-2">
-        <div class="space-y-6">
+        <div class="min-w-0 space-y-6">
             <x-table>
                 <x-slot:head>
                     <tr><th>Route</th><th>Vehicle</th><th class="text-center">Riders</th><th class="text-right">Fare</th><th class="text-right">Actions</th></tr>
@@ -36,7 +36,7 @@
 
         </div>
 
-        <div class="space-y-6">
+        <div class="min-w-0 space-y-6">
             <x-table>
                 <x-slot:head>
                     <tr><th>Vehicle</th><th>Driver</th><th class="text-center">Seats</th><th class="text-right">Actions</th></tr>

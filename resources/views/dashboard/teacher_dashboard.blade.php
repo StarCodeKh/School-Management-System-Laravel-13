@@ -5,7 +5,7 @@
         <x-alert type="warning" title="No teacher profile yet" class="mb-6">Your account has no teacher profile yet, so personal details are not shown. An administrator can add one under <strong>Teachers &rarr; Teacher Add</strong>.</x-alert>
     @endunless
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <x-stat-card label="Classes today" :value="$todayClasses->count()" icon="calendar" :href="route('timetable.index')" />
         <x-stat-card label="Students" :value="number_format($stats['students'])" icon="academic-cap" color="sky" />
         <x-stat-card label="Subjects" :value="number_format($stats['subjects'])" icon="book" color="amber" />

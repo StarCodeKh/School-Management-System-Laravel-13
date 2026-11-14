@@ -8,7 +8,7 @@
     </x-page-header>
 
     @php($net = $feesIncome - $expenses - $salaries)
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <x-stat-card label="Fees collected" :value="money($feesIncome)" icon="banknotes" color="green" :href="route('account/fees/collections/page')" />
         <x-stat-card label="Expenses" :value="money($expenses)" icon="clipboard" color="amber" :href="route('expenses.index', ['month' => $month])" />
         <x-stat-card label="Salaries paid" :value="money($salaries)" icon="users" color="sky" :href="route('payroll.index', ['month' => $month])" />

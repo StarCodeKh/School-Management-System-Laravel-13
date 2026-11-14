@@ -5,7 +5,7 @@
 --}}
 @props(['live' => false])
 
-<div {{ $attributes->class('relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm') }}
+<div {{ $attributes->class('relative min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm') }}
      @if ($live) data-live-region="{{ $live === true ? 'table' : $live }}" @endif>
     <div class="max-h-[75vh] overflow-auto print:max-h-none print:overflow-visible">
         <table class="min-w-full text-sm">

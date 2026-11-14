@@ -2,7 +2,7 @@
     <x-page-header :title="'Welcome, '.auth()->user()->name.'!'" :breadcrumbs="['Home' => route('home'), 'Parent Dashboard' => null]" />
 
     @if ($children->isNotEmpty())
-        <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             <x-stat-card label="Children" :value="$stats['children']" icon="users" />
             <x-stat-card label="Attendance" :value="$stats['attendance'] !== null ? $stats['attendance'].'%' : 'Not recorded'" icon="check-circle"
                          :color="attendance_color($stats['attendance'])" />
