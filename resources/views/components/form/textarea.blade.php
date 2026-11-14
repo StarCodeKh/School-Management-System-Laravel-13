@@ -11,7 +11,7 @@
         <textarea name="{{ $name }}" id="{{ $attributes->get('id', $name) }}" rows="{{ $rows }}" @required($required)
                   @if ($max) x-ref="text" @input="count = $event.target.value.length" @endif
                   {{ $attributes->class([
-                      'block w-full rounded-lg text-sm shadow-sm placeholder:text-slate-400',
+                      'block w-full rounded-lg text-sm placeholder:text-slate-400',
                       'pb-6' => $max,
                       'border-slate-300 focus:border-primary-500 focus:ring-0' => ! $errors->has($key),
                       'border-red-400 focus:border-red-500 focus:ring-0' => $errors->has($key),

@@ -46,7 +46,7 @@
             <button type="button" id="{{ $id }}" x-ref="button" @click="toggle()" @keydown="onButtonKey($event)" :disabled="isDisabled"
                     aria-haspopup="dialog" :aria-expanded="open.toString()"
                     @class([
-                        'relative flex w-full items-center gap-2 rounded-lg border bg-white py-2 pr-2 pl-3 text-left text-sm shadow-sm transition focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500',
+                        'relative flex w-full items-center gap-2 rounded-lg border bg-white py-2 pr-2 pl-3 text-left text-sm transition focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500',
                         'border-slate-300 focus:border-primary-500 focus:ring-0' => ! $hasError,
                         'border-red-400 focus:border-red-500 focus:ring-0' => $hasError,
                     ])
@@ -141,7 +141,7 @@
                    @if ($current !== null) value="{{ $current }}" @endif
                    @required($required)
                    {{ $attributes->class([
-                       'block w-full rounded-lg text-sm shadow-sm placeholder:text-slate-400',
+                       'block w-full rounded-lg text-sm placeholder:text-slate-400',
                        'pl-9' => $icon,
                        'pr-10' => $isPassword,
                        'border-slate-300 focus:border-primary-500 focus:ring-0' => ! $hasError,

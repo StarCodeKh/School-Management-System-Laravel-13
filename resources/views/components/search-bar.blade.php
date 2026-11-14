@@ -5,7 +5,7 @@
     <div class="relative flex-1 sm:max-w-sm sm:min-w-72">
         <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
         <input type="search" name="search" value="{{ $value }}" placeholder="{{ $placeholder }}"
-               class="block w-full rounded-lg border-slate-300 py-2 pl-9 text-sm shadow-sm focus:border-primary-500 focus:ring-0">
+               class="block w-full rounded-lg border-slate-300 py-2 pl-9 text-sm focus:border-primary-500 focus:ring-0">
     </div>
     {{ $slot }}
     <x-button variant="secondary">Search</x-button>
